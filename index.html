@@ -3,88 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<title>Louis · Assistant IA</title>
-<meta name="theme-color" content="#04060a">
+<title>Louis // Core · Assistant IA</title>
+<meta name="theme-color" content="#030610">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <style>
-  html, body { height: 100%; margin: 0; background: #04060a; color: #e2e8f0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  body { background: radial-gradient(70% 50% at 50% -10%, rgba(34,211,238,.16), transparent 70%), radial-gradient(50% 40% at 100% 100%, rgba(45,212,191,.10), transparent 70%), #04060a; background-attachment: fixed; overscroll-behavior: none; }
-  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(34,211,238,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,.035) 1px, transparent 1px); background-size: 36px 36px; -webkit-mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent); mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent); }
+  html, body { height: 100%; margin: 0; background: #030610; color: #e2e8f0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { background: radial-gradient(70% 50% at 50% -10%, rgba(37,99,235,.28), transparent 70%), radial-gradient(50% 40% at 100% 100%, rgba(34,211,238,.12), transparent 70%), #030610; background-attachment: fixed; overscroll-behavior: none; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px); background-size: 36px 36px; -webkit-mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent); mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent); }
   .tab { display: none; position: absolute; inset: 0; overflow-y: auto; padding: 14px; overscroll-behavior: contain; }
   .tab.active { display: block; }
-  .hud { position: relative; border: 1px solid rgba(34,211,238,.22); border-radius: 16px; padding: 14px; background: linear-gradient(160deg, rgba(14,26,34,.72), rgba(3,7,11,.86)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 28px rgba(34,211,238,.05), 0 0 22px rgba(34,211,238,.06); }
-  .hud::before, .hud::after { content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid #22d3ee; opacity: .7; pointer-events: none; }
-  .hud::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; border-top-left-radius: 16px; }
-  .hud::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; border-bottom-right-radius: 16px; }
-  .lbl { font: 600 10px ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: rgba(103,232,249,.8); }
-  .btn-neon { background: linear-gradient(135deg, #06b6d4, #0e7490); color: #fff; font-weight: 700; border-radius: 12px; box-shadow: 0 0 18px rgba(34,211,238,.35); }
+  .hud { position: relative; border: 1px solid rgba(56,140,255,.35); border-radius: 18px; padding: 14px; background: linear-gradient(160deg, rgba(10,22,48,.75), rgba(3,7,16,.88)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 28px rgba(56,140,255,.07), 0 0 22px rgba(37,99,235,.10); }
+  .lbl { font: 600 10px ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: rgba(125,190,255,.85); }
+  .btn-neon { background: linear-gradient(135deg, #2563eb, #0891b2); color: #fff; font-weight: 700; border-radius: 14px; box-shadow: 0 0 18px rgba(56,140,255,.4); }
   .btn-neon:hover { filter: brightness(1.1); }
   .btn-neon:disabled { opacity: .4; box-shadow: none; }
-  .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(34,211,238,.28); background: rgba(34,211,238,.07); color: #a5f3fc; font-size: 12px; white-space: nowrap; }
-  .chip:hover { background: rgba(34,211,238,.16); }
-  .chip.on { background: rgba(34,211,238,.24); border-color: #22d3ee; color: #fff; }
-  .tile { text-align: left; padding: 10px; border-radius: 12px; border: 1px solid rgba(34,211,238,.18); background: rgba(0,0,0,.35); }
-  .tile:hover { border-color: #22d3ee; background: rgba(34,211,238,.08); }
-  .fld { width: 100%; margin-top: 4px; padding: 8px; border-radius: 10px; border: 1px solid rgba(34,211,238,.2); background: rgba(0,0,0,.5); color: #e0f7fa; font-size: 13px; outline: none; }
-  .fld:focus { border-color: #22d3ee; }
+  .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(56,140,255,.35); background: rgba(56,140,255,.08); color: #bfdbfe; font-size: 12px; white-space: nowrap; }
+  .chip:hover { background: rgba(56,140,255,.18); }
+  .chip.on { background: rgba(56,140,255,.3); border-color: #60a5fa; color: #fff; }
+  .tile { text-align: left; padding: 10px; border-radius: 14px; border: 1px solid rgba(56,140,255,.25); background: rgba(2,8,20,.55); }
+  .tile:hover { border-color: #60a5fa; background: rgba(56,140,255,.10); }
+  .ico { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 800; color: #fff; margin: 0 auto 6px; box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.28); text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .tile { transition: transform .15s, border-color .15s, background .15s; }
+  .tile:active { transform: scale(.96); }
+  .fld { width: 100%; margin-top: 4px; padding: 8px; border-radius: 10px; border: 1px solid rgba(56,140,255,.28); background: rgba(0,0,0,.5); color: #e0efff; font-size: 13px; outline: none; }
+  .fld:focus { border-color: #60a5fa; }
+  /* Avatar holographique */
+  .stage { position: relative; margin: 0 auto; }
+  .holo { filter: drop-shadow(0 0 14px rgba(56,170,255,.55)); }
+  .scan { transform-box: fill-box; animation: scan 4.5s linear infinite; }
+  @keyframes scan { 0% { transform: translateY(-5%); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(105%); opacity: 0; } }
+  .av-img { width: 100%; height: 100%; object-fit: cover; object-position: top; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
+  .speaking .av-img { animation: glowp .8s ease-in-out infinite alternate; }
+  @keyframes glowp { from { filter: brightness(1); } to { filter: brightness(1.25) drop-shadow(0 0 14px #38bdf8); } }
   /* Bulles et Markdown */
   .bub { max-width: 94%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
-  .bub-ai { background: rgba(8,13,19,.88); border: 1px solid rgba(34,211,238,.22); border-top-left-radius: 4px; }
-  .bub-user { background: linear-gradient(135deg, #0891b2, #0e7490); color: #fff; border-top-right-radius: 4px; white-space: pre-wrap; }
-  .bub-ai code { background: rgba(34,211,238,.1); color: #a5f3fc; padding: 1px 5px; border-radius: 5px; font-size: .9em; }
-  .bub-ai strong { color: #cffafe; }
-  .md-h { font-weight: 700; color: #67e8f9; margin: 10px 0 4px; }
+  .bub-ai { background: rgba(6,14,30,.9); border: 1px solid rgba(56,140,255,.3); border-top-left-radius: 4px; }
+  .bub-user { background: linear-gradient(135deg, #2563eb, #0e7490); color: #fff; border-top-right-radius: 4px; white-space: pre-wrap; }
+  .bub-ai code { background: rgba(56,140,255,.14); color: #bfdbfe; padding: 1px 5px; border-radius: 5px; font-size: .9em; }
+  .bub-ai strong { color: #dbeafe; }
+  .md-h { font-weight: 700; color: #7dd3fc; margin: 10px 0 4px; }
   .md-li { padding-left: 14px; text-indent: -12px; margin: 2px 0; }
-  .bub-ai hr { border: 0; border-top: 1px solid rgba(34,211,238,.2); margin: 8px 0; }
-  .cb { margin: 8px 0; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; background: #03060a; }
-  .cb-h { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: rgba(34,211,238,.08); font: 11px ui-monospace, monospace; color: #67e8f9; }
-  .cb-h button { margin-left: 12px; color: #a5f3fc; }
+  .bub-ai hr { border: 0; border-top: 1px solid rgba(56,140,255,.25); margin: 8px 0; }
+  .cb { margin: 8px 0; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; background: #02050a; }
+  .cb-h { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: rgba(56,140,255,.1); font: 11px ui-monospace, monospace; color: #7dd3fc; }
+  .cb-h button { margin-left: 12px; color: #bfdbfe; }
   .cb pre { margin: 0; padding: 10px; overflow-x: auto; font: 12px/1.5 ui-monospace, monospace; color: #e2e8f0; white-space: pre; }
-  /* Voix et robot */
-  .wave { display: flex; align-items: center; gap: 3px; height: 34px; }
-  .wave i { display: block; width: 3px; height: 5px; border-radius: 2px; background: linear-gradient(#67e8f9, #0891b2); }
+  /* Voix */
+  .wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 34px; }
+  .wave i { display: block; width: 3px; height: 5px; border-radius: 2px; background: linear-gradient(#7dd3fc, #2563eb); }
   .wave.on i { animation: wv .9s ease-in-out infinite; }
   @keyframes wv { 0%, 100% { height: 5px; } 50% { height: var(--h); } }
   .eye { animation: blink 6s infinite; transform-box: fill-box; transform-origin: center; }
   @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  .mb { transform-box: fill-box; transform-origin: center; }
   .core { animation: cp 3s ease-in-out infinite; }
   @keyframes cp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-  .mb { transform-box: fill-box; transform-origin: center; }
   .speaking .mb { animation: mouth .32s ease-in-out infinite alternate; }
-  @keyframes mouth { from { transform: scaleY(1); } to { transform: scaleY(3.2); } }
-  .mer { transform-box: fill-box; transform-origin: center; animation: mer 7s linear infinite; }
-  .mer.d2 { animation-delay: -2.3s; } .mer.d3 { animation-delay: -4.6s; }
-  @keyframes mer { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.05); } }
-  /* Le terminal reste parfaitement calme */
+  @keyframes mouth { from { transform: scaleY(1); } to { transform: scaleY(3.4); } }
+  .orb { width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; background: radial-gradient(circle, #0b1b3d 45%, #0a2a66); border: 3px solid #3b82f6; box-shadow: 0 0 26px rgba(59,130,246,.85), inset 0 0 18px rgba(59,130,246,.6); }
+  .mic-ico { width: 1.15em; height: 1.15em; vertical-align: -0.2em; display: inline-block; }
+  .orb { color: #e0f2fe; background: radial-gradient(circle at 35% 30%, #1e4fb8, #0a1f4d 70%); }
+  .orb .mic-ico { width: 36px; height: 36px; filter: drop-shadow(0 0 6px #38bdf8); }
+  .orb-sm .mic-ico { width: 26px; height: 26px; }
+  .mic-btn.listening { outline: 2px solid #60a5fa; }
+  .orb.listening { animation: micp 1.3s ease-out infinite; }
+  @keyframes micp { 0% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 0 rgba(96,165,250,.7); } 100% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 22px rgba(96,165,250,0); } }
+  .orb-sm { width: 54px; height: 54px; font-size: 22px; margin-top: -22px; border-width: 2px; }
+  /* Terminal calme */
   #tab-chat *, .still * { animation: none !important; transition: none !important; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
-  ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { background: rgba(34,211,238,.25); border-radius: 3px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { background: rgba(56,140,255,.3); border-radius: 3px; }
+  .chk { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #60a5fa; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #04101f; }
+  .chk.done { background: #22d3ee; border-color: #22d3ee; }
 </style>
 </head>
 <body>
 
-<!-- Définitions graphiques partagées -->
 <svg style="position:absolute;width:0;height:0" aria-hidden="true"><defs>
+  <linearGradient id="gHolo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc" stop-opacity=".85"/><stop offset=".55" stop-color="#2563eb" stop-opacity=".55"/><stop offset="1" stop-color="#1e3a8a" stop-opacity=".12"/></linearGradient>
+  <linearGradient id="gHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1e4a"/><stop offset="1" stop-color="#1d4ed8" stop-opacity=".8"/></linearGradient>
   <linearGradient id="gBlack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b434f"/><stop offset=".35" stop-color="#12161c"/><stop offset="1" stop-color="#020304"/></linearGradient>
   <linearGradient id="gVisor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1a22"/><stop offset="1" stop-color="#010304"/></linearGradient>
-  <radialGradient id="gGlow" cx="50%" cy="45%" r="50%"><stop offset="0" stop-color="#22d3ee" stop-opacity=".30"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gGlow" cx="50%" cy="45%" r="50%"><stop offset="0" stop-color="#3b82f6" stop-opacity=".40"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/></radialGradient>
+  <pattern id="gScan" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="1.2" fill="#bae6fd" opacity=".16"/></pattern>
   <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
 </defs></svg>
 
 <div class="flex flex-col h-[100dvh] w-full overflow-hidden relative">
 
-  <header class="relative z-10 flex items-center justify-between px-4 py-2.5 border-b border-cyan-400/15 bg-black/50 backdrop-blur-md" style="padding-top:calc(.625rem + env(safe-area-inset-top))">
+  <header class="relative z-10 flex items-center justify-between px-4 py-2.5 border-b border-blue-400/15 bg-black/50 backdrop-blur-md" style="padding-top:calc(.625rem + env(safe-area-inset-top))">
     <div class="flex items-center gap-3">
-      <div id="avatar-sm" class="w-10 h-10 rounded-xl border border-cyan-400/30 bg-black overflow-hidden still"></div>
-      <div><div class="font-bold tracking-[.3em] text-sm text-cyan-50">LOUIS</div><div id="status" class="lbl" style="font-size:9px">Système actif</div></div>
+      <div id="avatar-sm" class="w-10 h-10 rounded-xl border border-blue-400/40 bg-black overflow-hidden still"></div>
+      <div><div class="font-bold tracking-[.25em] text-sm text-blue-50">LOUIS // CORE</div><div id="status" class="lbl" style="font-size:9px">Prêt</div></div>
     </div>
     <div class="flex items-center gap-2">
       <button id="btn-install" class="chip hidden">Installer</button>
       <button id="btn-help" class="chip">Installer</button>
-      <button id="btn-settings" class="chip" aria-label="Réglages">⚙ Réglages</button>
+      <button id="btn-settings" class="chip" aria-label="Réglages">⚙</button>
     </div>
   </header>
 
@@ -92,73 +110,142 @@
 
     <!-- ACCUEIL -->
     <section id="tab-hud" class="tab active">
-      <div class="max-w-6xl mx-auto grid gap-3 lg:grid-cols-[1fr_1.15fr_1fr] items-start">
-
-        <div class="order-2 lg:order-1 space-y-3">
-          <div class="hud">
-            <div class="lbl mb-3">Système</div>
-            <div class="grid grid-cols-2 gap-2">
-              <div class="tile"><div class="lbl" style="font-size:9px">Cœurs</div><div id="sys-cpu" class="text-sm font-semibold text-cyan-50 mt-1">—</div></div>
-              <div class="tile"><div class="lbl" style="font-size:9px">Mémoire</div><div id="sys-ram" class="text-sm font-semibold text-cyan-50 mt-1">—</div></div>
-              <div class="tile"><div class="lbl" style="font-size:9px">Batterie</div><div id="sys-bat" class="text-sm font-semibold text-cyan-50 mt-1">—</div></div>
-              <div class="tile"><div class="lbl" style="font-size:9px">Réseau</div><div id="sys-net" class="text-sm font-semibold text-cyan-50 mt-1">—</div></div>
-            </div>
+      <div class="max-w-xl mx-auto space-y-3">
+        <div class="text-center">
+          <div class="lbl">Votre assistant IA</div>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] gap-3 items-center">
+          <div class="hud !p-3">
+            <div class="text-sm font-bold text-blue-50" id="home-hello">Bonjour Monsieur</div>
+            <div class="text-[12px] text-zinc-300 mt-1">Je suis LOUIS. Que puis-je faire pour vous ?</div>
           </div>
-          <div class="hud">
-            <div class="flex items-center justify-between">
-              <div><div class="lbl">Louis · Voix</div><div id="voice-state" class="text-sm font-semibold text-cyan-50 mt-1">Système actif</div></div>
-              <button data-vt class="chip on">Voix ON</button>
-            </div>
-            <div class="flex items-center gap-3 mt-3">
-              <button class="mic-btn w-12 h-12 rounded-full btn-neon text-xl shrink-0" aria-label="Parler à Louis">🎤</button>
-              <div id="wave" class="wave flex-1"></div>
-            </div>
+          <div class="space-y-2 w-28">
+            <div class="tile !p-2"><div id="h-time" class="text-sm font-bold text-blue-50">--:--</div><div id="h-date" class="text-[10px] text-zinc-400">—</div></div>
+            <div class="tile !p-2"><div id="sys-bat" class="text-sm font-bold text-blue-50">—</div><div class="text-[10px] text-zinc-400">Batterie</div></div>
           </div>
         </div>
 
-        <div class="order-1 lg:order-2 text-center">
-          <div id="robot-big" class="mx-auto" style="width:min(74vw,330px)"></div>
-          <div class="lbl mt-1">Louis · Intelligence artificielle</div>
-          <div class="flex gap-2 justify-center mt-3">
-            <button data-go="chat" class="btn-neon px-5 py-2.5 text-sm">Ouvrir le terminal</button>
-            <button class="mic-btn chip !py-2.5 !px-4">🎤 Parler</button>
-          </div>
+        <div class="stage" style="width:min(78vw,320px)">
+          <div id="robot-big"></div>
         </div>
 
-        <div class="order-3 space-y-3">
-          <div class="hud">
-            <div class="flex items-center justify-between mb-3"><div class="lbl">Raccourcis</div><button id="lk-edit" class="text-[11px] text-cyan-300/70 hover:text-cyan-200">Modifier</button></div>
-            <div id="links" class="grid grid-cols-4 gap-2"></div>
-          </div>
-          <div class="hud">
-            <div class="flex items-start justify-between"><div class="lbl">Modules</div><div id="globe" class="w-16 h-16 -mt-2 -mr-1"></div></div>
-            <div class="grid grid-cols-2 gap-2 -mt-3">
-              <button data-mode="code" class="tile"><div class="text-sm font-bold text-cyan-50">💻 Programmation</div><div class="text-[11px] text-zinc-400">Sites, apps, code</div></button>
-              <button data-mode="anglais" class="tile"><div class="text-sm font-bold text-cyan-50">🌐 Anglais</div><div class="text-[11px] text-zinc-400">Réviser, progresser</div></button>
-              <button data-mode="devoirs" class="tile"><div class="text-sm font-bold text-cyan-50">📚 Devoirs</div><div class="text-[11px] text-zinc-400">Exercices pas à pas</div></button>
-              <button data-mode="maths" class="tile"><div class="text-sm font-bold text-cyan-50">📐 Maths et finance</div><div class="text-[11px] text-zinc-400">Preuves, Python, R</div></button>
-            </div>
-          </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <button class="mic-btn tile !text-center !p-2"><div class="text-lg"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></div><div class="text-[11px] text-blue-100">Mode vocal</div></button>
+          <button data-go="chat" data-focus class="tile !text-center !p-2"><div class="text-lg">💬</div><div class="text-[11px] text-blue-100">Mode texte</div></button>
+          <button data-go="apps" class="tile !text-center !p-2"><div class="text-lg">⚡</div><div class="text-[11px] text-blue-100">Mode actions</div></button>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <button class="mic-btn orb" aria-label="Parler à Louis"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+          <div id="wave" class="wave w-full mt-1"></div>
+          <div id="voice-state" class="text-xs text-blue-200/80">Prêt</div>
+          <button data-vt class="chip mt-2">Voix OFF</button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button class="mic-btn tile"><div class="text-sm font-bold text-blue-50"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg> Parler</div><div class="text-[10px] text-zinc-400">Pose ta question à voix haute</div></button>
+          <button data-go="chat" data-focus class="tile"><div class="text-sm font-bold text-blue-50">💬 Chat</div><div class="text-[10px] text-zinc-400">Écris ton message</div></button>
+          <button data-go="apps" class="tile"><div class="text-sm font-bold text-blue-50">⚡ Actions</div><div class="text-[10px] text-zinc-400">Modules et outils</div></button>
+        </div>
+
+        <div class="hud !p-3">
+          <div class="flex items-center justify-between mb-2"><div class="lbl">Accès rapide</div><button id="lk-edit" class="text-[11px] text-blue-300/70 hover:text-blue-200">Modifier</button></div>
+          <div id="links" class="grid grid-cols-4 gap-2"></div>
         </div>
       </div>
     </section>
 
-    <!-- TERMINAL -->
+    <!-- CHAT -->
     <section id="tab-chat" class="tab" style="overflow:hidden">
       <div class="max-w-3xl mx-auto h-full flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2"><div id="avatar-chat" class="w-8 h-8 rounded-lg border border-cyan-400/30 bg-black overflow-hidden"></div><div><div class="text-sm font-bold text-cyan-50">Terminal</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
+          <div class="flex items-center gap-2"><div id="avatar-chat" class="w-8 h-8 rounded-lg border border-blue-400/40 bg-black overflow-hidden"></div><div><div class="text-sm font-bold text-blue-50">Chat</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
           <button id="new-chat" class="chip">Nouvelle conversation</button>
         </div>
         <div id="modes" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
         <div id="chips" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
         <div id="chat-log" class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1" style="overscroll-behavior:contain"></div>
+        <div id="mem-bar" class="hud hidden !p-2 text-xs flex items-center gap-2 shrink-0"><span id="mem-txt" class="flex-1 text-blue-100"></span><button id="mem-yes" type="button" class="chip on">Retenir</button><button id="mem-no" type="button" class="chip">Non</button></div>
         <form id="chat-form" class="hud flex items-center gap-2 !p-2 shrink-0" style="margin-bottom:2px">
-          <button type="button" data-vt class="chip">🔊</button>
-          <button type="button" class="mic-btn chip">🎤</button>
-          <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Posez votre question à Louis…" class="flex-1 min-w-0 bg-transparent text-sm px-1 py-2 outline-none placeholder-zinc-500">
+          <button type="button" data-vt class="chip">🔇</button>
+          <button type="button" class="mic-btn chip"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+          <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Écris ton message…" class="flex-1 min-w-0 bg-transparent text-sm px-1 py-2 outline-none placeholder-zinc-500">
           <button id="chat-send" type="submit" class="btn-neon px-4 py-2 text-sm">Envoyer</button>
         </form>
+      </div>
+    </section>
+
+    <!-- TÂCHES -->
+    <section id="tab-tasks" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Tâches</div><div class="text-xs text-zinc-400">Organise ta journée</div></div>
+        <div class="flex gap-2" id="task-filters">
+          <button class="chip on" data-tf="all">Toutes</button><button class="chip" data-tf="todo">En cours</button><button class="chip" data-tf="done">Terminées</button>
+        </div>
+        <form id="task-form" class="hud flex gap-2 !p-2">
+          <input id="task-input" type="text" autocomplete="off" placeholder="Nouvelle tâche…" class="flex-1 min-w-0 bg-transparent text-sm px-2 py-2 outline-none placeholder-zinc-500">
+          <input id="task-time" type="time" class="bg-transparent text-xs text-blue-200 outline-none">
+          <button class="btn-neon px-4 py-2 text-sm" type="submit">＋</button>
+        </form>
+        <div id="task-list" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- APPLICATIONS -->
+    <section id="tab-apps" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Applications</div><div class="text-xs text-zinc-400">Modules et outils à portée de main</div></div>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-mode="code" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">💻</div><div class="text-xs font-bold text-blue-50">Programmation</div><div class="text-[10px] text-zinc-400">Sites, apps</div></button>
+          <button data-mode="anglais" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#22c55e,#15803d)">🌐</div><div class="text-xs font-bold text-blue-50">Anglais</div><div class="text-[10px] text-zinc-400">Réviser</div></button>
+          <button data-mode="devoirs" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">📚</div><div class="text-xs font-bold text-blue-50">Devoirs</div><div class="text-[10px] text-zinc-400">Exercices</div></button>
+          <button data-mode="maths" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#a855f7,#6d28d9)">📐</div><div class="text-xs font-bold text-blue-50">Maths, finance</div><div class="text-[10px] text-zinc-400">Preuves, code</div></button>
+          <button data-go="lab" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">∑</div><div class="text-xs font-bold text-blue-50">Labo</div><div class="text-[10px] text-zinc-400">Monte-Carlo</div></button>
+          <button data-go="notes" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#fbbf24,#d97706)">★</div><div class="text-xs font-bold text-blue-50">Notes</div><div class="text-[10px] text-zinc-400">Carnet</div></button>
+          <button data-go="sys" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#14b8a6,#0f766e)">📊</div><div class="text-xs font-bold text-blue-50">Système</div><div class="text-[10px] text-zinc-400">Appareil</div></button>
+          <button data-go="improve" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#ec4899,#be185d)">🧠</div><div class="text-xs font-bold text-blue-50">Évolution</div><div id="imp-sub" class="text-[10px] text-zinc-400">Mémoire, règles</div></button>
+          <button id="apps-settings" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#64748b,#334155)">⚙</div><div class="text-xs font-bold text-blue-50">Réglages</div><div class="text-[10px] text-zinc-400">Clé, voix</div></button>
+        </div>
+        <div class="lbl pt-1">Applications suggérées</div>
+        <div id="apps-ext" class="grid grid-cols-3 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- ÉVOLUTION -->
+    <section id="tab-improve" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Évolution</div><div id="imp-stats" class="text-xs text-zinc-400"></div></div>
+        <div class="hud">
+          <div class="lbl mb-2">Bilan d'amélioration</div>
+          <p class="text-xs text-zinc-400 mb-3">Louis analyse vos derniers échanges et vos 👍 / 👎, puis propose des règles et signale ce qui lui manque. Rien n'est appliqué sans votre accord.</p>
+          <button id="bilan-run" class="btn-neon w-full py-2.5 text-sm">Faire le bilan</button>
+          <div id="bilan-out" class="mt-3 space-y-2"></div>
+        </div>
+        <div class="hud"><div class="lbl mb-2">Règles apprises</div><div id="rule-list" class="space-y-2"></div></div>
+        <div class="hud">
+          <div class="lbl mb-2">Mémoire</div>
+          <form id="mem-form" class="flex gap-2 mb-2"><input id="mem-input" type="text" autocomplete="off" placeholder="Ajouter un fait à retenir…" class="fld !mt-0"><button class="chip on" type="submit">＋</button></form>
+          <div id="mem-list" class="space-y-2"></div>
+        </div>
+        <div class="hud">
+          <div class="lbl mb-2">Sauvegarde</div>
+          <div class="flex gap-2"><button id="bk-export" class="chip flex-1 !rounded-xl !py-2.5">Exporter</button><label class="chip flex-1 !rounded-xl !py-2.5 text-center cursor-pointer">Importer<input id="bk-import" type="file" accept="application/json" class="hidden"></label></div>
+          <p class="text-[10px] text-zinc-500 mt-2">La clé API n'est jamais exportée.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTÈME -->
+    <section id="tab-sys" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Système</div><div class="text-xs text-zinc-400">Informations sur l'appareil</div></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="tile"><div class="lbl" style="font-size:9px">Batterie</div><div id="sys-bat2" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile"><div class="lbl" style="font-size:9px">Stockage</div><div id="sys-sto" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile"><div class="lbl" style="font-size:9px">Mémoire</div><div id="sys-ram" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile"><div class="lbl" style="font-size:9px">Cœurs</div><div id="sys-cpu" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile col-span-2"><div class="lbl" style="font-size:9px">Réseau</div><div id="sys-net" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+        </div>
       </div>
     </section>
 
@@ -206,17 +293,18 @@
     </section>
   </main>
 
-  <nav class="relative z-10 flex items-center justify-around border-t border-cyan-400/15 bg-black/60 backdrop-blur-md py-2" style="padding-bottom:calc(.5rem + env(safe-area-inset-bottom))">
-    <button class="nav-btn flex flex-col items-center gap-0.5 text-cyan-300" data-go="hud"><span class="text-lg leading-none">◉</span><span class="lbl" style="font-size:9px;color:inherit">Accueil</span></button>
-    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="chat"><span class="text-lg leading-none">⌨</span><span class="lbl" style="font-size:9px;color:inherit">Terminal</span></button>
-    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="lab"><span class="text-lg leading-none">∑</span><span class="lbl" style="font-size:9px;color:inherit">Labo</span></button>
-    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="notes"><span class="text-lg leading-none">★</span><span class="lbl" style="font-size:9px;color:inherit">Notes</span></button>
+  <nav class="relative z-10 flex items-end justify-around border-t border-blue-400/15 bg-black/70 backdrop-blur-md pt-2" style="padding-bottom:calc(.5rem + env(safe-area-inset-bottom))">
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-blue-300" data-go="hud"><span class="text-lg leading-none">⌂</span><span class="lbl" style="font-size:9px;color:inherit">Accueil</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="chat" data-focus><span class="text-lg leading-none">💬</span><span class="lbl" style="font-size:9px;color:inherit">Chat</span></button>
+    <button class="mic-btn orb orb-sm" aria-label="Parler à Louis"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="tasks"><span class="text-lg leading-none">☑</span><span class="lbl" style="font-size:9px;color:inherit">Tâches</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="apps"><span class="text-lg leading-none">▦</span><span class="lbl" style="font-size:9px;color:inherit">Apps</span></button>
   </nav>
 </div>
 
 <!-- Réglages -->
 <div id="modal-settings" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-  <div class="hud w-full max-w-sm max-h-[90vh] overflow-y-auto space-y-3" style="background:#070b10">
+  <div class="hud w-full max-w-sm max-h-[90vh] overflow-y-auto space-y-3" style="background:#050a16">
     <div class="lbl">Réglages</div>
     <label class="lbl block" style="font-size:9px">Votre prénom<input id="set-name" type="text" class="fld"></label>
     <label class="lbl block" style="font-size:9px">Clé API Gemini<input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="fld"></label>
@@ -231,18 +319,18 @@
 
 <!-- Installation -->
 <div id="modal-help" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-  <div class="hud w-full max-w-sm space-y-2 text-xs text-zinc-300 leading-relaxed" style="background:#070b10">
+  <div class="hud w-full max-w-sm space-y-2 text-xs text-zinc-300 leading-relaxed" style="background:#050a16">
     <div class="lbl">Installer Louis</div>
-    <p><b class="text-cyan-300">Ordinateur (Chrome ou Edge)</b><br>Icône d'installation à droite de la barre d'adresse, ou menu ⋮ puis « Installer la page en tant qu'application ». Louis s'ouvre dans sa propre fenêtre, épinglable au bureau.</p>
-    <p><b class="text-cyan-300">Android (Chrome)</b><br>Menu ⋮ puis « Installer l'application ».</p>
-    <p><b class="text-cyan-300">iPhone (Safari)</b><br>Partager puis « Sur l'écran d'accueil ».</p>
+    <p><b class="text-blue-300">Ordinateur (Chrome ou Edge)</b><br>Icône d'installation à droite de la barre d'adresse, ou menu ⋮ puis « Installer la page en tant qu'application ».</p>
+    <p><b class="text-blue-300">Android (Chrome)</b><br>Menu ⋮ puis « Installer l'application ».</p>
+    <p><b class="text-blue-300">iPhone (Safari)</b><br>Partager puis « Sur l'écran d'accueil ».</p>
     <button id="help-close" class="btn-neon w-full py-2.5 text-sm mt-2">Compris</button>
   </div>
 </div>
 
 <!-- Aperçu de code -->
 <div id="modal-prev" class="hidden fixed inset-0 bg-black z-50 flex flex-col">
-  <div class="flex items-center justify-between p-3 border-b border-cyan-400/20" style="padding-top:calc(.75rem + env(safe-area-inset-top))">
+  <div class="flex items-center justify-between p-3 border-b border-blue-400/20" style="padding-top:calc(.75rem + env(safe-area-inset-top))">
     <div class="lbl">Aperçu</div>
     <div class="flex gap-2"><button id="prev-dl" class="chip">Télécharger</button><button id="prev-close" class="chip on">Fermer</button></div>
   </div>
@@ -260,21 +348,28 @@
   const escH = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const unesc = x => x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
   const now = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-  const toast = m => { const s = $('#status'); s.textContent = m; clearTimeout(toast.t); toast.t = setTimeout(() => s.textContent = 'Système actif', 2800); };
+  const toast = m => { const s = $('#status'); s.textContent = m; clearTimeout(toast.t); toast.t = setTimeout(() => s.textContent = 'Prêt', 2800); };
 
   /* ---------- Données ---------- */
   let settings = Object.assign({ key: '', model: 'gemini-2.5-flash', voice: '', notes: '', name: 'Leonard', v: 0 }, store.get('jarvis.settings', {}));
   if (settings.v < 3) { if (!settings.model || settings.model === 'gemini-3-flash-preview') settings.model = 'gemini-2.5-flash'; settings.v = 3; store.set('jarvis.settings', settings); }
   let notes = store.get('jarvis.notes', []);
+  let mem = store.get('louis.mem', []), rules = store.get('louis.rules', []), fb = store.get('louis.fb', []), pendingMem = [], lastRegles = [];
+  let tasks = store.get('louis.tasks', []);
+  let tfilter = 'all';
   let messages = store.get('louis.chat2', []);
   let mode = store.get('louis.mode', 'general');
-  let autoVoice = store.get('jarvis.voice', true);
-  let busy = false;
+  // La voix est désactivée par défaut : Louis ne parle que si vous l'activez.
+  let autoVoice = store.get('louis.voice2', false);
+  let busy = false, abortCtl = null;
+  let exch = store.get('louis.exch', 0), bilanAt = store.get('louis.bilanAt', 0);
   const greet = () => ({ id: 1, sender: 'jarvis', ts: now(), text: 'Bonjour Monsieur', greet: true });
   if (!messages.length) messages.push(greet());
   const persist = () => store.set('louis.chat2', messages.filter(m => !m.pending).slice(-60));
+  const hello = () => `Bonjour Monsieur ${settings.name || ''}, que puis-je faire pour vous ?`;
+  $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || '');
 
-  /* ---------- Robot noir (SVG) ---------- */
+  /* ---------- Robot noir de Louis ---------- */
   const robot = full => `<svg viewBox="${full ? '0 0 300 340' : '52 14 196 200'}" class="w-full h-full" role="img" aria-label="Louis">
     ${full ? `<ellipse cx="150" cy="190" rx="150" ry="160" fill="url(#gGlow)"/>
     <path d="M14 340C16 268 58 232 108 222L192 222C242 232 284 268 286 340Z" fill="url(#gBlack)" stroke="#22d3ee" stroke-opacity=".35"/>
@@ -297,23 +392,23 @@
   $('#robot-big').innerHTML = robot(true);
   $('#avatar-sm').innerHTML = robot(false);
   $('#avatar-chat').innerHTML = robot(false);
-  $('#globe').innerHTML = `<svg viewBox="0 0 100 100" class="w-full h-full"><defs><radialGradient id="gg" cx="35%" cy="30%"><stop offset="0" stop-color="#67e8f9" stop-opacity=".45"/><stop offset="1" stop-color="#083344" stop-opacity=".15"/></radialGradient></defs><circle cx="50" cy="50" r="44" fill="url(#gg)" stroke="#22d3ee" stroke-opacity=".6"/><ellipse cx="50" cy="50" rx="44" ry="14" fill="none" stroke="#22d3ee" stroke-opacity=".35"/><ellipse cx="50" cy="50" rx="44" ry="30" fill="none" stroke="#22d3ee" stroke-opacity=".3"/><line x1="6" y1="50" x2="94" y2="50" stroke="#22d3ee" stroke-opacity=".3"/><ellipse class="mer" cx="50" cy="50" rx="44" ry="44" fill="none" stroke="#22d3ee" stroke-opacity=".5"/><ellipse class="mer d2" cx="50" cy="50" rx="44" ry="44" fill="none" stroke="#22d3ee" stroke-opacity=".5"/><ellipse class="mer d3" cx="50" cy="50" rx="44" ry="44" fill="none" stroke="#22d3ee" stroke-opacity=".5"/></svg>`;
   $('#wave').innerHTML = Array.from({ length: 30 }, (_, i) => `<i style="--h:${8 + Math.round(Math.abs(Math.sin(i * 1.7)) * 24)}px;animation-delay:${(i % 7) * .09}s"></i>`).join('');
 
   /* ---------- Navigation ---------- */
-  function go(tab) {
+  const GROUP = { lab: 'apps', notes: 'apps', sys: 'apps', improve: 'apps' };
+  function go(tab, focus) {
     $$('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + tab));
-    $$('.nav-btn').forEach(b => { const on = b.dataset.go === tab; b.classList.toggle('text-cyan-300', on); b.classList.toggle('text-zinc-500', !on); });
+    const g = GROUP[tab] || tab;
+    $$('.nav-btn').forEach(b => { const on = b.dataset.go === g; b.classList.toggle('text-blue-300', on); b.classList.toggle('text-zinc-500', !on); });
     if (tab === 'notes') renderNotes();
-    if (tab === 'chat') {
-      const log = $('#chat-log'); log.scrollTop = log.scrollHeight;
-      let first = false; try { first = !sessionStorage.getItem('louis.g'); sessionStorage.setItem('louis.g', '1'); } catch {}
-      if (first && autoVoice) enqueueSpeech(`Bonjour Monsieur ${settings.name || ''}, que me proposes-tu de faire pour toi ?`);
-    }
+    if (tab === 'tasks') renderTasks();
+    if (tab === 'sys') sysInfo();
+    if (tab === 'improve') renderImprove();
+    if (tab === 'chat') { const log = $('#chat-log'); log.scrollTop = log.scrollHeight; if (focus) setTimeout(() => $('#chat-input').focus(), 50); }
   }
   document.addEventListener('click', e => {
-    const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go);
-    const m = e.target.closest('[data-mode]'); if (m) { setMode(m.dataset.mode); go('chat'); }
+    const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go, g.hasAttribute('data-focus'));
+    const m = e.target.closest('[data-mode]'); if (m) { setMode(m.dataset.mode); go('chat', true); }
     const v = e.target.closest('[data-vt]'); if (v) toggleVoice();
     const mic = e.target.closest('.mic-btn'); if (mic) startMic();
   });
@@ -322,25 +417,25 @@
   const MODES = {
     general: { n: 'Général', e: '💬', x: '', chips: [
       ['💡 Que sais-tu faire ?', 'Présente en quelques lignes ce que tu peux faire pour moi (programmation, anglais, devoirs, maths, finance, organisation).', true],
-      ['🗓 Mes tâches', "Aide-moi à organiser ma semaine et mes priorités : pose-moi d'abord les questions utiles, puis propose un planning concret.", true],
+      ['🗓 Organiser ma semaine', "Aide-moi à organiser ma semaine : pose-moi d'abord les questions utiles, puis propose un planning concret.", true],
       ['📄 E-mail, CV, lettre', 'Rédige pour moi : ', false]] },
-    code: { n: 'Programmation', e: '💻', x: "MODE PROGRAMMATION : tu es ingénieur logiciel senior et architecte. Tu crées des projets complets : sites web, applications, interfaces modernes et responsives, scripts, API, bases de données, projets Python, R, JavaScript, SQL, VBA. Pour un site, une application ou une interface : fournis UN fichier HTML complet et autonome (CSS et JavaScript inclus) dans un seul bloc de code html, moderne, soigné et responsive, directement prévisualisable. Pour un projet multi-fichiers : donne d'abord l'arborescence, puis chaque fichier dans son propre bloc, avec son nom en titre juste avant. Explique brièvement comment le lancer. Pour le débogage : identifie la cause, corrige, explique. Vérifie mentalement ton code avant de répondre.", chips: [
+    code: { n: 'Programmation', e: '💻', x: "MODE PROGRAMMATION : tu es ingénieur logiciel senior et architecte. Tu crées uniquement ce qui est demandé : sites web, applications, interfaces modernes et responsives, scripts, API, bases de données, projets Python, R, JavaScript, SQL, VBA. Pour un site, une application ou une interface : fournis UN fichier HTML complet et autonome (CSS et JavaScript inclus) dans un seul bloc de code html, moderne, soigné et responsive, directement prévisualisable. Pour un projet multi-fichiers : donne d'abord l'arborescence, puis chaque fichier dans son propre bloc, avec son nom en titre juste avant. Explique brièvement comment le lancer. Pour le débogage : identifie la cause, corrige, explique. Vérifie mentalement ton code avant de répondre. N'ajoute aucune fonctionnalité non demandée.", chips: [
       ['🌐 Créer un site web', 'Crée un site web moderne et responsive pour : ', false],
       ['📱 Créer une application', 'Crée une application web complète (HTML, CSS, JavaScript) qui : ', false],
       ['🎨 Interface stylée', 'Conçois une interface moderne, sombre et élégante pour : ', false],
       ['🐞 Corriger mon code', 'Voici mon code, trouve l\'erreur et corrige-la :\n', false]] },
-    anglais: { n: 'Anglais', e: '🌐', x: "MODE ANGLAIS : tu es un professeur d'anglais expert (académique, professionnel, examens TOEIC, IELTS, baccalauréat). Évalue d'abord le niveau de l'utilisateur d'après ses messages. Corrige avec le format : faute, correction, règle en une phrase. Pour réviser : un quiz à la fois, attends la réponse, corrige, puis enchaîne en augmentant la difficulté. Pour la conversation orale : phrases courtes en anglais, corrections brèves après chaque réponse. Adapte la part de français au niveau (beaucoup si débutant, peu si avancé). Donne des astuces de mémorisation et propose des exercices progressifs.", chips: [
+    anglais: { n: 'Anglais', e: '🌐', x: "MODE ANGLAIS : tu es un professeur d'anglais expert (académique, professionnel, examens TOEIC, IELTS, baccalauréat). Évalue le niveau d'après ses messages. Corrige avec le format : faute, correction, règle en une phrase. Ne lance un quiz, une conversation ou un exercice que si l'utilisateur le demande ; dans ce cas, une question à la fois, tu attends la réponse puis tu corriges. Adapte la part de français au niveau (beaucoup si débutant, peu si avancé).", chips: [
       ['🎯 Quiz de vocabulaire', "Fais-moi un quiz de vocabulaire anglais adapté à mon niveau : pose UNE question à la fois, attends ma réponse, corrige-moi puis enchaîne. Commence par évaluer mon niveau en 3 questions rapides.", true],
       ['🗣 Conversation orale', "Let's have a spoken conversation in English. Start with a simple question, keep your sentences short, and briefly correct my mistakes after each answer.", true],
       ['✍️ Corriger mon texte', 'Corrige ce texte anglais, explique mes fautes et propose une version améliorée :\n', false],
-      ['📘 Règle de grammaire', 'Explique clairement cette règle de grammaire anglaise avec exemples et exercices : ', false],
+      ['📘 Règle de grammaire', 'Explique clairement cette règle de grammaire anglaise avec exemples : ', false],
       ['📝 Préparer un examen', "Prépare-moi à un examen d'anglais (TOEIC, IELTS, bac…) : ", false]] },
-    maths: { n: 'Maths et finance', e: '📐', x: "MODE MATHS, FINANCE ET DATA : raisonne avec rigueur. Pour une démonstration, détaille chaque étape et vérifie les conditions de régularité, d'intégrabilité et de convergence. Pour la finance, annonce les hypothèses, les limites du modèle (queues épaisses, volatilité stochastique, sauts) et propose des alternatives. Pour le code, fournis Python (pandas, NumPy, SciPy, Numba) ou R (tidyverse, ggplot2) propre, vectorisé et commenté, ainsi que Excel (formules, Power Query) et Power BI (DAX) si utile.", chips: [
+    maths: { n: 'Maths et finance', e: '📐', x: "MODE MATHS, FINANCE ET DATA : raisonne avec rigueur. Pour une démonstration, détaille chaque étape et vérifie les conditions de régularité, d'intégrabilité et de convergence. Pour la finance, annonce les hypothèses et les limites du modèle (queues épaisses, volatilité stochastique, sauts). Pour le code, fournis Python (pandas, NumPy, SciPy, Numba) ou R (tidyverse, ggplot2) propre, vectorisé et commenté, ainsi que Excel et Power BI (DAX) seulement si demandé.", chips: [
       ['📐 Démontrer', 'Démontre rigoureusement : ', false],
       ['📈 Graphique simulé', "Simule 5 trajectoires de prix d'une action (mouvement brownien géométrique, 60 jours, volatilité 25 %) et affiche-les dans un graphique.", true],
       ['🐍 Python / R', 'Écris le code Python (ou R) pour : ', false],
       ['📊 Excel / Power BI', 'Aide-moi sur Excel ou Power BI : ', false]] },
-    devoirs: { n: 'Devoirs', e: '📚', x: "MODE DEVOIRS : tu traites n'importe quel devoir ou exercice (maths, sciences, informatique, économie, langues, rédaction). Résous-le correctement, pas à pas, avec la méthode, le résultat final clairement indiqué et une vérification. Adapte le niveau d'explication à l'utilisateur ; si l'énoncé est incomplet, demande la précision utile. Termine en proposant un exercice similaire pour s'entraîner.", chips: [
+    devoirs: { n: 'Devoirs', e: '📚', x: "MODE DEVOIRS : tu traites le devoir ou l'exercice demandé (maths, sciences, informatique, économie, langues, rédaction). Résous-le correctement, pas à pas, avec la méthode, le résultat final clairement indiqué et une vérification. Si l'énoncé est incomplet, demande la précision utile. Ne propose pas d'exercice supplémentaire sauf demande.", chips: [
       ['📚 Résoudre un exercice', 'Résous cet exercice pas à pas : ', false],
       ['🧠 Explique simplement', 'Explique-moi simplement : ', false],
       ['📝 Préparer un contrôle', 'Prépare-moi à un contrôle sur : ', false]] }
@@ -358,38 +453,45 @@
     if (c[2]) send(c[1]); else { const i = $('#chat-input'); i.value = c[1]; i.focus(); }
   });
 
-  /* ---------- Intelligence : prompt et appel en streaming ---------- */
+  /* ---------- Intelligence ---------- */
   function buildSystem() {
-    const base = `Tu es LOUIS, un assistant personnel de niveau expert, capable de comprendre et de résoudre toute demande, comparable à un ingénieur logiciel, un analyste quantitatif, un data scientist et un professeur d'anglais seniors. Tu réponds en français sauf demande contraire.
+    const base = `Tu es LOUIS, un assistant personnel de niveau expert (ingénieur logiciel, analyste quantitatif, data scientist, professeur d'anglais seniors). Tu réponds en français sauf demande contraire.
 
-COMPÉTENCES : programmation (Python, R, JavaScript, HTML/CSS, SQL, VBA, Git, création de sites, d'applications et d'interfaces) ; Excel avancé (formules dynamiques, Power Query, tableaux croisés, macros) ; Power BI (modèle en étoile, DAX, Power Query M) ; mathématiques, statistiques, machine learning, finance quantitative ; anglais (grammaire, vocabulaire, expression, examens, anglais académique et professionnel) ; devoirs et exercices de toutes matières ; organisation et tâches personnelles (planning, études, carrière, CV, lettres, e-mails, budget, projets, business).
+RÈGLE ABSOLUE — OBÉIR, SANS INITIATIVE : tu ne fais que ce que l'utilisateur demande, exactement. Tu ne lances rien, ne crées rien, ne planifies rien, ne proposes aucun exercice, plan, outil ou fonctionnalité sans qu'on te l'ait demandé. Tu restes concentré sur la demande en cours, sans digresser. Si la demande est ambiguë ou incomplète, pose UNE question courte avant d'agir. Tu ne fais une suggestion que lorsqu'elle est vraiment nécessaire (risque d'erreur, étape manquante, meilleure option évidente) : une phrase, en fin de réponse, sans liste d'offres et sans « Veux-tu que… ? » systématique.
 
-ADAPTATION : repère le niveau, le style et les objectifs de l'utilisateur d'après ses messages et ses instructions personnelles, puis adapte le vocabulaire, la profondeur et les exemples. Si le niveau est inconnu pour un travail d'apprentissage, pose UNE question courte avant de commencer.
+COMPÉTENCES : programmation (Python, R, JavaScript, HTML/CSS, SQL, VBA, Git, sites, applications, interfaces) ; Excel avancé ; Power BI (DAX, Power Query M) ; mathématiques, statistiques, machine learning, finance quantitative ; anglais (grammaire, vocabulaire, examens, anglais académique et professionnel) ; devoirs et exercices de toutes matières ; organisation et tâches (planning, études, carrière, CV, lettres, e-mails, budget, projets).
 
-RIGUEUR : annonce tes hypothèses ; signale les limites des modèles (queues épaisses, volatilité stochastique, marché en crise) ; dans une démonstration, détaille chaque étape et vérifie les conditions de validité ; fournis un code propre, commenté, testé mentalement et optimisé quand la performance compte ; tiens compte des contraintes réelles (frais, spread, liquidité) ; privilégie la parcimonie. N'invente jamais de chiffres : si une donnée manque, dis-le.
+ADAPTATION : repère le niveau et les objectifs de l'utilisateur d'après ses messages et ses instructions personnelles, puis adapte vocabulaire, profondeur et exemples. Si le niveau est inconnu pour un travail d'apprentissage demandé, pose UNE question courte.
 
-VITESSE : réponds directement à la question, sans préambule ni répétition de la demande ; longueur proportionnée (courte pour une question simple, détaillée pour un projet ou une démonstration).
+RIGUEUR : annonce tes hypothèses ; signale les limites des modèles ; dans une démonstration, détaille chaque étape ; fournis un code propre, commenté et testé mentalement ; tiens compte des contraintes réelles (frais, spread, liquidité). N'invente jamais de chiffres : si une donnée manque, dis-le.
 
-GRAPHIQUES : pour toute demande de graphique, de simulation ou de visualisation, calcule réellement les valeurs et affiche-les avec un bloc de code de langage chart contenant un JSON valide : {"type":"line|area|bar","title":"...","labels":["..."],"series":[{"name":"...","data":[nombres]}]}, au plus 60 points par série, nombres arrondis, puis une courte interprétation. Donne aussi le code Python, R ou Excel si l'utilisateur le veut.
+VITESSE : réponds directement, sans préambule ni répétition de la demande ; longueur proportionnée (courte pour une question simple, détaillée pour un projet ou une démonstration).
+
+GRAPHIQUES : si (et seulement si) un graphique, une simulation ou une visualisation est demandé, calcule réellement les valeurs et affiche-les avec un bloc de code de langage chart contenant un JSON valide : {"type":"line|area|bar","title":"...","labels":["..."],"series":[{"name":"...","data":[nombres]}]}, au plus 60 points par série, nombres arrondis, puis une courte interprétation.
 
 STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, blocs de code).`;
-    const who = settings.name ? `\n\nL'utilisateur s'appelle ${settings.name}.` : '';
+    const who = settings.name ? `\n\nL'utilisateur s'appelle ${settings.name} ; tu l'appelles « Monsieur ${settings.name} », uniquement pour saluer, pas à chaque phrase.` : '';
     const mine = settings.notes ? `\n\nINSTRUCTIONS PERSONNELLES DE L'UTILISATEUR : ${settings.notes}` : '';
-    return base + who + mine + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
+    const memo = mem.length ? '\n\nMÉMOIRE (faits durables validés par l\'utilisateur) :\n- ' + mem.map(m => m.t).join('\n- ') : '';
+    const lessons = rules.length ? '\n\nRÈGLES APPRISES (validées par l\'utilisateur, à appliquer) :\n- ' + rules.map(r => r.t).join('\n- ') : '';
+    const tag = "\n\nMÉMORISATION : seulement si l'utilisateur te donne un fait durable le concernant (objectif, niveau, préférence, contrainte) ou te demande de retenir quelque chose, ajoute à la toute fin de ta réponse une ligne [[mem: fait court à retenir]]. N'écris jamais cette ligne autrement. L'utilisateur validera avant tout enregistrement.";
+    return base + who + mine + memo + lessons + tag + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
   }
   const genCfg = model => /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
 
-  async function ask(history, onDelta) {
+  async function ask(history, onDelta, sysText) {
     if (!settings.key) return { error: true, text: "Clé API manquante. Ouvrez ⚙ Réglages et collez votre clé Gemini (gratuite sur aistudio.google.com)." };
     const models = [...new Set([settings.model, 'gemini-2.5-flash', 'gemini-2.5-flash-lite'])];
     let last = '';
+    abortCtl = new AbortController();
     for (const model of models) {
       let full = '';
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
-          body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: buildSystem() }] }, generationConfig: genCfg(model) })
+          signal: abortCtl.signal,
+          body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: sysText || buildSystem() }] }, generationConfig: genCfg(model) })
         });
         if (!res.ok) {
           const d = await res.json().catch(() => ({}));
@@ -410,6 +512,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
         if (full.trim()) return { error: false, text: full };
         last = 'Aucune réponse reçue.';
       } catch (err) {
+        if (err && err.name === 'AbortError') return { error: !full.trim(), text: full.trim() ? full + '\n\n(Arrêté)' : 'Arrêté.' };
         if (full.trim()) return { error: false, text: full + '\n\n(Connexion interrompue)' };
         last = 'Connexion impossible. Vérifiez votre accès à Internet.';
       }
@@ -438,7 +541,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
       return `<div class="cb"><div class="cb-h"><span>${escH(b.l || 'code')}</span><span><button data-act="copy" data-k="${key}">Copier</button>${isHtml ? `<button data-act="prev" data-k="${key}">Aperçu</button>` : ''}</span></div><pre>${b.c}</pre></div>`;
     });
   }
-  const PAL = ['#22d3ee', '#a78bfa', '#f472b6', '#fbbf24', '#34d399', '#60a5fa'];
+  const PAL = ['#38bdf8', '#a78bfa', '#f472b6', '#fbbf24', '#34d399', '#60a5fa'];
   function chartSVG(spec) {
     try {
       const W = 320, H = 170, L = 36, R = 8, T = 12, B = 26;
@@ -471,26 +574,27 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
         }
       });
       const legend = ser.length <= 6 ? '<div class="flex flex-wrap gap-3 mt-1 text-[10px] text-zinc-300">' + ser.map((s, si) => `<span><span style="color:${s.color || PAL[si % PAL.length]}">●</span> ${escH(s.name || 'Série ' + (si + 1))}</span>`).join('') + '</div>' : '';
-      return `<div class="my-2 p-2 rounded-xl border border-cyan-400/20 bg-black/50">${spec.title ? `<div class="text-[11px] font-bold text-cyan-300 mb-1">${escH(spec.title)}</div>` : ''}<svg viewBox="0 0 ${W} ${H}" class="w-full">${g}</svg>${legend}</div>`;
+      return `<div class="my-2 p-2 rounded-xl border border-blue-400/25 bg-black/50">${spec.title ? `<div class="text-[11px] font-bold text-sky-300 mb-1">${escH(spec.title)}</div>` : ''}<svg viewBox="0 0 ${W} ${H}" class="w-full">${g}</svg>${legend}</div>`;
     } catch { return '<div class="text-rose-400 text-[11px]">Graphique invalide.</div>'; }
   }
 
-  /* ---------- Terminal ---------- */
+  /* ---------- Chat ---------- */
+  const stripTags = t => String(t || '').replace(/\[\[mem:[\s\S]*?(\]\]|$)/g, '').trimEnd();
   const msgEl = m => {
     const w = document.createElement('div'); w.id = 'm-' + m.id; w.className = 'flex flex-col ' + (m.sender === 'user' ? 'items-end' : 'items-start');
     const b = document.createElement('div'); b.id = 'b-' + m.id; b.className = 'bub ' + (m.sender === 'user' ? 'bub-user' : 'bub-ai');
     fill(b, m); w.appendChild(b);
     if (m.sender === 'jarvis' && !m.pending) {
       const a = document.createElement('div'); a.className = 'flex items-center gap-3 mt-1 px-1 text-[11px] text-zinc-500';
-      a.innerHTML = `<span>${m.ts}</span><button data-act="say" data-id="${m.id}" class="hover:text-cyan-300">Écouter</button><button data-act="copym" data-id="${m.id}" class="hover:text-cyan-300">Copier</button><button data-act="note" data-id="${m.id}" class="hover:text-cyan-300">Enregistrer</button>`;
+      a.innerHTML = `<span>${m.ts}</span><button data-act="say" data-id="${m.id}" class="hover:text-sky-300">Écouter</button><button data-act="copym" data-id="${m.id}" class="hover:text-sky-300">Copier</button><button data-act="note" data-id="${m.id}" class="hover:text-sky-300">Enregistrer</button>${m.greet ? '' : `<button data-act="up" data-id="${m.id}" class="${m.fb === 1 ? 'text-emerald-400' : 'hover:text-emerald-400'}">👍</button><button data-act="down" data-id="${m.id}" class="${m.fb === -1 ? 'text-rose-400' : 'hover:text-rose-400'}">👎</button><button data-act="regen" data-id="${m.id}" class="hover:text-sky-300">Refaire</button>`}`;
       w.appendChild(a);
     }
     return w;
   };
   function fill(b, m) {
     if (m.sender === 'user') b.textContent = m.text;
-    else if (m.pending && !m.text) b.innerHTML = '<span class="text-cyan-300/80">Louis réfléchit…</span>';
-    else b.innerHTML = md(m.text, m.id);
+    else if (m.pending && !m.text) b.innerHTML = '<span class="text-sky-300/80">Louis réfléchit…</span>';
+    else b.innerHTML = md(stripTags(m.text), m.id);
   }
   function renderChat() { const log = $('#chat-log'); log.innerHTML = ''; messages.forEach(m => log.appendChild(msgEl(m))); log.scrollTop = log.scrollHeight; }
   let raf = 0;
@@ -505,7 +609,8 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
 
   let sp = { idx: 0 };
   function feedSpeech(text, final) {
-    if (!autoVoice || !('speechSynthesis' in window)) return;
+    if (!(autoVoice || sp.on) || !('speechSynthesis' in window)) return;
+    const k = text.indexOf('[[mem:'); if (k >= 0) text = text.slice(0, k);
     const open = (text.match(/```/g) || []).length % 2 === 1;
     const limit = open ? text.lastIndexOf('```') : text.length;
     let seg = text.slice(sp.idx, limit);
@@ -517,33 +622,37 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     if (!seg.trim()) return;
     sp.idx += seg.length; enqueueSpeech(seg);
   }
-  async function send(text) {
+  async function send(text, viaVoice) {
     text = (text || '').trim(); if (!text || busy) return;
-    stopSpeech(); busy = true; $('#chat-send').disabled = true;
+    stopSpeech(); busy = true; $('#chat-send').textContent = 'Stop'; exch++; store.set('louis.exch', exch);
     const u = { id: Date.now(), sender: 'user', text, ts: now() };
     const a = { id: u.id + 1, sender: 'jarvis', text: '', ts: now(), pending: true };
     messages.push(u, a);
     const log = $('#chat-log'); log.appendChild(msgEl(u)); log.appendChild(msgEl(a)); log.scrollTop = log.scrollHeight;
     const hist = messages.filter(m => m !== a && !m.greet && !m.err && m.text).slice(-14).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
     while (hist.length && hist[0].role !== 'user') hist.shift();
-    sp = { idx: 0 };
+    sp = { idx: 0, on: !!viaVoice };
     const res = await ask(hist, part => { a.text = part; live(a); feedSpeech(part, false); });
-    a.pending = false; a.text = res.text; a.err = res.error;
+    a.pending = false; a.err = res.error;
+    const tags = [...res.text.matchAll(/\[\[mem:\s*([^\]]+?)\s*\]\]/g)].map(x => x[1]);
+    a.text = stripTags(res.text);
     cancelAnimationFrame(raf); raf = 0;
     const w = $('#m-' + a.id); if (w) w.replaceWith(msgEl(a));
-    if (!res.error) feedSpeech(a.text, true);
-    busy = false; $('#chat-send').disabled = false; persist();
+    if (!res.error) { feedSpeech(a.text, true); tags.forEach(proposeMem); }
+    busy = false; $('#chat-send').textContent = 'Envoyer'; persist(); updateBadge();
   }
-  $('#chat-form').addEventListener('submit', e => { e.preventDefault(); const i = $('#chat-input'), t = i.value; i.value = ''; send(t); });
+  $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (busy) { if (abortCtl) abortCtl.abort(); return; } const i = $('#chat-input'), t = i.value; i.value = ''; send(t); });
   $('#new-chat').onclick = () => { if (!confirm('Commencer une nouvelle conversation ?')) return; stopSpeech(); messages = [greet()]; persist(); renderChat(); };
   $('#chat-log').addEventListener('click', e => {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const act = b.dataset.act, m = messages.find(x => x.id === +b.dataset.id);
     if (act === 'copy') { navigator.clipboard?.writeText(CODES[b.dataset.k] || ''); b.textContent = 'Copié'; setTimeout(() => b.textContent = 'Copier', 1500); }
     else if (act === 'prev') openPreview(CODES[b.dataset.k] || '');
-    else if (act === 'say' && m) { if (speakCount) stopSpeech(); else enqueueSpeech(m.greet ? `Bonjour Monsieur ${settings.name || ''}, que me proposes-tu de faire pour toi ?` : m.text); }
+    else if (act === 'say' && m) { if (speakCount) stopSpeech(); else enqueueSpeech(m.greet ? hello() : m.text); }
     else if (act === 'copym' && m) { navigator.clipboard?.writeText(m.text); toast('Copié'); }
     else if (act === 'note' && m) { saveNote('Réponse de Louis', m.text); }
+    else if ((act === 'up' || act === 'down') && m) { rate(m, act === 'up' ? 1 : -1); }
+    else if (act === 'regen' && m) { regen(m); }
   });
 
   /* ---------- Aperçu de code ---------- */
@@ -553,12 +662,12 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
   $('#prev-dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([prevCode], { type: 'text/html' })); a.download = 'projet-louis.html'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
 
   /* ---------- Voix ---------- */
-  let speakToken = 0, speakCount = 0;
+  let speakToken = 0, speakCount = 0, listening = false;
   const hasTTS = 'speechSynthesis' in window;
   if (hasTTS) speechSynthesis.getVoices();
   function setSpeaking(on) {
     $('#robot-big').classList.toggle('speaking', on); $('#wave').classList.toggle('on', on);
-    $('#voice-state').textContent = on ? 'Louis parle…' : (listening ? "J'écoute…" : 'Système actif');
+    $('#voice-state').textContent = on ? 'Louis parle…' : (listening ? "J'écoute…" : 'Prêt');
   }
   function stopSpeech() { speakToken++; speakCount = 0; if (hasTTS) speechSynthesis.cancel(); setSpeaking(false); }
   function cleanForSpeech(t) { return t.replace(/```[\s\S]*?(```|$)/g, " Le détail est affiché à l'écran. ").replace(/https?:\/\/\S+/g, '').replace(/[*#`_>~|•]/g, '').replace(/\s+/g, ' ').trim(); }
@@ -593,41 +702,65 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
       u.onend = done; u.onerror = done; speechSynthesis.speak(u);
     });
   }
-  function toggleVoice() {
-    autoVoice = !autoVoice; store.set('jarvis.voice', autoVoice); if (!autoVoice) stopSpeech();
-    $$('[data-vt]').forEach(b => { b.textContent = b.closest('#tab-chat') ? (autoVoice ? '🔊' : '🔇') : (autoVoice ? 'Voix ON' : 'Voix OFF'); b.classList.toggle('on', autoVoice); });
-  }
-  $$('[data-vt]').forEach(b => { b.textContent = b.closest('#tab-chat') ? (autoVoice ? '🔊' : '🔇') : (autoVoice ? 'Voix ON' : 'Voix OFF'); b.classList.toggle('on', autoVoice); });
+  function paintVT() { $$('[data-vt]').forEach(b => { b.textContent = b.closest('#tab-chat') ? (autoVoice ? '🔊' : '🔇') : (autoVoice ? 'Voix ON' : 'Voix OFF'); b.classList.toggle('on', autoVoice); }); }
+  function toggleVoice() { autoVoice = !autoVoice; store.set('louis.voice2', autoVoice); if (!autoVoice) stopSpeech(); paintVT(); }
+  paintVT();
 
-  /* ---------- Micro ---------- */
+  /* ---------- Micro : écoute seulement quand on appuie ---------- */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec = null, listening = false;
+  let rec = null;
   function startMic() {
     if (!SR) { toast('Micro non pris en charge : utilisez Chrome'); return; }
     if (listening) { rec.stop(); return; }
     stopSpeech(); rec = new SR(); rec.lang = mode === 'anglais' ? 'en-US' : 'fr-FR'; rec.interimResults = false;
-    rec.onstart = () => { listening = true; $('#wave').classList.add('on'); $('#voice-state').textContent = "J'écoute…"; $$('.mic-btn').forEach(b => b.style.outline = '2px solid #22d3ee'); };
-    rec.onend = () => { listening = false; if (!speakCount) { $('#wave').classList.remove('on'); $('#voice-state').textContent = 'Système actif'; } $$('.mic-btn').forEach(b => b.style.outline = ''); };
+    rec.onstart = () => { listening = true; $('#wave').classList.add('on'); $('#voice-state').textContent = "J'écoute…"; $$('.mic-btn').forEach(b => b.classList.add('listening')); };
+    rec.onend = () => { listening = false; if (!speakCount) { $('#wave').classList.remove('on'); $('#voice-state').textContent = 'Prêt'; } $$('.mic-btn').forEach(b => b.classList.remove('listening')); };
     rec.onerror = () => {};
-    rec.onresult = e => { go('chat'); send(e.results[0][0].transcript); };
+    rec.onresult = e => { go('chat'); send(e.results[0][0].transcript, true); };
     rec.start();
   }
 
-  /* ---------- Système réel et raccourcis ---------- */
-  function sys() {
+  /* ---------- Horloge, système, raccourcis ---------- */
+  function clock() {
+    const d = new Date();
+    $('#h-time').textContent = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    $('#h-date').textContent = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+  clock(); setInterval(clock, 30000);
+  function sysInfo() {
     $('#sys-cpu').textContent = navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' cœurs' : '—';
     $('#sys-ram').textContent = navigator.deviceMemory ? '≈ ' + navigator.deviceMemory + ' Go' : '—';
     $('#sys-net').textContent = navigator.onLine ? ((navigator.connection && navigator.connection.effectiveType) || 'en ligne').toUpperCase() : 'HORS LIGNE';
+    if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => { $('#sys-sto').textContent = (e.usage / 1e6).toFixed(1) + ' Mo / ' + (e.quota / 1e9).toFixed(1) + ' Go'; }).catch(() => {});
   }
-  sys(); addEventListener('online', sys); addEventListener('offline', sys);
-  if (navigator.getBattery) navigator.getBattery().then(b => { const u = () => $('#sys-bat').textContent = Math.round(b.level * 100) + ' %' + (b.charging ? ' ⚡' : ''); u(); b.onlevelchange = b.onchargingchange = u; }).catch(() => {});
+  sysInfo(); addEventListener('online', sysInfo); addEventListener('offline', sysInfo);
+  if (navigator.getBattery) navigator.getBattery().then(b => { const u = () => { const t = Math.round(b.level * 100) + ' %' + (b.charging ? ' ⚡' : ''); $('#sys-bat').textContent = t; $('#sys-bat2').textContent = t; }; u(); b.onlevelchange = b.onchargingchange = u; }).catch(() => {});
   let links = store.get('louis.links', [
     { n: 'Gmail', u: 'https://mail.google.com', i: '✉' }, { n: 'YouTube', u: 'https://www.youtube.com', i: '▶' },
     { n: 'GitHub', u: 'https://github.com', i: '⌘' }, { n: 'Drive', u: 'https://drive.google.com', i: '☁' }]);
+  const APPS = [
+    { n: 'Google', u: 'https://www.google.com', i: 'G', c: 'linear-gradient(135deg,#4285f4,#34a853)' },
+    { n: 'YouTube', u: 'https://www.youtube.com', i: '▶', c: '#ff0033' },
+    { n: 'Gmail', u: 'https://mail.google.com', i: '✉', c: 'linear-gradient(135deg,#ea4335,#fbbc04)' },
+    { n: 'Spotify', u: 'https://open.spotify.com', i: '♫', c: '#1db954' },
+    { n: 'Drive', u: 'https://drive.google.com', i: '△', c: 'linear-gradient(135deg,#fbbc04,#0f9d58,#4285f4)' },
+    { n: 'Traduction', u: 'https://translate.google.com', i: '文', c: 'linear-gradient(135deg,#4285f4,#1a73e8)' },
+    { n: 'Maps', u: 'https://maps.google.com', i: '⌖', c: 'linear-gradient(135deg,#34a853,#ea4335)' },
+    { n: 'Agenda', u: 'https://calendar.google.com', i: '▦', c: 'linear-gradient(135deg,#4285f4,#1967d2)' },
+    { n: 'GitHub', u: 'https://github.com', i: '⌘', c: '#2b3137' }];
+  const brand = l => {
+    const a = APPS.find(x => x.n.toLowerCase() === String(l.n).toLowerCase());
+    if (a) return { c: a.c, i: a.i };
+    let h = 0; for (const ch of String(l.n)) h = (h * 31 + ch.charCodeAt(0)) % 360;
+    return { c: `linear-gradient(135deg,hsl(${h},75%,52%),hsl(${(h + 40) % 360},70%,38%))`, i: l.i };
+  };
+  function renderApps() {
+    $('#apps-ext').innerHTML = APPS.map(a => `<a href="${a.u}" target="_blank" rel="noopener" class="tile text-center block !p-2"><div class="ico" style="background:${a.c}">${a.i}</div><div class="text-[11px] text-blue-50 truncate">${a.n}</div></a>`).join('');
+  }
   let linkEdit = false;
   function renderLinks() {
-    $('#links').innerHTML = links.map((l, i) => `<a href="${escH(l.u)}" target="_blank" rel="noopener" class="tile text-center relative block !p-2"><div class="text-xl text-cyan-300">${escH(l.i)}</div><div class="text-[10px] text-zinc-300 truncate">${escH(l.n)}</div>${linkEdit ? `<span data-del="${i}" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[11px] leading-5">✕</span>` : ''}</a>`).join('') +
-      `<button id="lk-add" class="tile text-center !p-2"><div class="text-xl text-cyan-300">＋</div><div class="text-[10px] text-zinc-400">Ajouter</div></button>`;
+    $('#links').innerHTML = links.map((l, i) => `<a href="${escH(l.u)}" target="_blank" rel="noopener" class="tile text-center relative block !p-2"><div class="ico" style="background:${brand(l).c}">${escH(brand(l).i)}</div><div class="text-[10px] text-zinc-300 truncate">${escH(l.n)}</div>${linkEdit ? `<span data-del="${i}" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[11px] leading-5">✕</span>` : ''}</a>`).join('') +
+      `<button id="lk-add" class="tile text-center !p-2"><div class="ico" style="background:rgba(56,140,255,.15);border:1px dashed rgba(96,165,250,.6);box-shadow:none;color:#93c5fd">＋</div><div class="text-[10px] text-zinc-400">Ajouter</div></button>`;
   }
   $('#links').addEventListener('click', e => {
     const d = e.target.closest('[data-del]'); if (d) { e.preventDefault(); links.splice(+d.dataset.del, 1); store.set('louis.links', links); renderLinks(); return; }
@@ -639,15 +772,38 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
   });
   $('#lk-edit').onclick = () => { linkEdit = !linkEdit; $('#lk-edit').textContent = linkEdit ? 'Terminer' : 'Modifier'; renderLinks(); };
 
+  /* ---------- Tâches (créées uniquement par vous) ---------- */
+  function renderTasks() {
+    $$('#task-filters [data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === tfilter));
+    const list = $('#task-list'); list.innerHTML = '';
+    const shown = tasks.filter(t => tfilter === 'all' || (tfilter === 'done' ? t.done : !t.done));
+    if (!shown.length) { list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Aucune tâche.</div>'; return; }
+    shown.forEach(t => {
+      const r = document.createElement('div'); r.className = 'hud !p-3 flex items-center gap-3';
+      r.innerHTML = '<button class="chk"></button><div class="flex-1 min-w-0"><div class="text-sm text-blue-50 break-words"></div><div class="text-[10px] text-zinc-400"></div></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      const chk = r.children[0]; chk.classList.toggle('done', t.done); chk.textContent = t.done ? '✓' : '';
+      r.children[1].children[0].textContent = t.text; if (t.done) r.children[1].children[0].style.textDecoration = 'line-through';
+      r.children[1].children[1].textContent = (t.done ? 'Terminée' : 'En cours') + (t.time ? ' · ' + t.time : '');
+      chk.onclick = () => { t.done = !t.done; store.set('louis.tasks', tasks); renderTasks(); };
+      r.children[2].onclick = () => { tasks = tasks.filter(x => x.id !== t.id); store.set('louis.tasks', tasks); renderTasks(); };
+      list.appendChild(r);
+    });
+  }
+  $('#task-form').addEventListener('submit', e => {
+    e.preventDefault(); const i = $('#task-input'), tm = $('#task-time'), text = i.value.trim(); if (!text) return;
+    tasks.unshift({ id: Date.now(), text: text.slice(0, 200), time: tm.value, done: false }); store.set('louis.tasks', tasks); i.value = ''; tm.value = ''; renderTasks();
+  });
+  $('#task-filters').addEventListener('click', e => { const b = e.target.closest('[data-tf]'); if (b) { tfilter = b.dataset.tf; renderTasks(); } });
+
   /* ---------- Notes ---------- */
   function saveNote(title, content) { notes.unshift({ id: Date.now(), title, content, date: new Date().toLocaleDateString('fr-FR') }); store.set('jarvis.notes', notes); toast('Note enregistrée'); }
   function renderNotes() {
     $('#notes-title').textContent = `Carnet (${notes.length})`;
     const list = $('#notes-list'); list.innerHTML = '';
-    if (!notes.length) { list.innerHTML = '<div class="text-center py-12 text-zinc-500 text-xs">Aucune note. Enregistrez une réponse depuis le terminal.</div>'; return; }
+    if (!notes.length) { list.innerHTML = '<div class="text-center py-12 text-zinc-500 text-xs">Aucune note. Enregistrez une réponse depuis le chat.</div>'; return; }
     notes.forEach(n => {
       const d = document.createElement('div'); d.className = 'hud text-xs space-y-1';
-      d.innerHTML = '<div class="flex justify-between text-cyan-300 font-bold"><span></span><span class="text-[10px] text-zinc-500 font-normal"></span></div><p class="text-zinc-300 text-[12px] whitespace-pre-wrap max-h-44 overflow-y-auto"></p><button class="text-[10px] text-zinc-500 hover:text-rose-400">Supprimer</button>';
+      d.innerHTML = '<div class="flex justify-between text-sky-300 font-bold"><span></span><span class="text-[10px] text-zinc-500 font-normal"></span></div><p class="text-zinc-300 text-[12px] whitespace-pre-wrap max-h-44 overflow-y-auto"></p><button class="text-[10px] text-zinc-500 hover:text-rose-400">Supprimer</button>';
       d.children[0].children[0].textContent = n.title; d.children[0].children[1].textContent = n.date; d.children[1].textContent = n.content;
       d.children[2].onclick = () => { notes = notes.filter(x => x.id !== n.id); store.set('jarvis.notes', notes); renderNotes(); };
       list.appendChild(d);
@@ -657,7 +813,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
 
   /* ---------- Labo : Black-Scholes et Monte-Carlo ---------- */
   const cdf = x => { const t = 1 / (1 + 0.2316419 * Math.abs(x)), d = 0.3989423 * Math.exp(-x * x / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x >= 0 ? 1 - p : p; };
-  const card = (l, v, c = 'text-cyan-300') => `<div class="tile"><div class="lbl" style="font-size:9px">${l}</div><div class="text-sm font-bold ${c} mt-1">${v}</div></div>`;
+  const card = (l, v, c = 'text-sky-300') => `<div class="tile"><div class="lbl" style="font-size:9px">${l}</div><div class="text-sm font-bold ${c} mt-1">${v}</div></div>`;
   $('#f-run').onclick = () => {
     const S = parseFloat($('#f-S').value), K = parseFloat($('#f-K').value), T = parseFloat($('#f-T').value) / 365, v = parseFloat($('#f-v').value) / 100, r = (parseFloat($('#f-r').value) || 0) / 100;
     const out = $('#f-out'), err = $('#f-err');
@@ -685,7 +841,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     const p5 = quant(sorted, .05), p95 = quant(sorted, .95), med = quant(sorted, .5), pUp = ST.filter(v => v > S0).length / N;
     const steps = Math.min(D, 60), dt = T / steps, labels = [], paths = [];
     for (let i = 0; i <= steps; i++) labels.push(Math.round(i * D / steps));
-    for (let p = 0; p < 25; p++) { let s = S0; const a = [s]; for (let i = 0; i < steps; i++) { s *= Math.exp((mu - sg * sg / 2) * dt + sg * Math.sqrt(dt) * randn()); a.push(+s.toFixed(2)); } paths.push({ data: a, color: '#22d3ee' }); }
+    for (let p = 0; p < 25; p++) { let s = S0; const a = [s]; for (let i = 0; i < steps; i++) { s *= Math.exp((mu - sg * sg / 2) * dt + sg * Math.sqrt(dt) * randn()); a.push(+s.toFixed(2)); } paths.push({ data: a, color: '#38bdf8' }); }
     paths.push({ name: 'Espérance', color: '#ffffff', data: labels.map((_, i) => +(S0 * Math.exp(mu * i * dt)).toFixed(2)) });
     const lo = quant(sorted, .01), hi = quant(sorted, .99), nb = 16, w = (hi - lo) / nb || 1, cnt = new Array(nb).fill(0);
     ST.forEach(v => { if (v >= lo && v <= hi) cnt[Math.min(nb - 1, Math.floor((v - lo) / w))]++; });
@@ -707,15 +863,16 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     sel.value = settings.voice || '';
   }
   const show = (id, on) => $(id).classList.toggle('hidden', !on);
-  $('#btn-settings').onclick = () => {
+  function openSettings() {
     const ms = MODELS.slice(); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
     $('#set-model').innerHTML = ms.map(m => `<option value="${escH(m[0])}">${escH(m[1])}</option>`).join(''); $('#set-model').value = settings.model;
     $('#set-name').value = settings.name || ''; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
-  };
+  }
+  $('#btn-settings').onclick = openSettings; $('#apps-settings').onclick = openSettings;
   $('#set-cancel').onclick = () => show('#modal-settings', false);
   $('#set-save').onclick = () => {
     settings = Object.assign(settings, { name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
-    store.set('jarvis.settings', settings); show('#modal-settings', false); toast('Réglages enregistrés');
+    store.set('jarvis.settings', settings); $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || ''); show('#modal-settings', false); toast('Réglages enregistrés');
   };
   $('#set-test').onclick = () => {
     if (!hasTTS) return; stopSpeech();
@@ -731,7 +888,91 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
   $('#btn-install').onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btn-install').classList.add('hidden'); $('#btn-help').classList.remove('hidden'); };
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
-  renderModes(); renderChat(); renderLinks();
+  /* ---------- Évolution : mémoire, retours, bilan ---------- */
+  function updateBadge() { const e = $('#imp-sub'); if (e) e.textContent = exch - bilanAt >= 10 ? 'Bilan conseillé' : 'Mémoire, règles'; }
+  function proposeMem(t) {
+    t = t.trim().slice(0, 200); if (!t || mem.some(m => m.t === t) || pendingMem.includes(t)) return;
+    pendingMem.push(t); showMem();
+  }
+  function showMem() {
+    const bar = $('#mem-bar'); if (!pendingMem.length) { bar.classList.add('hidden'); return; }
+    $('#mem-txt').textContent = 'Retenir : « ' + pendingMem[0] + ' » ?'; bar.classList.remove('hidden');
+  }
+  $('#mem-yes').onclick = () => { const t = pendingMem.shift(); if (t) { mem.unshift({ id: Date.now(), t }); store.set('louis.mem', mem); } showMem(); };
+  $('#mem-no').onclick = () => { pendingMem.shift(); showMem(); };
+  function rate(m, v) {
+    const i = messages.indexOf(m), u = messages[i - 1];
+    fb = fb.filter(x => x.id !== m.id);
+    if (m.fb === v) m.fb = 0; else { m.fb = v; fb.push({ id: m.id, v, q: u ? String(u.text).slice(0, 300) : '', a: String(m.text).slice(0, 500) }); }
+    fb = fb.slice(-40); store.set('louis.fb', fb); persist();
+    const w = $('#m-' + m.id); if (w) w.replaceWith(msgEl(m));
+    toast(m.fb === 1 ? 'Merci, noté' : m.fb === -1 ? 'Noté, je ferai mieux' : 'Retiré');
+  }
+  function regen(m) {
+    if (busy) return;
+    const i = messages.indexOf(m), u = messages[i - 1];
+    if (i !== messages.length - 1 || !u || u.sender !== 'user') { toast('Seule la dernière réponse peut être refaite'); return; }
+    messages.splice(i - 1, 2); renderChat(); send(u.text);
+  }
+  function listRows(el, arr, key, empty) {
+    el.innerHTML = '';
+    if (!arr.length) { el.innerHTML = `<div class="text-xs text-zinc-500">${empty}</div>`; return; }
+    arr.forEach(x => {
+      const r = document.createElement('div'); r.className = 'tile flex items-start gap-2 !p-2';
+      r.innerHTML = '<div class="flex-1 text-[12px] text-blue-100 break-words"></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      r.children[0].textContent = x.t;
+      r.children[1].onclick = () => { const k = arr.indexOf(x); arr.splice(k, 1); store.set(key, arr); renderImprove(); };
+      el.appendChild(r);
+    });
+  }
+  function renderImprove() {
+    const up = fb.filter(x => x.v === 1).length, down = fb.filter(x => x.v === -1).length;
+    $('#imp-stats').textContent = `👍 ${up} · 👎 ${down} · ${exch - bilanAt} échanges depuis le dernier bilan`;
+    listRows($('#mem-list'), mem, 'louis.mem', 'Rien en mémoire.');
+    listRows($('#rule-list'), rules, 'louis.rules', 'Aucune règle adoptée.');
+  }
+  $('#mem-form').addEventListener('submit', e => { e.preventDefault(); const i = $('#mem-input'), t = i.value.trim().slice(0, 200); if (!t) return; mem.unshift({ id: Date.now(), t }); store.set('louis.mem', mem); i.value = ''; renderImprove(); });
+  async function bilan() {
+    if (busy) return;
+    const out = $('#bilan-out'), btn = $('#bilan-run');
+    btn.disabled = true; out.innerHTML = '<div class="text-xs text-sky-300/80">Louis analyse…</div>';
+    const recent = messages.filter(m => m.text && !m.greet && !m.err).slice(-16).map(m => (m.sender === 'user' ? 'Utilisateur' : 'Louis') + ' : ' + String(m.text).slice(0, 300)).join('\n');
+    const fbs = fb.slice(-15).map(x => (x.v === 1 ? '👍' : '👎') + ' Q: ' + x.q + ' | R: ' + x.a.slice(0, 200)).join('\n');
+    const prompt = `Voici les derniers échanges et retours (👍/👎) entre un utilisateur et son assistant Louis.\n\nÉCHANGES :\n${recent || '(aucun)'}\n\nRETOURS :\n${fbs || '(aucun)'}\n\nRÈGLES DÉJÀ ADOPTÉES :\n${rules.map(r => r.t).join('\n') || '(aucune)'}\n\nPropose au plus 3 nouvelles règles de comportement courtes, concrètes et différentes des règles existantes, qui amélioreraient les réponses de Louis pour CET utilisateur, et au plus 3 capacités qui manquent à l'application. Réponds uniquement en JSON : {"regles":["..."],"manques":["..."]}. Si les données sont insuffisantes, renvoie des listes vides.`;
+    const res = await ask([{ role: 'user', parts: [{ text: prompt }] }], () => {}, "Tu analyses un assistant personnel pour l'améliorer. Tu réponds uniquement par du JSON valide, en français.");
+    btn.disabled = false;
+    if (res.error) { out.innerHTML = '<div class="text-xs text-rose-400">' + escH(res.text) + '</div>'; return; }
+    let j; try { j = JSON.parse(res.text.replace(/```(?:json)?/g, '').trim().match(/\{[\s\S]*\}/)[0]); } catch { out.innerHTML = '<div class="text-xs text-rose-400">Réponse illisible, réessayez.</div>'; return; }
+    bilanAt = exch; store.set('louis.bilanAt', bilanAt); updateBadge(); renderImprove();
+    lastRegles = (j.regles || []).map(String).slice(0, 3); const man = (j.manques || []).map(String).slice(0, 3);
+    out.innerHTML = (lastRegles.length ? '<div class="lbl">Règles proposées</div>' + lastRegles.map((r, i) => `<div class="tile flex items-start gap-2 !p-2"><div class="flex-1 text-[12px] text-blue-100">${escH(r)}</div><button data-adopt="${i}" class="chip on">Adopter</button></div>`).join('') : '<div class="text-xs text-zinc-400">Aucune règle à proposer pour l\'instant.</div>') +
+      (man.length ? '<div class="lbl mt-2">Ce qui manque</div>' + man.map(x => `<div class="text-[12px] text-zinc-300">• ${escH(x)}</div>`).join('') : '');
+  }
+  $('#bilan-run').onclick = bilan;
+  $('#bilan-out').addEventListener('click', e => {
+    const b = e.target.closest('[data-adopt]'); if (!b) return;
+    const t = lastRegles[+b.dataset.adopt]; if (t && !rules.some(r => r.t === t)) { rules.unshift({ id: Date.now(), t }); store.set('louis.rules', rules); }
+    b.textContent = 'Adoptée'; b.disabled = true; renderImprove();
+  });
+  $('#bk-export').onclick = () => {
+    const d = { v: 1, settings: Object.assign({}, settings, { key: '' }), notes, tasks, mem, rules, fb, links };
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' })); a.download = 'louis-sauvegarde.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+  $('#bk-import').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result); if (!confirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
+        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key }));
+        [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
+        location.reload();
+      } catch { toast('Fichier invalide'); }
+    };
+    r.readAsText(f);
+  };
+
+  renderModes(); renderChat(); renderLinks(); renderApps(); renderTasks(); updateBadge();
 })();
 </script>
 </body>
