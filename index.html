@@ -30,7 +30,6 @@
   .tile:active { transform: scale(.96); }
   .fld { width: 100%; margin-top: 4px; padding: 8px; border-radius: 10px; border: 1px solid rgba(56,140,255,.28); background: rgba(0,0,0,.5); color: #e0efff; font-size: 13px; outline: none; }
   .fld:focus { border-color: #60a5fa; }
-  /* Avatar holographique */
   .stage { position: relative; margin: 0 auto; }
   .holo { filter: drop-shadow(0 0 14px rgba(56,170,255,.55)); }
   .scan { transform-box: fill-box; animation: scan 4.5s linear infinite; }
@@ -38,7 +37,6 @@
   .av-img { width: 100%; height: 100%; object-fit: cover; object-position: top; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
   .speaking .av-img { animation: glowp .8s ease-in-out infinite alternate; }
   @keyframes glowp { from { filter: brightness(1); } to { filter: brightness(1.25) drop-shadow(0 0 14px #38bdf8); } }
-  /* Bulles et Markdown */
   .bub { max-width: 94%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
   .bub-ai { background: rgba(6,14,30,.9); border: 1px solid rgba(56,140,255,.3); border-top-left-radius: 4px; }
   .bub-user { background: linear-gradient(135deg, #2563eb, #0e7490); color: #fff; border-top-right-radius: 4px; white-space: pre-wrap; }
@@ -51,18 +49,24 @@
   .cb-h { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: rgba(56,140,255,.1); font: 11px ui-monospace, monospace; color: #7dd3fc; }
   .cb-h button { margin-left: 12px; color: #bfdbfe; }
   .cb pre { margin: 0; padding: 10px; overflow-x: auto; font: 12px/1.5 ui-monospace, monospace; color: #e2e8f0; white-space: pre; }
-  /* Voix */
   .wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 34px; }
   .wave i { display: block; width: 3px; height: 5px; border-radius: 2px; background: linear-gradient(#7dd3fc, #2563eb); }
   .wave.on i { animation: wv .9s ease-in-out infinite; }
   @keyframes wv { 0%, 100% { height: 5px; } 50% { height: var(--h); } }
-  .eye { animation: blink 6s infinite; transform-box: fill-box; transform-origin: center; }
+  .eye { animation: blink 6s infinite, eyehide 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
   @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
   .mb { transform-box: fill-box; transform-origin: center; }
   .core { animation: cp 3s ease-in-out infinite; }
   @keyframes cp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-  .speaking .mb { animation: mouth .32s ease-in-out infinite alternate; }
-  @keyframes mouth { from { transform: scaleY(1); } to { transform: scaleY(3.4); } }
+  /* Sourire de Louis */
+  .smile, .hap { transform-box: fill-box; transform-origin: center; }
+  .hap { opacity: 0; animation: eyeshow 5s ease-in-out infinite; }
+  .smile { animation: grin 5s ease-in-out infinite; }
+  @keyframes grin { 0%, 35%, 85%, 100% { transform: scale(1); } 45%, 75% { transform: scale(1.2, 1.5); } }
+  @keyframes eyeshow { 0%, 35%, 85%, 100% { opacity: 0; } 45%, 75% { opacity: 1; } }
+  @keyframes eyehide { 0%, 35%, 85%, 100% { opacity: 1; } 45%, 75% { opacity: 0; } }
+  .speaking .smile { animation: talk .32s ease-in-out infinite alternate; }
+  @keyframes talk { from { transform: scale(1); } to { transform: scale(1.05, 1.9); } }
   .orb { width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; background: radial-gradient(circle, #0b1b3d 45%, #0a2a66); border: 3px solid #3b82f6; box-shadow: 0 0 26px rgba(59,130,246,.85), inset 0 0 18px rgba(59,130,246,.6); }
   .mic-ico { width: 1.15em; height: 1.15em; vertical-align: -0.2em; display: inline-block; }
   .orb { color: #e0f2fe; background: radial-gradient(circle at 35% 30%, #1e4fb8, #0a1f4d 70%); }
@@ -72,7 +76,6 @@
   .orb.listening { animation: micp 1.3s ease-out infinite; }
   @keyframes micp { 0% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 0 rgba(96,165,250,.7); } 100% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 22px rgba(96,165,250,0); } }
   .orb-sm { width: 54px; height: 54px; font-size: 22px; margin-top: -22px; border-width: 2px; }
-  /* Terminal calme */
   #tab-chat *, .still * { animation: none !important; transition: none !important; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
   ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { background: rgba(56,140,255,.3); border-radius: 3px; }
@@ -101,7 +104,7 @@
     </div>
     <div class="flex items-center gap-2">
       <button id="btn-install" class="chip hidden">Installer</button>
-      <button id="btn-help" class="chip">Installer</button>
+      <button id="btn-help" class="chip">Aide</button>
       <button id="btn-settings" class="chip" aria-label="Réglages">⚙</button>
     </div>
   </header>
@@ -160,14 +163,16 @@
       <div class="max-w-3xl mx-auto h-full flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2"><div id="avatar-chat" class="w-8 h-8 rounded-lg border border-blue-400/40 bg-black overflow-hidden"></div><div><div class="text-sm font-bold text-blue-50">Chat</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
-          <button id="new-chat" class="chip">Nouvelle conversation</button>
+          <div class="flex gap-2"><button id="conv-open" class="chip">🗂 Conversations</button><button id="new-chat" class="chip">＋ Nouvelle</button></div>
         </div>
         <div id="modes" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
         <div id="chips" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
         <div id="chat-log" class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1" style="overscroll-behavior:contain"></div>
         <div id="mem-bar" class="hud hidden !p-2 text-xs flex items-center gap-2 shrink-0"><span id="mem-txt" class="flex-1 text-blue-100"></span><button id="mem-yes" type="button" class="chip on">Retenir</button><button id="mem-no" type="button" class="chip">Non</button></div>
+        <div id="att-bar" class="hidden flex gap-2 overflow-x-auto shrink-0"></div>
         <form id="chat-form" class="hud flex items-center gap-2 !p-2 shrink-0" style="margin-bottom:2px">
           <button type="button" data-vt class="chip">🔇</button>
+          <button type="button" id="att-btn" class="chip" aria-label="Joindre une image ou un PDF">📎</button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
           <button type="button" class="mic-btn chip"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
           <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Écris ton message…" class="flex-1 min-w-0 bg-transparent text-sm px-1 py-2 outline-none placeholder-zinc-500">
           <button id="chat-send" type="submit" class="btn-neon px-4 py-2 text-sm">Envoyer</button>
@@ -317,6 +322,15 @@
   </div>
 </div>
 
+<!-- Conversations -->
+<div id="modal-convs" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+  <div class="hud w-full max-w-sm max-h-[85vh] flex flex-col gap-2" style="background:#050a16">
+    <div class="flex items-center justify-between"><div class="lbl">Conversations</div><button id="conv-close" class="chip on">Fermer</button></div>
+    <input id="conv-q" type="search" placeholder="Rechercher…" class="fld !mt-0">
+    <div id="conv-list" class="space-y-2 overflow-y-auto"></div>
+  </div>
+</div>
+
 <!-- Installation -->
 <div id="modal-help" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
   <div class="hud w-full max-w-sm space-y-2 text-xs text-zinc-300 leading-relaxed" style="background:#050a16">
@@ -324,6 +338,7 @@
     <p><b class="text-blue-300">Ordinateur (Chrome ou Edge)</b><br>Icône d'installation à droite de la barre d'adresse, ou menu ⋮ puis « Installer la page en tant qu'application ».</p>
     <p><b class="text-blue-300">Android (Chrome)</b><br>Menu ⋮ puis « Installer l'application ».</p>
     <p><b class="text-blue-300">iPhone (Safari)</b><br>Partager puis « Sur l'écran d'accueil ».</p>
+    <p><b class="text-blue-300">Images et PDF</b><br>Touchez 📎 dans le chat (jusqu'à 5 fichiers), ou collez une image dans la zone de texte.</p>
     <button id="help-close" class="btn-neon w-full py-2.5 text-sm mt-2">Compris</button>
   </div>
 </div>
@@ -357,19 +372,21 @@
   let mem = store.get('louis.mem', []), rules = store.get('louis.rules', []), fb = store.get('louis.fb', []), pendingMem = [], lastRegles = [];
   let tasks = store.get('louis.tasks', []);
   let tfilter = 'all';
-  let messages = store.get('louis.chat2', []);
+  let convs = store.get('louis.convs', []), curId = store.get('louis.cur', 0), messages = [], cur;
+  if (!convs.length) { const old = store.get('louis.chat2', []); if (old.length > 1) convs.push({ id: Date.now(), title: 'Ancienne conversation', ts: Date.now(), mode: 'general', messages: old }); }
   let mode = store.get('louis.mode', 'general');
-  // La voix est désactivée par défaut : Louis ne parle que si vous l'activez.
   let autoVoice = store.get('louis.voice2', false);
   let busy = false, abortCtl = null;
   let exch = store.get('louis.exch', 0), bilanAt = store.get('louis.bilanAt', 0);
   const greet = () => ({ id: 1, sender: 'jarvis', ts: now(), text: 'Bonjour Monsieur', greet: true });
-  if (!messages.length) messages.push(greet());
-  const persist = () => store.set('louis.chat2', messages.filter(m => !m.pending).slice(-60));
+  const newConv = () => { const c = { id: Date.now(), title: 'Nouvelle conversation', ts: Date.now(), mode, messages: [greet()] }; convs.unshift(c); return c; };
+  cur = convs.find(c => c.id === curId) || convs[0] || newConv(); messages = cur.messages; mode = cur.mode || mode;
+  const strip = c => ({ ...c, messages: c.messages.filter(m => !m.pending).slice(-200).map(({ files, ...m }) => m) });
+  const persist = () => { cur.messages = messages; cur.ts = Date.now(); store.set('louis.cur', cur.id); store.set('louis.convs', convs.slice(0, 50).map(strip)); };
   const hello = () => `Bonjour Monsieur ${settings.name || ''}, que puis-je faire pour vous ?`;
   $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || '');
 
-  /* ---------- Robot noir de Louis ---------- */
+  /* ---------- Robot noir de Louis (il sourit) ---------- */
   const robot = full => `<svg viewBox="${full ? '0 0 300 340' : '52 14 196 200'}" class="w-full h-full" role="img" aria-label="Louis">
     ${full ? `<ellipse cx="150" cy="190" rx="150" ry="160" fill="url(#gGlow)"/>
     <path d="M14 340C16 268 58 232 108 222L192 222C242 232 284 268 286 340Z" fill="url(#gBlack)" stroke="#22d3ee" stroke-opacity=".35"/>
@@ -387,7 +404,9 @@
     <path d="M92 98C92 86 106 84 150 84C194 84 208 86 208 98L208 132C208 144 194 148 150 148C106 148 92 144 92 132Z" fill="url(#gVisor)" stroke="#22d3ee" stroke-opacity=".65"/>
     <g class="eye"><ellipse cx="124" cy="116" rx="15" ry="8" fill="#22d3ee" filter="url(#blur2)" opacity=".9"/><ellipse cx="124" cy="116" rx="9" ry="3.6" fill="#cffafe"/></g>
     <g class="eye"><ellipse cx="176" cy="116" rx="15" ry="8" fill="#22d3ee" filter="url(#blur2)" opacity=".9"/><ellipse cx="176" cy="116" rx="9" ry="3.6" fill="#cffafe"/></g>
-    ${[0, 1, 2, 3, 4].map(i => `<rect class="mb" style="animation-delay:${i * .07}s" x="${128 + i * 9}" y="168" width="5" height="6" rx="2" fill="#22d3ee" opacity=".75"/>`).join('')}
+    <g class="hap" fill="none" stroke="#cffafe" stroke-width="5" stroke-linecap="round"><path d="M110 122Q124 106 138 122"/><path d="M162 122Q176 106 190 122"/></g>
+    <ellipse cx="102" cy="164" rx="11" ry="6" fill="#22d3ee" opacity=".16"/><ellipse cx="198" cy="164" rx="11" ry="6" fill="#22d3ee" opacity=".16"/>
+    <path class="smile" d="M120 165Q150 190 180 165" fill="none" stroke="#22d3ee" stroke-width="4.5" stroke-linecap="round"/>
   </svg>`;
   $('#robot-big').innerHTML = robot(true);
   $('#avatar-sm').innerHTML = robot(false);
@@ -408,7 +427,7 @@
   }
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go, g.hasAttribute('data-focus'));
-    const m = e.target.closest('[data-mode]'); if (m) { setMode(m.dataset.mode); go('chat', true); }
+    const m = e.target.closest('[data-mode]'); if (m) { startFresh(m.dataset.mode); go('chat', true); }
     const v = e.target.closest('[data-vt]'); if (v) toggleVoice();
     const mic = e.target.closest('.mic-btn'); if (mic) startMic();
   });
@@ -416,7 +435,7 @@
   /* ---------- Modes ---------- */
   const MODES = {
     general: { n: 'Général', e: '💬', x: '', chips: [
-      ['💡 Que sais-tu faire ?', 'Présente en quelques lignes ce que tu peux faire pour moi (programmation, anglais, devoirs, maths, finance, organisation).', true],
+      ['💡 Que sais-tu faire ?', 'Présente en quelques lignes ce que tu peux faire pour moi (programmation, anglais, devoirs, maths, finance, organisation, analyse d\'images et de PDF).', true],
       ['🗓 Organiser ma semaine', "Aide-moi à organiser ma semaine : pose-moi d'abord les questions utiles, puis propose un planning concret.", true],
       ['📄 E-mail, CV, lettre', 'Rédige pour moi : ', false]] },
     code: { n: 'Programmation', e: '💻', x: "MODE PROGRAMMATION : tu es ingénieur logiciel senior et architecte. Tu crées uniquement ce qui est demandé : sites web, applications, interfaces modernes et responsives, scripts, API, bases de données, projets Python, R, JavaScript, SQL, VBA. Pour un site, une application ou une interface : fournis UN fichier HTML complet et autonome (CSS et JavaScript inclus) dans un seul bloc de code html, moderne, soigné et responsive, directement prévisualisable. Pour un projet multi-fichiers : donne d'abord l'arborescence, puis chaque fichier dans son propre bloc, avec son nom en titre juste avant. Explique brièvement comment le lancer. Pour le débogage : identifie la cause, corrige, explique. Vérifie mentalement ton code avant de répondre. N'ajoute aucune fonctionnalité non demandée.", chips: [
@@ -440,7 +459,7 @@
       ['🧠 Explique simplement', 'Explique-moi simplement : ', false],
       ['📝 Préparer un contrôle', 'Prépare-moi à un contrôle sur : ', false]] }
   };
-  function setMode(k) { mode = MODES[k] ? k : 'general'; store.set('louis.mode', mode); renderModes(); }
+  function setMode(k) { mode = MODES[k] ? k : 'general'; if (cur) cur.mode = mode; store.set('louis.mode', mode); renderModes(); }
   function renderModes() {
     $('#modes').innerHTML = Object.entries(MODES).map(([k, m]) => `<button class="chip ${k === mode ? 'on' : ''}" data-setmode="${k}">${m.e} ${m.n}</button>`).join('');
     $('#chips').innerHTML = MODES[mode].chips.map((c, i) => `<button class="chip" data-chip="${i}" style="background:rgba(255,255,255,.04);color:#cbd5e1">${c[0]}</button>`).join('');
@@ -461,6 +480,8 @@ RÈGLE ABSOLUE — OBÉIR, SANS INITIATIVE : tu ne fais que ce que l'utilisateur
 
 COMPÉTENCES : programmation (Python, R, JavaScript, HTML/CSS, SQL, VBA, Git, sites, applications, interfaces) ; Excel avancé ; Power BI (DAX, Power Query M) ; mathématiques, statistiques, machine learning, finance quantitative ; anglais (grammaire, vocabulaire, examens, anglais académique et professionnel) ; devoirs et exercices de toutes matières ; organisation et tâches (planning, études, carrière, CV, lettres, e-mails, budget, projets).
 
+FICHIERS : si une image ou un PDF est joint, analyse-le précisément (texte, tableaux, schémas, énoncés d'exercices, graphiques) et réponds à la demande. Si le fichier est illisible ou incomplet, dis-le.
+
 ADAPTATION : repère le niveau et les objectifs de l'utilisateur d'après ses messages et ses instructions personnelles, puis adapte vocabulaire, profondeur et exemples. Si le niveau est inconnu pour un travail d'apprentissage demandé, pose UNE question courte.
 
 RIGUEUR : annonce tes hypothèses ; signale les limites des modèles ; dans une démonstration, détaille chaque étape ; fournis un code propre, commenté et testé mentalement ; tiens compte des contraintes réelles (frais, spread, liquidité). N'invente jamais de chiffres : si une donnée manque, dis-le.
@@ -469,10 +490,10 @@ VITESSE : réponds directement, sans préambule ni répétition de la demande ; 
 
 GRAPHIQUES : si (et seulement si) un graphique, une simulation ou une visualisation est demandé, calcule réellement les valeurs et affiche-les avec un bloc de code de langage chart contenant un JSON valide : {"type":"line|area|bar","title":"...","labels":["..."],"series":[{"name":"...","data":[nombres]}]}, au plus 60 points par série, nombres arrondis, puis une courte interprétation.
 
-STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, blocs de code).`;
+STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses structurées et précises ; Markdown (titres, listes, gras, blocs de code).`;
     const who = settings.name ? `\n\nL'utilisateur s'appelle ${settings.name} ; tu l'appelles « Monsieur ${settings.name} », uniquement pour saluer, pas à chaque phrase.` : '';
     const mine = settings.notes ? `\n\nINSTRUCTIONS PERSONNELLES DE L'UTILISATEUR : ${settings.notes}` : '';
-    const memo = mem.length ? '\n\nMÉMOIRE (faits durables validés par l\'utilisateur) :\n- ' + mem.map(m => m.t).join('\n- ') : '';
+    const memo = mem.length ? '\n\nMÉMOIRE (faits durables validés par l\'utilisateur) :\n- ' + mem.slice(0, 30).map(m => m.t).join('\n- ') : '';
     const lessons = rules.length ? '\n\nRÈGLES APPRISES (validées par l\'utilisateur, à appliquer) :\n- ' + rules.map(r => r.t).join('\n- ') : '';
     const tag = "\n\nMÉMORISATION : seulement si l'utilisateur te donne un fait durable le concernant (objectif, niveau, préférence, contrainte) ou te demande de retenir quelque chose, ajoute à la toute fin de ta réponse une ligne [[mem: fait court à retenir]]. N'écris jamais cette ligne autrement. L'utilisateur validera avant tout enregistrement.";
     return base + who + mine + memo + lessons + tag + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
@@ -623,13 +644,16 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     sp.idx += seg.length; enqueueSpeech(seg);
   }
   async function send(text, viaVoice) {
-    text = (text || '').trim(); if (!text || busy) return;
+    text = (text || '').trim(); if (!text && atts.length) text = 'Analyse ce fichier.'; if (!text || busy) return;
+    const F = atts; atts = []; paintAtt();
     stopSpeech(); busy = true; $('#chat-send').textContent = 'Stop'; exch++; store.set('louis.exch', exch);
-    const u = { id: Date.now(), sender: 'user', text, ts: now() };
+    const u = { id: Date.now(), sender: 'user', raw: text, text: text + (F.length ? '\n' + F.map(f => '📎 ' + f.name).join('\n') : ''), files: F, ts: now() };
     const a = { id: u.id + 1, sender: 'jarvis', text: '', ts: now(), pending: true };
     messages.push(u, a);
+    if (cur.title === 'Nouvelle conversation') cur.title = text.slice(0, 42);
     const log = $('#chat-log'); log.appendChild(msgEl(u)); log.appendChild(msgEl(a)); log.scrollTop = log.scrollHeight;
-    const hist = messages.filter(m => m !== a && !m.greet && !m.err && m.text).slice(-14).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+    const withF = messages.filter(m => m.files && m.files.length).slice(-2);
+    const hist = messages.filter(m => m !== a && !m.greet && !m.err && m.text).slice(-14).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [...(withF.includes(m) ? m.files.map(f => ({ inlineData: { mimeType: f.mime, data: f.data } })) : []), { text: m.text }] }));
     while (hist.length && hist[0].role !== 'user') hist.shift();
     sp = { idx: 0, on: !!viaVoice };
     const res = await ask(hist, part => { a.text = part; live(a); feedSpeech(part, false); });
@@ -642,7 +666,34 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     busy = false; $('#chat-send').textContent = 'Envoyer'; persist(); updateBadge();
   }
   $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (busy) { if (abortCtl) abortCtl.abort(); return; } const i = $('#chat-input'), t = i.value; i.value = ''; send(t); });
-  $('#new-chat').onclick = () => { if (!confirm('Commencer une nouvelle conversation ?')) return; stopSpeech(); messages = [greet()]; persist(); renderChat(); };
+
+  /* ---------- Conversations séparées ---------- */
+  function startFresh(k) {
+    if (busy) return;
+    if (messages.some(m => m.sender === 'user')) { cur = newConv(); messages = cur.messages; renderChat(); }
+    if (k) setMode(k);
+    persist();
+  }
+  $('#new-chat').onclick = () => { stopSpeech(); startFresh(); toast('Nouvelle conversation'); };
+  $('#conv-open').onclick = () => { renderConvs(); show('#modal-convs', true); };
+  $('#conv-close').onclick = () => show('#modal-convs', false);
+  $('#conv-q').oninput = renderConvs;
+  function renderConvs() {
+    const q = $('#conv-q').value.trim().toLowerCase(), box = $('#conv-list');
+    const rows = convs.filter(c => !q || c.title.toLowerCase().includes(q) || c.messages.some(m => String(m.text).toLowerCase().includes(q)));
+    box.innerHTML = rows.length ? '' : '<div class="text-xs text-zinc-500">Aucune conversation.</div>';
+    rows.forEach(c => {
+      const r = document.createElement('div'); r.className = 'tile flex items-center gap-2 !p-2' + (c.id === cur.id ? ' !border-sky-400' : '');
+      r.innerHTML = '<button class="flex-1 min-w-0 text-left"><div class="text-[13px] text-blue-50 truncate"></div><div class="text-[10px] text-zinc-400"></div></button><button class="text-zinc-500 text-sm" aria-label="Renommer">✎</button><button class="text-zinc-500 hover:text-rose-400 text-sm" aria-label="Supprimer">✕</button>';
+      r.children[0].children[0].textContent = c.title;
+      r.children[0].children[1].textContent = (MODES[c.mode] ? MODES[c.mode].e + ' ' + MODES[c.mode].n : '') + ' · ' + new Date(c.ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + c.messages.filter(m => m.sender === 'user').length + ' msg';
+      r.children[0].onclick = () => { if (busy) return toast('Réponse en cours'); stopSpeech(); cur = c; messages = c.messages; mode = MODES[c.mode] ? c.mode : 'general'; store.set('louis.mode', mode); renderModes(); persist(); renderChat(); show('#modal-convs', false); go('chat'); };
+      r.children[1].onclick = () => { const t = prompt('Nouveau titre ?', c.title); if (t && t.trim()) { c.title = t.trim().slice(0, 60); persist(); renderConvs(); } };
+      r.children[2].onclick = () => { if (busy || !confirm('Supprimer cette conversation ?')) return; convs = convs.filter(x => x !== c); if (c === cur) { cur = convs[0] || newConv(); messages = cur.messages; renderChat(); } persist(); renderConvs(); };
+      box.appendChild(r);
+    });
+  }
+
   $('#chat-log').addEventListener('click', e => {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const act = b.dataset.act, m = messages.find(x => x.id === +b.dataset.id);
@@ -654,6 +705,41 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     else if ((act === 'up' || act === 'down') && m) { rate(m, act === 'up' ? 1 : -1); }
     else if (act === 'regen' && m) { regen(m); }
   });
+
+  /* ---------- Images et PDF ---------- */
+  let atts = [];
+  function paintAtt() {
+    const bar = $('#att-bar'); bar.classList.toggle('hidden', !atts.length); bar.innerHTML = '';
+    atts.forEach((f, i) => { const c = document.createElement('button'); c.type = 'button'; c.className = 'chip on'; c.textContent = (f.mime === 'application/pdf' ? '📄 ' : '🖼 ') + f.name.slice(0, 20) + ' ✕'; c.onclick = () => { atts.splice(i, 1); paintAtt(); }; bar.appendChild(c); });
+    $('#att-btn').textContent = atts.length ? '📎' + atts.length : '📎';
+  }
+  function addFile(f) {
+    if (!f) return;
+    if (atts.length >= 5) return toast('5 fichiers maximum');
+    const isImg = f.type.startsWith('image/'), isPdf = f.type === 'application/pdf';
+    if (!isImg && !isPdf) return toast('Images et PDF seulement');
+    if (f.size > 15e6) return toast('Fichier trop lourd (15 Mo max)');
+    const r = new FileReader();
+    r.onload = () => {
+      const url = r.result;
+      if (isPdf) { atts.push({ mime: f.type, data: url.split(',')[1], name: f.name }); paintAtt(); return; }
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        atts.push({ mime: 'image/jpeg', data: c.toDataURL('image/jpeg', .85).split(',')[1], name: f.name }); paintAtt();
+      };
+      img.onerror = () => toast('Image illisible');
+      img.src = url;
+    };
+    r.readAsDataURL(f);
+  }
+  $('#att-btn').onclick = () => $('#att-file').click();
+  $('#att-file').onchange = e => { [...e.target.files].forEach(addFile); e.target.value = ''; };
+  $('#chat-input').addEventListener('paste', e => { const fs = [...(e.clipboardData?.files || [])]; if (fs.length) { e.preventDefault(); fs.forEach(addFile); } });
+  $('#tab-chat').addEventListener('dragover', e => e.preventDefault());
+  $('#tab-chat').addEventListener('drop', e => { e.preventDefault(); [...e.dataTransfer.files].forEach(addFile); });
 
   /* ---------- Aperçu de code ---------- */
   let prevCode = '';
@@ -672,9 +758,9 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
   function stopSpeech() { speakToken++; speakCount = 0; if (hasTTS) speechSynthesis.cancel(); setSpeaking(false); }
   function cleanForSpeech(t) { return t.replace(/```[\s\S]*?(```|$)/g, " Le détail est affiché à l'écran. ").replace(/https?:\/\/\S+/g, '').replace(/[*#`_>~|•]/g, '').replace(/\s+/g, ' ').trim(); }
   function toChunks(t) {
-    const parts = t.match(/[^.!?;:\n]+[.!?;:]?/g) || [], out = []; let cur = '';
-    parts.forEach(p => { if ((cur + p).length > 180 && cur) { out.push(cur.trim()); cur = p; } else cur += p; });
-    if (cur.trim()) out.push(cur.trim());
+    const parts = t.match(/[^.!?;:\n]+[.!?;:]?/g) || [], out = []; let cur2 = '';
+    parts.forEach(p => { if ((cur2 + p).length > 180 && cur2) { out.push(cur2.trim()); cur2 = p; } else cur2 += p; });
+    if (cur2.trim()) out.push(cur2.trim());
     return out;
   }
   function detectLang(c) {
@@ -772,7 +858,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
   });
   $('#lk-edit').onclick = () => { linkEdit = !linkEdit; $('#lk-edit').textContent = linkEdit ? 'Terminer' : 'Modifier'; renderLinks(); };
 
-  /* ---------- Tâches (créées uniquement par vous) ---------- */
+  /* ---------- Tâches (créées uniquement par vous) + rappels ---------- */
   function renderTasks() {
     $$('#task-filters [data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === tfilter));
     const list = $('#task-list'); list.innerHTML = '';
@@ -791,9 +877,19 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
   }
   $('#task-form').addEventListener('submit', e => {
     e.preventDefault(); const i = $('#task-input'), tm = $('#task-time'), text = i.value.trim(); if (!text) return;
+    if (tm.value && window.Notification && Notification.permission === 'default') Notification.requestPermission();
     tasks.unshift({ id: Date.now(), text: text.slice(0, 200), time: tm.value, done: false }); store.set('louis.tasks', tasks); i.value = ''; tm.value = ''; renderTasks();
   });
   $('#task-filters').addEventListener('click', e => { const b = e.target.closest('[data-tf]'); if (b) { tfilter = b.dataset.tf; renderTasks(); } });
+  setInterval(() => {
+    const d = new Date(), hm = d.toTimeString().slice(0, 5), day = d.toDateString();
+    tasks.forEach(t => {
+      if (!t.done && t.time === hm && t.nd !== day) {
+        t.nd = day; store.set('louis.tasks', tasks); toast('⏰ ' + t.text); navigator.vibrate?.(300);
+        if (window.Notification && Notification.permission === 'granted') new Notification('Louis · Tâche', { body: t.text, icon: 'icon-192.png' });
+      }
+    });
+  }, 20000);
 
   /* ---------- Notes ---------- */
   function saveNote(title, content) { notes.unshift({ id: Date.now(), title, content, date: new Date().toLocaleDateString('fr-FR') }); store.set('jarvis.notes', notes); toast('Note enregistrée'); }
@@ -852,7 +948,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
       card('Perte max. à 95 % (VaR)', f(Math.max(0, S0 - p5)), 'text-rose-400') + card('Probabilité de hausse', (pUp * 100).toFixed(1) + ' %', 'text-emerald-400') + card('Call Monte-Carlo', f(mc) + ' ± ' + f(1.96 * se)) + card('Call Black-Scholes', f(bs)) + '</div>' +
       '<button id="s-ask" class="chip w-full !rounded-xl !py-2.5">Faire analyser ces résultats par Louis</button>';
     out.classList.remove('hidden');
-    $('#s-ask').onclick = () => { setMode('maths'); go('chat'); send(`Analyse ces résultats de simulation Monte-Carlo (mouvement brownien géométrique) : S0=${S0}, K=${K}, rendement ${(mu * 100).toFixed(1)} %, taux ${(r * 100).toFixed(1)} %, volatilité ${(sg * 100).toFixed(1)} %, ${D} jours, ${N} simulations. Prix final moyen ${f(mean)}, médiane ${f(med)}, P5 ${f(p5)}, P95 ${f(p95)}, probabilité de hausse ${(pUp * 100).toFixed(1)} %, call Monte-Carlo ${f(mc)} (± ${f(1.96 * se)}) contre Black-Scholes ${f(bs)}. Commente la cohérence, les risques (queues épaisses) et les limites du modèle.`); };
+    $('#s-ask').onclick = () => { startFresh('maths'); go('chat'); send(`Analyse ces résultats de simulation Monte-Carlo (mouvement brownien géométrique) : S0=${S0}, K=${K}, rendement ${(mu * 100).toFixed(1)} %, taux ${(r * 100).toFixed(1)} %, volatilité ${(sg * 100).toFixed(1)} %, ${D} jours, ${N} simulations. Prix final moyen ${f(mean)}, médiane ${f(med)}, P5 ${f(p5)}, P95 ${f(p95)}, probabilité de hausse ${(pUp * 100).toFixed(1)} %, call Monte-Carlo ${f(mc)} (± ${f(1.96 * se)}) contre Black-Scholes ${f(bs)}. Commente la cohérence, les risques (queues épaisses) et les limites du modèle.`); };
   };
 
   /* ---------- Réglages ---------- */
@@ -884,8 +980,8 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
 
   /* ---------- Installation (PWA) ---------- */
   let deferred = null;
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('#btn-install').classList.remove('hidden'); $('#btn-help').classList.add('hidden'); });
-  $('#btn-install').onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btn-install').classList.add('hidden'); $('#btn-help').classList.remove('hidden'); };
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('#btn-install').classList.remove('hidden'); });
+  $('#btn-install').onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btn-install').classList.add('hidden'); };
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
   /* ---------- Évolution : mémoire, retours, bilan ---------- */
@@ -912,7 +1008,9 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     if (busy) return;
     const i = messages.indexOf(m), u = messages[i - 1];
     if (i !== messages.length - 1 || !u || u.sender !== 'user') { toast('Seule la dernière réponse peut être refaite'); return; }
-    messages.splice(i - 1, 2); renderChat(); send(u.text);
+    messages.splice(i - 1, 2); renderChat();
+    atts = u.files && u.files.length ? [...u.files] : []; paintAtt();
+    send(u.raw !== undefined ? u.raw : u.text);
   }
   function listRows(el, arr, key, empty) {
     el.innerHTML = '';
@@ -955,7 +1053,7 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
     b.textContent = 'Adoptée'; b.disabled = true; renderImprove();
   });
   $('#bk-export').onclick = () => {
-    const d = { v: 1, settings: Object.assign({}, settings, { key: '' }), notes, tasks, mem, rules, fb, links };
+    const d = { v: 2, settings: Object.assign({}, settings, { key: '' }), notes, tasks, mem, rules, fb, links, convs: convs.map(strip) };
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' })); a.download = 'louis-sauvegarde.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
   $('#bk-import').onchange = e => {
@@ -965,14 +1063,14 @@ STYLE : réponses structurées et précises ; Markdown (titres, listes, gras, bl
       try {
         const d = JSON.parse(r.result); if (!confirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
         if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key }));
-        [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
+        [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links], ['louis.convs', d.convs]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
         location.reload();
       } catch { toast('Fichier invalide'); }
     };
     r.readAsText(f);
   };
 
-  renderModes(); renderChat(); renderLinks(); renderApps(); renderTasks(); updateBadge();
+  renderModes(); renderChat(); renderLinks(); renderApps(); renderTasks(); updateBadge(); persist();
 })();
 </script>
 </body>
