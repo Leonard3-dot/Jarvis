@@ -17,25 +17,32 @@
   #tab-chat.active { display: flex; }
   .nav-btn.on { color: #22d3ee; }
   textarea, input { font-family: ui-monospace, monospace; }
+  body { background: radial-gradient(60% 45% at 12% 105%, rgba(168,85,247,.30), transparent 70%), radial-gradient(55% 40% at 95% -5%, rgba(59,130,246,.25), transparent 70%), #0a0a0f; background-attachment: fixed; }
+  .btn-grad { background: linear-gradient(135deg, #6366f1, #8b5cf6 55%, #22d3ee); color: #fff; }
+  .btn-grad:hover { filter: brightness(1.1); }
+  .btn-grad:disabled { opacity: .4; }
+  [class*="bg-zinc-900"] { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .orb { background-image: radial-gradient(circle at 30% 25%, rgba(255,255,255,.28), rgba(99,102,241,.35) 38%, rgba(24,24,40,.92) 78%) !important; }
+  .orb-text { font-size: 2.6rem; font-weight: 800; letter-spacing: .1em; color: #ede9fe; text-shadow: 0 0 18px #a78bfa, 0 0 40px #6366f1; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
 </style>
 </head>
 <body class="text-zinc-200">
-<div class="flex flex-col h-full w-full bg-zinc-950 overflow-hidden" style="padding-top:env(safe-area-inset-top)">
+<div class="flex flex-col h-full w-full overflow-hidden" style="padding-top:env(safe-area-inset-top)">
 
   <!-- En-tête -->
-  <header class="flex items-center justify-between px-4 py-3 bg-zinc-900/80 border-b border-cyan-500/20">
+  <header class="flex items-center justify-between px-4 py-3 bg-zinc-900/80 border-b border-violet-500/20">
     <div class="flex items-center gap-2">
-      <div class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-950 border border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.4)] text-cyan-400 animate-pulse">◉</div>
+      <div class="flex items-center justify-center w-8 h-8 rounded-full bg-violet-950 border border-violet-400/50 shadow-[0_0_12px_rgba(139,92,246,0.4)] text-violet-400 animate-pulse">◉</div>
       <div>
-        <h1 class="text-sm font-bold tracking-widest text-cyan-100 font-mono">LOUIS // CORE</h1>
-        <p id="status" class="text-[10px] text-cyan-400/70 font-mono">Statut : en ligne</p>
+        <h1 class="text-sm font-bold tracking-widest text-violet-100 font-mono">LOUIS // CORE</h1>
+        <p id="status" class="text-[10px] text-violet-400/70 font-mono">Statut : en ligne</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
-      <button id="btn-install" class="hidden px-2.5 py-1 text-xs rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">Installer l'application</button>
-      <button id="btn-help" class="px-2.5 py-1 text-xs rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">Installer</button>
-      <button id="btn-settings" class="px-2.5 py-1 text-xs rounded-full bg-zinc-800 border border-cyan-500/30 text-cyan-300 hover:bg-zinc-700" aria-label="Réglages">⚙ Réglages</button>
+      <button id="btn-install" class="hidden px-2.5 py-1 text-xs rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 hover:bg-violet-500/20">Installer l'application</button>
+      <button id="btn-help" class="px-2.5 py-1 text-xs rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 hover:bg-violet-500/20">Installer</button>
+      <button id="btn-settings" class="px-2.5 py-1 text-xs rounded-full bg-zinc-800 border border-violet-500/30 text-violet-300 hover:bg-zinc-700" aria-label="Réglages">⚙ Réglages</button>
     </div>
   </header>
 
@@ -44,117 +51,117 @@
     <!-- HUD -->
     <section id="tab-hud" class="tab active max-w-xl mx-auto py-4">
       <div class="relative my-8 flex items-center justify-center h-60">
-        <div class="absolute w-56 h-56 rounded-full border border-cyan-500/20 animate-[spin_10s_linear_infinite]"></div>
-        <div class="absolute w-48 h-48 rounded-full border border-dashed border-cyan-400/40 animate-[spin_15s_linear_infinite_reverse]"></div>
-        <div class="absolute w-40 h-40 rounded-full border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)] animate-pulse"></div>
-        <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-cyan-900 via-zinc-900 to-cyan-500/20 border border-cyan-300/50 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.5)]">
-          <span class="text-4xl text-cyan-300 animate-pulse">◉</span>
-          <span class="text-[9px] font-mono tracking-widest text-cyan-200 mt-1">CORE ACTIVE</span>
+        <div class="absolute w-56 h-56 rounded-full border border-violet-500/20 animate-[spin_10s_linear_infinite]"></div>
+        <div class="absolute w-48 h-48 rounded-full border border-dashed border-violet-400/40 animate-[spin_15s_linear_infinite_reverse]"></div>
+        <div class="absolute w-40 h-40 rounded-full border-2 border-violet-500/30 shadow-[0_0_30px_rgba(139,92,246,0.2)] animate-pulse"></div>
+        <div class="w-32 h-32 rounded-full orb bg-gradient-to-tr from-violet-900 via-zinc-900 to-violet-500/20 border border-violet-300/50 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(139,92,246,0.5)]">
+          <span class="orb-text">AI</span><span class="text-[9px] font-mono tracking-widest text-violet-200 mt-1">LOUIS · EN LIGNE</span>
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-3 mb-6">
-        <div class="p-3 bg-zinc-900/60 border border-cyan-500/20 rounded-xl">
-          <div class="text-[10px] font-mono text-cyan-400/70">MOTEUR DE RAISONNEMENT</div>
+        <div class="p-3 bg-zinc-900/60 border border-violet-500/20 rounded-xl">
+          <div class="text-[10px] font-mono text-violet-400/70">MOTEUR DE RAISONNEMENT</div>
           <div id="hud-model" class="text-sm font-semibold text-zinc-100 mt-1">—</div>
         </div>
-        <div class="p-3 bg-zinc-900/60 border border-cyan-500/20 rounded-xl">
-          <div class="text-[10px] font-mono text-cyan-400/70">CLÉ API</div>
+        <div class="p-3 bg-zinc-900/60 border border-violet-500/20 rounded-xl">
+          <div class="text-[10px] font-mono text-violet-400/70">CLÉ API</div>
           <div id="hud-key" class="text-sm font-semibold mt-1">—</div>
         </div>
       </div>
 
-      <p class="text-xs font-mono text-cyan-400/80 mb-2">Modules spécialisés</p>
+      <p class="text-xs font-mono text-violet-400/80 mb-2">Modules spécialisés</p>
       <div class="grid grid-cols-2 gap-2">
-        <button data-go="math" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">📐 Mathématiques</div><div class="text-[10px] text-zinc-400">Analyse et algèbre</div></button>
-        <button data-go="data" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">📊 Data science</div><div class="text-[10px] text-zinc-400">Python et analyse</div></button>
-        <button data-go="finance" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">📈 Finance</div><div class="text-[10px] text-zinc-400">Black-Scholes</div></button>
-        <button data-go="english" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">🌐 Anglais technique</div><div class="text-[10px] text-zinc-400">Articles et vocabulaire</div></button>
+        <button data-go="math" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-violet-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">📐 Mathématiques</div><div class="text-[10px] text-zinc-400">Analyse et algèbre</div></button>
+        <button data-go="data" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-violet-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">📊 Data et simulations</div><div class="text-[10px] text-zinc-400">Graphiques, Python, R</div></button>
+        <button data-go="finance" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-violet-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">📈 Finance</div><div class="text-[10px] text-zinc-400">Black-Scholes</div></button>
+        <button data-go="english" class="p-3 bg-zinc-900/80 hover:bg-zinc-800 border border-violet-500/30 rounded-xl text-left"><div class="text-xs font-bold text-zinc-100">🌐 Anglais technique</div><div class="text-[10px] text-zinc-400">Articles et vocabulaire</div></button>
       </div>
-      <button data-go="chat" class="w-full mt-3 p-3 bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.4)]">Ouvrir le terminal</button>
+      <button data-go="chat" class="w-full mt-3 p-3 btn-grad font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.4)]">Ouvrir le terminal</button>
     </section>
 
     <!-- Terminal -->
     <section id="tab-chat" class="tab flex-col h-full max-w-2xl mx-auto">
       <div class="flex gap-2 overflow-x-auto pb-2 mb-2 text-xs">
-        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50" data-p="Conçois un pipeline Python complet avec Pandas et Scikit-Learn pour la détection d'anomalies sur des transactions financières.">⚡ Pipeline de données</button>
-        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50" data-p="Démontre mathématiquement la règle de mise à jour de la descente de gradient pour un perceptron multicouche.">📐 Démonstration</button>
-        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50" data-p="Explique la simulation de Monte-Carlo pour la valorisation d'options, avec rigueur.">📈 Finance quantitative</button>
-      <button id="new-chat" class="px-3 py-1.5 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-300 whitespace-nowrap hover:bg-zinc-700">Nouvelle conversation</button>
+        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-violet-500/30 text-violet-300 whitespace-nowrap hover:bg-violet-950/50" data-p="Conçois un pipeline Python complet avec Pandas et Scikit-Learn pour la détection d'anomalies sur des transactions financières.">⚡ Pipeline de données</button>
+        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-violet-500/30 text-violet-300 whitespace-nowrap hover:bg-violet-950/50" data-p="Démontre mathématiquement la règle de mise à jour de la descente de gradient pour un perceptron multicouche.">📐 Démonstration</button>
+        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-violet-500/30 text-violet-300 whitespace-nowrap hover:bg-violet-950/50" data-p="Explique la simulation de Monte-Carlo pour la valorisation d'options, avec rigueur.">📈 Finance quantitative</button>
+      <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-violet-500/30 text-violet-300 whitespace-nowrap hover:bg-violet-950/50" data-p="Simule 5 trajectoires de prix d'une action (mouvement brownien géométrique, 60 jours, volatilité 25 %) et affiche-les dans un graphique.">📉 Graphique simulé</button>
+        <button class="preset px-3 py-1.5 rounded-full bg-zinc-900 border border-violet-500/30 text-violet-300 whitespace-nowrap hover:bg-violet-950/50" data-p="Aide-moi à organiser ma semaine et mes priorités : pose-moi d'abord les questions utiles puis propose un planning concret.">🗓 Mes tâches</button>
+        <button id="new-chat" class="px-3 py-1.5 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-300 whitespace-nowrap hover:bg-zinc-700">Nouvelle conversation</button>
       </div>
       <div id="chat-log" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
-      <form id="chat-form" class="mt-3 flex gap-2 items-center bg-zinc-900/90 border border-cyan-500/30 p-2 rounded-xl">
-        <button id="voice-toggle" type="button" class="px-2 py-1 text-base rounded-lg bg-zinc-800 border border-cyan-500/30" aria-label="Voix de Louis" title="Voix de Louis">🔊</button>
-        <button id="mic-btn" type="button" class="px-2 py-1 text-base rounded-lg bg-zinc-800 border border-cyan-500/30" aria-label="Parler" title="Parler à Louis">🎤</button>
+      <form id="chat-form" class="mt-3 flex gap-2 items-center bg-zinc-900/90 border border-violet-500/30 p-2 rounded-xl">
+        <button id="voice-toggle" type="button" class="px-2 py-1 text-base rounded-lg bg-zinc-800 border border-violet-500/30" aria-label="Voix de Louis" title="Voix de Louis">🔊</button>
+        <button id="mic-btn" type="button" class="px-2 py-1 text-base rounded-lg bg-zinc-800 border border-violet-500/30" aria-label="Parler" title="Parler à Louis">🎤</button>
         <input id="chat-input" type="text" autocomplete="off" placeholder="Posez votre question (maths, Python, finance, anglais)…" class="flex-1 bg-transparent px-2 py-1 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none">
-        <button id="chat-send" type="submit" class="px-3 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:bg-zinc-800 text-zinc-950 text-xs font-bold rounded-lg">Envoyer</button>
+        <button id="chat-send" type="submit" class="px-3 py-2 btn-grad text-xs font-bold rounded-lg">Envoyer</button>
       </form>
     </section>
 
     <!-- Maths -->
     <section id="tab-math" class="tab max-w-xl mx-auto space-y-4">
-      <div class="p-4 bg-zinc-900/80 border border-cyan-500/30 rounded-2xl">
-        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">MOTEUR DE MATHÉMATIQUES</h2>
+      <div class="p-4 bg-zinc-900/80 border border-violet-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-violet-300 font-mono mb-1">MOTEUR DE MATHÉMATIQUES</h2>
         <p class="text-xs text-zinc-400 mb-3">Dérivées, intégrales, matrices et équations différentielles, résolues pas à pas.</p>
-        <textarea id="math-input" rows="3" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-xl p-3 text-xs text-cyan-100 focus:outline-none focus:border-cyan-400 mb-3">d/dx (x^3 * sin(x) + e^(2x))</textarea>
-        <button id="math-run" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs rounded-xl">Résoudre pas à pas</button>
+        <textarea id="math-input" rows="3" class="w-full bg-zinc-950 border border-violet-500/20 rounded-xl p-3 text-xs text-violet-100 focus:outline-none focus:border-violet-400 mb-3">d/dx (x^3 * sin(x) + e^(2x))</textarea>
+        <button id="math-run" class="w-full py-2 btn-grad font-bold text-xs rounded-xl">Résoudre pas à pas</button>
       </div>
-      <div id="math-out" class="hidden p-4 bg-zinc-900/90 border border-cyan-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed"></div>
+      <div id="math-out" class="hidden p-4 bg-zinc-900/90 border border-violet-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed"></div>
     </section>
 
     <!-- Data -->
     <section id="tab-data" class="tab max-w-xl mx-auto space-y-4">
-      <div class="p-4 bg-zinc-900/80 border border-cyan-500/30 rounded-2xl">
-        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">DATA SCIENCE ET PYTHON</h2>
-        <p class="text-xs text-zinc-400 mb-3">Courbes d'entraînement d'exemple et générateur de code Python.</p>
-        <div class="bg-zinc-950 p-2 rounded-xl border border-cyan-500/20 mb-3">
-          <div class="text-[10px] font-mono text-cyan-400 mb-1">ENTRAÎNEMENT : <span class="text-cyan-300">précision (%)</span> et <span class="text-rose-400">perte</span></div>
-          <svg id="chart" viewBox="0 0 320 140" class="w-full h-36"></svg>
+      <div class="p-4 bg-zinc-900/80 border border-violet-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-violet-300 font-mono mb-1">SIMULATIONS MONTE-CARLO</h2>
+        <p class="text-xs text-zinc-400 mb-3">Trajectoires de prix (mouvement brownien géométrique), distribution finale, risque et prix d'un call. Calculé sur votre appareil.</p>
+        <div class="grid grid-cols-2 gap-3 mb-3 text-xs font-mono">
+          <label class="text-zinc-400 text-[10px]">PRIX INITIAL<input id="s-S0" type="number" value="100" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label><label class="text-zinc-400 text-[10px]">PRIX D'EXERCICE<input id="s-K" type="number" value="100" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label><label class="text-zinc-400 text-[10px]">RENDEMENT ATTENDU (%/AN)<input id="s-mu" type="number" value="8" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label><label class="text-zinc-400 text-[10px]">TAUX SANS RISQUE (%)<input id="s-r" type="number" value="3" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label><label class="text-zinc-400 text-[10px]">VOLATILITÉ (%/AN)<input id="s-sig" type="number" value="25" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label><label class="text-zinc-400 text-[10px]">JOURS<input id="s-days" type="number" value="252" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label><label class="text-zinc-400 text-[10px] col-span-2">NOMBRE DE SIMULATIONS<input id="s-n" type="number" value="5000" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button class="preset p-2.5 bg-zinc-950 hover:bg-zinc-900 border border-cyan-500/20 rounded-xl text-left text-xs" data-p="Écris un script Python performant pour entraîner un modèle XGBoost avec réglage des hyperparamètres via Optuna.">
-            <div class="font-bold text-zinc-200">XGBoost + Optuna</div><div class="text-[10px] text-zinc-400">Code de pipeline ML</div></button>
-          <button class="preset p-2.5 bg-zinc-950 hover:bg-zinc-900 border border-cyan-500/20 rounded-xl text-left text-xs" data-p="Génère une boucle d'entraînement PyTorch personnalisée avec précision mixte et accumulation de gradient.">
-            <div class="font-bold text-zinc-200">Entraîneur PyTorch</div><div class="text-[10px] text-zinc-400">Code de deep learning</div></button>
-        </div>
+        <button id="s-run" class="w-full py-2 btn-grad font-bold text-xs rounded-xl">Lancer la simulation</button>
+        <p id="s-err" class="hidden text-xs text-rose-400 mt-2">Vérifiez les valeurs : prix, volatilité, jours (au moins 1) et simulations (au moins 10) doivent être valides.</p>
+      </div>
+      <div id="s-out" class="hidden space-y-3"></div>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="preset p-2.5 bg-zinc-900/80 border border-violet-500/20 rounded-xl text-left text-xs" data-p="Écris un script Python performant pour entraîner un modèle XGBoost avec réglage des hyperparamètres via Optuna, et compare-le à une régression linéaire simple."><div class="font-bold text-zinc-200">XGBoost + Optuna</div><div class="text-[10px] text-zinc-400">Python</div></button><button class="preset p-2.5 bg-zinc-900/80 border border-violet-500/20 rounded-xl text-left text-xs" data-p="Montre-moi une analyse exploratoire complète en R (tidyverse, ggplot2) sur un jeu de données de ventes, avec le code."><div class="font-bold text-zinc-200">Analyse en R</div><div class="text-[10px] text-zinc-400">tidyverse, ggplot2</div></button><button class="preset p-2.5 bg-zinc-900/80 border border-violet-500/20 rounded-xl text-left text-xs" data-p="Construis un tableau de bord Excel avancé : tableaux croisés dynamiques, formules dynamiques, Power Query et graphiques, étape par étape."><div class="font-bold text-zinc-200">Tableau de bord Excel</div><div class="text-[10px] text-zinc-400">Power Query, TCD</div></button><button class="preset p-2.5 bg-zinc-900/80 border border-violet-500/20 rounded-xl text-left text-xs" data-p="Explique comment concevoir un rapport Power BI complet : modèle en étoile, mesures DAX essentielles et visuels, avec des exemples de code DAX."><div class="font-bold text-zinc-200">Rapport Power BI</div><div class="text-[10px] text-zinc-400">Modèle, DAX</div></button>
       </div>
     </section>
 
     <!-- Finance -->
     <section id="tab-finance" class="tab max-w-xl mx-auto space-y-4">
-      <div class="p-4 bg-zinc-900/80 border border-cyan-500/30 rounded-2xl">
-        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">CALCULATEUR BLACK-SCHOLES</h2>
+      <div class="p-4 bg-zinc-900/80 border border-violet-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-violet-300 font-mono mb-1">CALCULATEUR BLACK-SCHOLES</h2>
         <p class="text-xs text-zinc-400 mb-3">Valorisation d'options européennes et sensibilités (Grecques). Fonctionne hors ligne.</p>
         <div class="grid grid-cols-2 gap-3 mb-3 text-xs font-mono">
-          <label class="text-zinc-400 text-[10px]">PRIX DE L'ACTION<input id="f-S" type="number" value="100" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
-          <label class="text-zinc-400 text-[10px]">PRIX D'EXERCICE<input id="f-K" type="number" value="100" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
-          <label class="text-zinc-400 text-[10px]">JOURS AVANT ÉCHÉANCE<input id="f-T" type="number" value="30" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
-          <label class="text-zinc-400 text-[10px]">VOLATILITÉ (%)<input id="f-v" type="number" value="25" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
-          <label class="text-zinc-400 text-[10px] col-span-2">TAUX SANS RISQUE (%)<input id="f-r" type="number" value="5" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+          <label class="text-zinc-400 text-[10px]">PRIX DE L'ACTION<input id="f-S" type="number" value="100" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
+          <label class="text-zinc-400 text-[10px]">PRIX D'EXERCICE<input id="f-K" type="number" value="100" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
+          <label class="text-zinc-400 text-[10px]">JOURS AVANT ÉCHÉANCE<input id="f-T" type="number" value="30" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
+          <label class="text-zinc-400 text-[10px]">VOLATILITÉ (%)<input id="f-v" type="number" value="25" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
+          <label class="text-zinc-400 text-[10px] col-span-2">TAUX SANS RISQUE (%)<input id="f-r" type="number" value="5" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
         </div>
-        <button id="f-run" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs rounded-xl">Calculer le prix et les Grecques</button>
+        <button id="f-run" class="w-full py-2 btn-grad font-bold text-xs rounded-xl">Calculer le prix et les Grecques</button>
         <p id="f-err" class="hidden text-xs text-rose-400 mt-2">Vérifiez les valeurs : prix, échéance et volatilité doivent être supérieurs à 0.</p>
       </div>
-      <div id="f-out" class="hidden p-4 bg-zinc-900/90 border border-cyan-500/30 rounded-2xl grid grid-cols-2 gap-3 font-mono text-xs"></div>
+      <div id="f-out" class="hidden p-4 bg-zinc-900/90 border border-violet-500/30 rounded-2xl grid grid-cols-2 gap-3 font-mono text-xs"></div>
     </section>
 
     <!-- Anglais -->
     <section id="tab-english" class="tab max-w-xl mx-auto space-y-4">
-      <div class="p-4 bg-zinc-900/80 border border-cyan-500/30 rounded-2xl">
-        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">ANGLAIS TECHNIQUE ET ACADÉMIQUE</h2>
+      <div class="p-4 bg-zinc-900/80 border border-violet-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-violet-300 font-mono mb-1">ANGLAIS TECHNIQUE ET ACADÉMIQUE</h2>
         <p class="text-xs text-zinc-400 mb-3">Reformulez un résumé, relisez un texte ou construisez votre vocabulaire.</p>
-        <textarea id="en-input" rows="4" placeholder="Collez ici le texte à corriger ou à reformuler en anglais académique…" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-xl p-3 text-xs text-cyan-100 focus:outline-none focus:border-cyan-400 mb-3"></textarea>
-        <button id="en-run" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs rounded-xl mb-2">Reformuler en anglais académique</button>
-        <button class="preset w-full p-3 bg-zinc-950 hover:bg-zinc-900 border border-cyan-500/20 rounded-xl text-left text-xs" data-p="Fournis un lexique complet des termes statistiques avancés en anglais avec leurs définitions en français.">
+        <textarea id="en-input" rows="4" placeholder="Collez ici le texte à corriger ou à reformuler en anglais académique…" class="w-full bg-zinc-950 border border-violet-500/20 rounded-xl p-3 text-xs text-violet-100 focus:outline-none focus:border-violet-400 mb-3"></textarea>
+        <button id="en-run" class="w-full py-2 btn-grad font-bold text-xs rounded-xl mb-2">Reformuler en anglais académique</button>
+        <button class="preset w-full p-3 bg-zinc-950 hover:bg-zinc-900 border border-violet-500/20 rounded-xl text-left text-xs" data-p="Fournis un lexique complet des termes statistiques avancés en anglais avec leurs définitions en français.">
           <div class="font-bold text-zinc-200">Lexique de data science</div><div class="text-[10px] text-zinc-400">Terminologie bilingue</div></button>
       </div>
-      <div id="en-out" class="hidden p-4 bg-zinc-900/90 border border-cyan-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed"></div>
+      <div id="en-out" class="hidden p-4 bg-zinc-900/90 border border-violet-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed"></div>
     </section>
 
     <!-- Notes -->
     <section id="tab-notes" class="tab max-w-xl mx-auto space-y-3">
       <div class="flex justify-between items-center">
-        <h2 id="notes-title" class="text-sm font-bold text-cyan-300 font-mono"></h2>
+        <h2 id="notes-title" class="text-sm font-bold text-violet-300 font-mono"></h2>
         <button id="notes-clear" class="text-[10px] text-zinc-400 hover:text-rose-400">Tout effacer</button>
       </div>
       <div id="notes-list" class="space-y-3"></div>
@@ -162,7 +169,7 @@
   </main>
 
   <!-- Navigation -->
-  <nav class="flex items-center justify-around bg-zinc-900/90 border-t border-cyan-500/20 py-2 px-1" style="padding-bottom:calc(0.5rem + env(safe-area-inset-bottom))">
+  <nav class="flex items-center justify-around bg-zinc-900/90 border-t border-violet-500/20 py-2 px-1" style="padding-bottom:calc(0.5rem + env(safe-area-inset-bottom))">
     <button class="nav-btn on flex flex-col items-center gap-0.5 text-zinc-500" data-go="hud"><span>◉</span><span class="text-[9px] font-mono">Accueil</span></button>
     <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="chat"><span>⌨</span><span class="text-[9px] font-mono">Terminal</span></button>
     <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="math"><span>∑</span><span class="text-[9px] font-mono">Maths</span></button>
@@ -175,31 +182,36 @@
 
 <!-- Fenêtre : réglages -->
 <div id="modal-settings" class="hidden fixed inset-0 bg-zinc-950/80 flex items-center justify-center p-4 z-50">
-  <div class="bg-zinc-900 border border-cyan-500/40 rounded-2xl p-5 max-w-sm w-full font-mono text-xs space-y-3">
-    <h3 class="text-cyan-300 font-bold">Réglages</h3>
+  <div class="bg-zinc-900 border border-violet-500/40 rounded-2xl p-5 max-w-sm w-full max-h-[90vh] overflow-y-auto font-mono text-xs space-y-3">
+    <h3 class="text-violet-300 font-bold">Réglages</h3>
     <label class="block text-zinc-400 text-[10px]">CLÉ API GEMINI
-      <input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+      <input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
     <label class="block text-zinc-400 text-[10px]">MODÈLE
-      <input id="set-model" type="text" class="w-full bg-zinc-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+      <input id="set-model" type="text" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></label>
+    <label class="block text-zinc-400 text-[10px]">VOIX DE LOUIS
+      <select id="set-voice" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></select></label>
+    <button id="set-test" type="button" class="w-full py-1.5 bg-zinc-800 text-zinc-200 rounded-xl">Écouter cette voix</button>
+    <label class="block text-zinc-400 text-[10px]">INSTRUCTIONS PERSONNELLES (facultatif)
+      <textarea id="set-notes" rows="3" placeholder="Ex. : mon niveau, mes objectifs, mes outils habituels…" class="w-full bg-zinc-950 border border-violet-500/20 rounded-lg p-2 text-violet-100 mt-1 text-xs"></textarea></label>
     <p class="text-[10px] text-zinc-400 leading-relaxed">La clé est enregistrée uniquement dans ce navigateur (stockage local). Créez-en une gratuitement sur aistudio.google.com. Ne la publiez jamais dans le code sur GitHub.</p>
     <div class="flex gap-2">
       <button id="set-cancel" class="flex-1 py-2 bg-zinc-800 text-zinc-200 rounded-xl">Annuler</button>
-      <button id="set-save" class="flex-1 py-2 bg-cyan-600 text-zinc-950 font-bold rounded-xl">Enregistrer</button>
+      <button id="set-save" class="flex-1 py-2 btn-grad font-bold rounded-xl">Enregistrer</button>
     </div>
   </div>
 </div>
 
 <!-- Fenêtre : installation -->
 <div id="modal-help" class="hidden fixed inset-0 bg-zinc-950/80 flex items-center justify-center p-4 z-50">
-  <div class="bg-zinc-900 border border-cyan-500/40 rounded-2xl p-5 max-w-sm w-full font-mono text-xs text-zinc-300 space-y-2 leading-relaxed">
-    <h3 class="text-cyan-300 font-bold">Installer Louis</h3>
-    <p class="font-bold text-cyan-400">Ordinateur (Chrome ou Edge)</p>
+  <div class="bg-zinc-900 border border-violet-500/40 rounded-2xl p-5 max-w-sm w-full font-mono text-xs text-zinc-300 space-y-2 leading-relaxed">
+    <h3 class="text-violet-300 font-bold">Installer Louis</h3>
+    <p class="font-bold text-violet-400">Ordinateur (Chrome ou Edge)</p>
     <p>Cliquez sur l'icône d'installation à droite de la barre d'adresse, ou menu ⋮ → « Diffuser, enregistrer et partager » → « Installer la page en tant qu'application ». Louis s'ouvre alors dans sa propre fenêtre et vous pouvez l'épingler au bureau ou à la barre des tâches.</p>
-    <p class="font-bold text-cyan-400 pt-1">Android (Chrome)</p>
+    <p class="font-bold text-violet-400 pt-1">Android (Chrome)</p>
     <p>Menu ⋮ → « Ajouter à l'écran d'accueil » ou « Installer l'application ».</p>
-    <p class="font-bold text-cyan-400 pt-1">iPhone (Safari)</p>
+    <p class="font-bold text-violet-400 pt-1">iPhone (Safari)</p>
     <p>Bouton Partager → « Sur l'écran d'accueil ».</p>
-    <button id="help-close" class="w-full py-2 bg-cyan-600 text-zinc-950 font-bold rounded-xl mt-2">Compris</button>
+    <button id="help-close" class="w-full py-2 btn-grad font-bold rounded-xl mt-2">Compris</button>
   </div>
 </div>
 
@@ -250,8 +262,18 @@
   /* ---------- API Gemini ---------- */
   async function callLouis(prompt, extra = '', history = null) {
     if (!settings.key) return "Clé API manquante. Ouvrez « Réglages » et collez votre clé Gemini pour activer cette fonction.";
-    const base = "Tu es LOUIS, un assistant expert en mathématiques avancées, data science, ingénierie financière et anglais technique. Réponds en français sauf demande contraire, avec précision, rigueur et concision. Fournis du code propre quand c'est utile.";
-    const system = extra ? base + '\n' + extra : base;
+    const base = `Tu es LOUIS, un assistant personnel de niveau expert, comparable à un analyste quantitatif et data scientist senior, capable de comprendre et de résoudre toute demande. Tu réponds en français sauf demande contraire.
+
+COMPÉTENCES : mathématiques (analyse, probabilités, algèbre linéaire, calcul stochastique), statistiques, machine learning, finance quantitative ; programmation Python (pandas, NumPy, SciPy, scikit-learn, statsmodels, PyTorch, Numba), R (tidyverse, ggplot2, tidymodels), SQL, VBA ; Excel avancé (formules dynamiques, XLOOKUP, Power Query, tableaux croisés, macros) ; Power BI (modèle en étoile, DAX, Power Query M, visuels) ; Tableau, Git ; anglais technique et académique.
+
+RIGUEUR : annonce tes hypothèses. Indique les limites de tout modèle (queues épaisses, volatilité stochastique, sauts, marché en crise) et propose des alternatives (Jump-Diffusion, Heston, GARCH). Dans une démonstration, détaille chaque étape et vérifie les conditions de régularité, d'intégrabilité et de convergence. Pour le code, fournis un code propre, commenté, testable et vectorisé, et propose une version optimisée (Numba, parallélisme) quand la performance compte. Tiens compte des contraintes réelles (frais, spread bid-ask, liquidité, levier, réglementation). Privilégie la parcimonie (rasoir d'Ockham) et compare avec un modèle plus simple. N'invente jamais de chiffres : si une donnée manque, dis-le ou demande-la.
+
+TÂCHES PERSONNELLES : tu dois aussi résoudre les tâches personnelles de l'utilisateur (organisation, planification, études, carrière, CV, lettres, e-mails, projets, budget, business) avec des réponses concrètes, prêtes à l'emploi, étape par étape.
+
+GRAPHIQUES : pour toute demande de graphique, de simulation ou de visualisation, calcule réellement les valeurs et affiche-les avec un bloc de code de langage chart contenant un JSON valide de la forme {"type":"line|area|bar","title":"...","labels":["..."],"series":[{"name":"...","data":[nombres]}]}, avec au plus 60 points par série et des nombres arrondis. Ajoute ensuite une courte interprétation. Si l'utilisateur veut le code Python, R ou Excel du graphique, fournis-le aussi.
+
+STYLE : réponses structurées, précises et directes ; utilise le Markdown (titres, listes, gras, blocs de code).`;
+    const system = base + (settings.notes ? '\n\nINSTRUCTIONS PERSONNELLES DE L\'UTILISATEUR : ' + settings.notes : '') + (extra ? '\n' + extra : '');
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(settings.model)}:generateContent`;
     try {
       const res = await fetch(url, {
@@ -274,13 +296,17 @@
   function md(t) {
     const esc = x => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const blocks = [];
-    t = esc(t).replace(/```\w*\n?([\s\S]*?)```/g, (_, c) => { blocks.push(c); return '@@B' + (blocks.length - 1) + '@@'; });
-    t = t.replace(/`([^`\n]+)`/g, '<code class="px-1 rounded bg-zinc-800 text-cyan-200">$1</code>')
-         .replace(/\*\*([^*\n]+)\*\*/g, '<strong class="text-cyan-100">$1</strong>')
-         .replace(/^#{1,6}\s*(.+)$/gm, '<div class="font-bold text-cyan-300 mt-3 mb-1 text-sm">$1</div>')
+    t = esc(t).replace(/```(\w*)\n?([\s\S]*?)```/g, (_, l, c) => { blocks.push({ l, c }); return '@@B' + (blocks.length - 1) + '@@'; });
+    t = t.replace(/`([^`\n]+)`/g, '<code class="px-1 rounded bg-zinc-800 text-violet-200">$1</code>')
+         .replace(/\*\*([^*\n]+)\*\*/g, '<strong class="text-violet-100">$1</strong>')
+         .replace(/^#{1,6}\s*(.+)$/gm, '<div class="font-bold text-violet-300 mt-3 mb-1 text-sm">$1</div>')
          .replace(/^\s*[*-]\s+(.+)$/gm, '<div class="pl-4 -indent-3">• $1</div>')
          .replace(/<\/div>\n/g, '</div>').replace(/\n/g, '<br>')
-         .replace(/@@B(\d+)@@/g, (_, i) => '<pre class="my-2 p-2 rounded-lg bg-zinc-950 border border-zinc-700 overflow-x-auto text-[11px] font-mono whitespace-pre">' + blocks[i] + '</pre>');
+         .replace(/@@B(\d+)@@/g, (_, i) => {
+           const b = blocks[i];
+           if (b.l === 'chart') { try { return chartSVG(JSON.parse(b.c.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'))); } catch (e) { /* JSON invalide : affiché comme code */ } }
+           return '<pre class="my-2 p-2 rounded-lg bg-zinc-950 border border-zinc-700 overflow-x-auto text-[11px] font-mono whitespace-pre">' + b.c + '</pre>';
+         });
     return t;
   }
   function renderChat() {
@@ -291,15 +317,15 @@
       wrap.className = 'flex flex-col ' + (m.sender === 'user' ? 'items-end' : 'items-start');
       const bubble = document.createElement('div');
       bubble.className = 'max-w-[88%] p-3.5 rounded-2xl text-[13px] leading-relaxed break-words ' +
-        (m.sender === 'user' ? 'bg-cyan-600 text-zinc-950 font-medium rounded-tr-none whitespace-pre-wrap'
-                             : 'bg-zinc-900/90 border border-cyan-500/30 text-zinc-200 rounded-tl-none');
+        (m.sender === 'user' ? 'btn-grad font-medium rounded-tr-none whitespace-pre-wrap'
+                             : 'bg-zinc-900/90 border border-violet-500/30 text-zinc-200 rounded-tl-none');
       if (m.sender === 'user') bubble.textContent = m.text; else bubble.innerHTML = md(m.text);
       wrap.appendChild(bubble);
       if (m.sender === 'jarvis') {
         const bar = document.createElement('div');
         bar.className = 'flex items-center gap-3 mt-1 px-1 text-[10px] text-zinc-500 font-mono';
         bar.innerHTML = `<span>${m.ts}</span>`;
-        const mk = (label, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = 'hover:text-cyan-400'; b.onclick = fn; bar.appendChild(b); };
+        const mk = (label, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = 'hover:text-violet-400'; b.onclick = fn; bar.appendChild(b); };
         mk(speakingId === m.id ? 'Arrêter' : 'Écouter', () => speak(m.text, m.id));
         mk('Copier', () => navigator.clipboard?.writeText(m.text));
         mk('Enregistrer', () => saveNote('Réponse du terminal', m.text));
@@ -309,7 +335,7 @@
     });
     if (busy) {
       const l = document.createElement('div');
-      l.className = 'text-cyan-400 font-mono text-xs p-2 bg-zinc-900/50 rounded-lg w-fit border border-cyan-500/20';
+      l.className = 'text-violet-400 font-mono text-xs p-2 bg-zinc-900/50 rounded-lg w-fit border border-violet-500/20';
       l.textContent = 'Louis analyse votre demande…';
       log.appendChild(l);
     }
@@ -350,7 +376,7 @@
     speakingId = id; renderChat();
     chunks.forEach((c, i) => {
       const u = new SpeechSynthesisUtterance(c);
-      u.lang = 'fr-FR'; if (voice) u.voice = voice; u.rate = 1; u.pitch = 0.9;
+      u.lang = 'fr-FR'; if (voice) u.voice = voice; u.rate = 1; u.pitch = 0.8;
       if (i === chunks.length - 1) u.onend = () => { if (my === speakToken) { speakingId = null; renderChat(); } };
       u.onerror = () => { if (my === speakToken) { speakingId = null; renderChat(); } };
       speechSynthesis.speak(u);
@@ -358,7 +384,7 @@
   }
   let speakToken = 0;
   function cleanForSpeech(t) {
-    return t.replace(/```[\s\S]*?```/g, ' Le code est affiché à l\'écran. ')
+    return t.replace(/```[\s\S]*?```/g, ' Le détail est affiché à l\'écran. ')
             .replace(/https?:\/\/\S+/g, '').replace(/[*#`_>~|]/g, '').replace(/\s+/g, ' ').trim();
   }
   function toChunks(t) {
@@ -367,10 +393,25 @@
     if (cur.trim()) out.push(cur.trim());
     return out;
   }
+  function voiceByURI(uri) { return uri && 'speechSynthesis' in window ? speechSynthesis.getVoices().find(v => v.voiceURI === uri) : null; }
   function pickVoice() {
+    const chosen = voiceByURI(settings.voice); if (chosen) return chosen;
     const v = speechSynthesis.getVoices().filter(x => x.lang && x.lang.toLowerCase().startsWith('fr'));
-    return v.find(x => /male|homme|thomas|paul|henri/i.test(x.name)) || v[0] || null;
+    return v.find(x => /frd|fre|male|homme|thomas|paul|henri|nicolas|antoine|daniel|jean|claude/i.test(x.name + ' ' + x.voiceURI)) || v[0] || null;
   }
+  function fillVoices() {
+    const sel = $('#set-voice');
+    const vs = ('speechSynthesis' in window ? speechSynthesis.getVoices() : []).filter(v => v.lang && v.lang.toLowerCase().startsWith('fr'));
+    sel.innerHTML = '<option value="">Automatique (voix grave)</option>' + vs.map(v => `<option value="${escH(v.voiceURI)}">${escH(v.name)} (${escH(v.lang)})</option>`).join('');
+    sel.value = settings.voice || '';
+  }
+  $('#set-test').onclick = () => {
+    if (!('speechSynthesis' in window)) return;
+    speakToken++; speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance('Bonjour, je suis Louis, votre assistant personnel.');
+    u.lang = 'fr-FR'; u.pitch = 0.8; const v = voiceByURI($('#set-voice').value) || pickVoice(); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  };
   if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
   let autoVoice = store.get('jarvis.voice', true);
   function updateVoiceBtn() { const b = $('#voice-toggle'); b.textContent = autoVoice ? '🔊' : '🔇'; b.title = autoVoice ? 'Voix activée' : 'Voix désactivée'; }
@@ -420,9 +461,9 @@
     }
     notes.forEach(n => {
       const d = document.createElement('div');
-      d.className = 'p-3 bg-zinc-900/80 border border-cyan-500/20 rounded-xl font-mono text-xs space-y-1';
+      d.className = 'p-3 bg-zinc-900/80 border border-violet-500/20 rounded-xl font-mono text-xs space-y-1';
       const h = document.createElement('div');
-      h.className = 'flex justify-between items-center text-cyan-400 font-bold';
+      h.className = 'flex justify-between items-center text-violet-400 font-bold';
       h.innerHTML = '<span></span><span class="text-[10px] text-zinc-500 font-normal"></span>';
       h.children[0].textContent = n.title; h.children[1].textContent = n.date;
       const p = document.createElement('p');
@@ -443,9 +484,9 @@
     const r = await callLouis(prompt, extra);
     out.textContent = '';
     const head = document.createElement('div');
-    head.className = 'flex justify-between items-center mb-2 pb-2 border-b border-cyan-500/20';
-    head.innerHTML = '<span class="text-cyan-400 font-bold">RÉSULTAT</span>';
-    const sv = document.createElement('button'); sv.textContent = 'Enregistrer'; sv.className = 'text-zinc-400 hover:text-cyan-300';
+    head.className = 'flex justify-between items-center mb-2 pb-2 border-b border-violet-500/20';
+    head.innerHTML = '<span class="text-violet-400 font-bold">RÉSULTAT</span>';
+    const sv = document.createElement('button'); sv.textContent = 'Enregistrer'; sv.className = 'text-zinc-400 hover:text-violet-300';
     sv.onclick = () => saveNote(title, r); head.appendChild(sv);
     const body = document.createElement('div'); body.textContent = r;
     out.append(head, body);
@@ -464,22 +505,7 @@
       "Tu es un relecteur scientifique anglophone.", 'Anglais académique');
   };
 
-  /* ---------- Graphique d'entraînement (SVG) ---------- */
-  (function drawChart() {
-    const pts = [[1,.85,62],[2,.62,74],[3,.41,85],[4,.28,91],[5,.19,96]];
-    const W = 320, H = 140, pad = 18;
-    const x = i => pad + (i - 1) * (W - 2 * pad) / 4;
-    const yAcc = a => H - pad - (a / 100) * (H - 2 * pad);
-    const yLoss = l => H - pad - (l / 1) * (H - 2 * pad);
-    const line = (f, k, col) => `<polyline fill="none" stroke="${col}" stroke-width="2" points="${pts.map(p => `${x(p[0])},${f(p[k])}`).join(' ')}"/>` +
-      pts.map(p => `<circle cx="${x(p[0])}" cy="${f(p[k])}" r="2.5" fill="${col}"/>`).join('');
-    let g = '';
-    for (let i = 0; i < 4; i++) { const y = pad + i * (H - 2 * pad) / 3; g += `<line x1="${pad}" x2="${W - pad}" y1="${y}" y2="${y}" stroke="#1e293b" stroke-dasharray="3 3"/>`; }
-    const lbl = pts.map(p => `<text x="${x(p[0])}" y="${H - 3}" fill="#64748b" font-size="9" text-anchor="middle">Ép. ${p[0]}</text>`).join('');
-    $('#chart').innerHTML = g + line(yAcc, 2, '#06b6d4') + line(yLoss, 1, '#f43f5e') + lbl;
-  })();
-
-  /* ---------- Black-Scholes ---------- */
+    /* ---------- Black-Scholes ---------- */
   const cdf = x => {
     const t = 1 / (1 + 0.2316419 * Math.abs(x));
     const d = 0.3989423 * Math.exp(-x * x / 2);
@@ -499,19 +525,104 @@
     const put = K * Math.exp(-r * T) * cdf(-d2) - S * cdf(-d1);
     const gamma = Math.exp(-d1 * d1 / 2) / (S * sq * Math.sqrt(2 * Math.PI));
     const vega = S * Math.exp(-d1 * d1 / 2) / Math.sqrt(2 * Math.PI) * Math.sqrt(T) / 100;
-    const cell = (l, val, c) => `<div class="p-2 bg-zinc-950 rounded-lg border border-cyan-500/10"><div class="text-[10px] text-zinc-400">${l}</div><div class="text-lg font-bold ${c}">${val}</div></div>`;
+    const cell = (l, val, c) => `<div class="p-2 bg-zinc-950 rounded-lg border border-violet-500/10"><div class="text-[10px] text-zinc-400">${l}</div><div class="text-lg font-bold ${c}">${val}</div></div>`;
     out.innerHTML = cell('PRIX DU CALL', call.toFixed(2), 'text-emerald-400') + cell('PRIX DU PUT', put.toFixed(2), 'text-rose-400') +
-      cell('DELTA (Δ) du call', cdf(d1).toFixed(3), 'text-cyan-300') + cell('GAMMA (Γ)', gamma.toFixed(4), 'text-cyan-300') +
-      cell('VEGA (pour 1 % de vol.)', vega.toFixed(3), 'text-cyan-300');
+      cell('DELTA (Δ) du call', cdf(d1).toFixed(3), 'text-violet-300') + cell('GAMMA (Γ)', gamma.toFixed(4), 'text-violet-300') +
+      cell('VEGA (pour 1 % de vol.)', vega.toFixed(3), 'text-violet-300');
     out.classList.remove('hidden');
   };
 
-  /* ---------- Réglages ---------- */
+  /* ---------- Graphiques (SVG) ---------- */
+  const PAL = ['#a78bfa', '#22d3ee', '#f472b6', '#fbbf24', '#34d399', '#60a5fa'];
+  const escH = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function chartSVG(spec) {
+    try {
+      const W = 320, H = 170, L = 36, R = 8, T = 12, B = 26;
+      const type = ['line', 'area', 'bar'].includes(spec.type) ? spec.type : 'line';
+      const labels = spec.labels || [];
+      const ser = (spec.series || []).filter(s => Array.isArray(s.data) && s.data.length);
+      if (!ser.length) return '';
+      const n = Math.max(...ser.map(s => s.data.length));
+      const all = ser.flatMap(s => s.data.map(Number)).filter(Number.isFinite);
+      let lo = Math.min(...all), hi = Math.max(...all);
+      if (type !== 'line') lo = Math.min(lo, 0);
+      if (lo === hi) hi = lo + 1;
+      const pad = (hi - lo) * 0.06; hi += pad; if (type === 'line') lo -= pad;
+      const x = i => L + (n === 1 ? 0 : i * (W - L - R) / (n - 1));
+      const y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+      const fmt = v => Math.abs(v) >= 1000 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2);
+      let g = '';
+      for (let k = 0; k <= 4; k++) {
+        const v = lo + (hi - lo) * k / 4, yy = y(v);
+        g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="#fff" stroke-opacity=".08"/><text x="${L - 4}" y="${yy + 3}" fill="#a1a1aa" font-size="8" text-anchor="end">${fmt(v)}</text>`;
+      }
+      const step = Math.ceil(n / 6), gw = (W - L - R) / n;
+      for (let i = 0; i < n; i += step) {
+        const lb = labels[i] !== undefined ? labels[i] : i + 1, xx = type === 'bar' ? L + (i + .5) * gw : x(i);
+        g += `<text x="${xx}" y="${H - 10}" fill="#a1a1aa" font-size="8" text-anchor="middle">${escH(lb)}</text>`;
+      }
+      ser.forEach((s, si) => {
+        const c = s.color || PAL[si % PAL.length], d = s.data.map(Number);
+        if (type === 'bar') {
+          const bw = gw * 0.7 / ser.length;
+          d.forEach((v, i) => { const y0 = y(Math.max(v, 0)), y1 = y(Math.min(v, 0)); g += `<rect x="${L + i * gw + gw * .15 + si * bw}" y="${y0}" width="${bw}" height="${Math.max(1, y1 - y0)}" rx="1.5" fill="${c}" fill-opacity=".85"/>`; });
+        } else {
+          const pts = d.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' '), base = y(Math.max(lo, 0));
+          if (type === 'area') g += `<polygon points="${x(0)},${base} ${pts} ${x(d.length - 1)},${base}" fill="${c}" fill-opacity=".18"/>`;
+          g += `<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="${ser.length > 8 ? 1 : 2}" stroke-opacity="${ser.length > 8 ? .55 : 1}" stroke-linejoin="round"/>`;
+        }
+      });
+      const legend = ser.length <= 6 ? '<div class="flex flex-wrap gap-3 mt-1 text-[10px] text-zinc-300">' + ser.map((s, si) => `<span><span style="color:${s.color || PAL[si % PAL.length]}">●</span> ${escH(s.name || 'Série ' + (si + 1))}</span>`).join('') + '</div>' : '';
+      return `<div class="my-2 p-2 rounded-xl bg-zinc-950/60 border border-zinc-700/60">${spec.title ? `<div class="text-[11px] font-bold text-violet-300 mb-1">${escH(spec.title)}</div>` : ''}<svg viewBox="0 0 ${W} ${H}" class="w-full">${g}</svg>${legend}</div>`;
+    } catch (e) { return '<div class="text-rose-400 text-[11px]">Graphique invalide.</div>'; }
+  }
+
+  /* ---------- Simulations Monte-Carlo ---------- */
+  const randn = () => { let u = 0; while (!u) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); };
+  const quant = (a, q) => a[Math.min(a.length - 1, Math.max(0, Math.floor(q * (a.length - 1))))];
+  $('#s-run').onclick = () => {
+    const g = id => parseFloat($(id).value);
+    const S0 = g('#s-S0'), K = g('#s-K'), mu = g('#s-mu') / 100, r = g('#s-r') / 100, sg = g('#s-sig') / 100;
+    const D = Math.round(g('#s-days')), N = Math.min(20000, Math.round(g('#s-n')));
+    const out = $('#s-out'), err = $('#s-err');
+    if (!(S0 > 0 && K > 0 && sg > 0 && D >= 1 && N >= 10)) { err.classList.remove('hidden'); out.classList.add('hidden'); return; }
+    err.classList.add('hidden');
+    const T = D / 252, sq = sg * Math.sqrt(T), ST = [], pay = [];
+    for (let i = 0; i < N; i++) {
+      const z = randn();
+      ST.push(S0 * Math.exp((mu - sg * sg / 2) * T + sq * z));
+      pay.push(Math.exp(-r * T) * Math.max(S0 * Math.exp((r - sg * sg / 2) * T + sq * z) - K, 0));
+    }
+    const sorted = [...ST].sort((a, b) => a - b), mean = ST.reduce((a, b) => a + b, 0) / N;
+    const mc = pay.reduce((a, b) => a + b, 0) / N, se = Math.sqrt(pay.reduce((a, b) => a + (b - mc) ** 2, 0) / (N - 1)) / Math.sqrt(N);
+    const d1 = (Math.log(S0 / K) + (r + sg * sg / 2) * T) / sq, bs = S0 * cdf(d1) - K * Math.exp(-r * T) * cdf(d1 - sq);
+    const p5 = quant(sorted, .05), p95 = quant(sorted, .95), med = quant(sorted, .5), pUp = ST.filter(v => v > S0).length / N;
+    const steps = Math.min(D, 60), dt = T / steps, labels = [], paths = [];
+    for (let i = 0; i <= steps; i++) labels.push(Math.round(i * D / steps));
+    for (let p = 0; p < 25; p++) { let s = S0; const a = [s]; for (let i = 0; i < steps; i++) { s *= Math.exp((mu - sg * sg / 2) * dt + sg * Math.sqrt(dt) * randn()); a.push(+s.toFixed(2)); } paths.push({ data: a, color: '#a78bfa' }); }
+    paths.push({ name: 'Espérance', color: '#ffffff', data: labels.map((_, i) => +(S0 * Math.exp(mu * i * dt)).toFixed(2)) });
+    const lo = quant(sorted, .01), hi = quant(sorted, .99), nb = 16, w = (hi - lo) / nb || 1, cnt = new Array(nb).fill(0);
+    ST.forEach(v => { if (v >= lo && v <= hi) cnt[Math.min(nb - 1, Math.floor((v - lo) / w))]++; });
+    const f = v => v.toFixed(2);
+    const card = (l, v, c = 'text-violet-300') => `<div class="p-2 bg-zinc-950/70 rounded-lg border border-violet-500/10"><div class="text-[10px] text-zinc-400">${l}</div><div class="text-sm font-bold ${c}">${v}</div></div>`;
+    out.innerHTML = chartSVG({ type: 'line', title: `Trajectoires simulées (25 sur ${N}) · ${D} jours`, labels, series: paths }) +
+      chartSVG({ type: 'bar', title: 'Distribution du prix final (% des simulations)', labels: cnt.map((_, i) => (lo + (i + .5) * w).toFixed(0)), series: [{ name: '% des simulations', data: cnt.map(c => +(c / N * 100).toFixed(1)) }] }) +
+      '<div class="grid grid-cols-2 gap-2 font-mono text-xs">' +
+      card('PRIX FINAL MOYEN', f(mean)) + card('MÉDIANE', f(med)) + card('PERCENTILE 5 %', f(p5), 'text-rose-400') + card('PERCENTILE 95 %', f(p95), 'text-emerald-400') +
+      card('PERTE MAX. À 95 % (VaR)', f(Math.max(0, S0 - p5)), 'text-rose-400') + card('PROBABILITÉ DE HAUSSE', (pUp * 100).toFixed(1) + ' %', 'text-emerald-400') +
+      card('CALL MONTE-CARLO', f(mc) + ' ± ' + f(1.96 * se)) + card('CALL BLACK-SCHOLES', f(bs)) + '</div>' +
+      '<button id="s-ask" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs rounded-xl">Faire analyser ces résultats par Louis</button>';
+    out.classList.remove('hidden');
+    $('#s-ask').onclick = () => { go('chat'); send(`Analyse ces résultats de simulation Monte-Carlo (mouvement brownien géométrique) : S0=${S0}, K=${K}, rendement ${(mu * 100).toFixed(1)} %, taux ${(r * 100).toFixed(1)} %, volatilité ${(sg * 100).toFixed(1)} %, ${D} jours, ${N} simulations. Prix final moyen ${f(mean)}, médiane ${f(med)}, P5 ${f(p5)}, P95 ${f(p95)}, probabilité de hausse ${(pUp * 100).toFixed(1)} %, call Monte-Carlo ${f(mc)} (± ${f(1.96 * se)}) contre Black-Scholes ${f(bs)}. Commente la cohérence, les risques (queues épaisses) et les limites du modèle.`); };
+  };
+
+  
+/* ---------- Réglages ---------- */
   const show = (id, on) => $(id).classList.toggle('hidden', !on);
-  $('#btn-settings').onclick = () => { $('#set-key').value = settings.key; $('#set-model').value = settings.model; show('#modal-settings', true); };
+  $('#btn-settings').onclick = () => { $('#set-key').value = settings.key; $('#set-model').value = settings.model; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true); };
   $('#set-cancel').onclick = () => show('#modal-settings', false);
   $('#set-save').onclick = () => {
-    settings = { key: $('#set-key').value.trim(), model: $('#set-model').value.trim() || 'gemini-3-flash-preview' };
+    settings = { key: $('#set-key').value.trim(), model: $('#set-model').value.trim() || 'gemini-3-flash-preview', voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) };
     store.set('jarvis.settings', settings); refreshHud(); show('#modal-settings', false);
   };
   $('#btn-help').onclick = () => show('#modal-help', true);
