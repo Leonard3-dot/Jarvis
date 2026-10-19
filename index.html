@@ -1,714 +1,462 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Cpu, Terminal, Calculator, BarChart3, TrendingUp, Languages, 
-  Send, Sparkles, Download, Copy, Bookmark, Volume2, CheckCircle2,
-  Phone, Smartphone, Plus, Trash2, Code, FileText, Settings, Play, Shield
-} from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Louis Core</title>
+<meta name="theme-color" content="#020617">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+  html, body { height: 100%; margin: 0; background: #020617; }
+  body { font-family: ui-sans-serif, system-ui, sans-serif; }
+  .tab { display: none; }
+  .tab.active { display: block; }
+  #tab-chat.active { display: flex; }
+  .nav-btn.on { color: #22d3ee; }
+  textarea, input { font-family: ui-monospace, monospace; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</head>
+<body class="text-slate-200">
+<div class="flex flex-col h-full w-full bg-slate-950 overflow-hidden" style="padding-top:env(safe-area-inset-top)">
 
-// --- MAIN APPLICATION COMPONENT ---
-export default function App() {
-  const [activeTab, setActiveTab] = useState('hud'); // 'hud', 'chat', 'math', 'data', 'finance', 'english', 'notes'
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'jarvis',
-      text: "Jarvis Core v3.8 online. All systems nominal. I am fully initialized with elite competencies in Mathematics, Advanced Data Science, Financial Engineering, and Technical English. How may I assist you, sir?",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
-  const [inputQuery, setInputQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [savedNotes, setSavedNotes] = useState([]);
-  const [showInstallModal, setShowInstallModal] = useState(false);
-  const [speakingMsgId, setSpeakingMsgId] = useState(null);
+  <!-- En-tête -->
+  <header class="flex items-center justify-between px-4 py-3 bg-slate-900/80 border-b border-cyan-500/20">
+    <div class="flex items-center gap-2">
+      <div class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-950 border border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.4)] text-cyan-400 animate-pulse">◉</div>
+      <div>
+        <h1 class="text-sm font-bold tracking-widest text-cyan-100 font-mono">LOUIS // CORE</h1>
+        <p id="status" class="text-[10px] text-cyan-400/70 font-mono">Statut : en ligne</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btn-install" class="hidden px-2.5 py-1 text-xs rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">Installer l'application</button>
+      <button id="btn-help" class="px-2.5 py-1 text-xs rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">Installer</button>
+      <button id="btn-settings" class="px-2.5 py-1 text-xs rounded-full bg-slate-800 border border-cyan-500/30 text-cyan-300 hover:bg-slate-700" aria-label="Réglages">⚙ Réglages</button>
+    </div>
+  </header>
 
-  // Financial Engine States
-  const [finForm, setFinForm] = useState({ stockPrice: 100, strikePrice: 100, daysToExp: 30, volatility: 25, interestRate: 5 });
-  const [finResult, setFinResult] = useState(null);
+  <main class="flex-1 overflow-y-auto p-4">
 
-  // Math Derivation Engine States
-  const [mathInput, setMathInput] = useState('d/dx (x^3 * sin(x) + e^(2x))');
-  const [mathSolution, setMathSolution] = useState('');
-  const [mathLoading, setMathLoading] = useState(false);
+    <!-- HUD -->
+    <section id="tab-hud" class="tab active max-w-xl mx-auto py-4">
+      <div class="relative my-8 flex items-center justify-center h-60">
+        <div class="absolute w-56 h-56 rounded-full border border-cyan-500/20 animate-[spin_10s_linear_infinite]"></div>
+        <div class="absolute w-48 h-48 rounded-full border border-dashed border-cyan-400/40 animate-[spin_15s_linear_infinite_reverse]"></div>
+        <div class="absolute w-40 h-40 rounded-full border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)] animate-pulse"></div>
+        <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-cyan-900 via-slate-900 to-cyan-500/20 border border-cyan-300/50 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.5)]">
+          <span class="text-4xl text-cyan-300 animate-pulse">◉</span>
+          <span class="text-[9px] font-mono tracking-widest text-cyan-200 mt-1">CORE ACTIVE</span>
+        </div>
+      </div>
 
-  // Data Science Simulator
-  const [dataPoints, setDataPoints] = useState([
-    { epoch: 'Ep 1', loss: 0.85, accuracy: 62 },
-    { epoch: 'Ep 2', loss: 0.62, accuracy: 74 },
-    { epoch: 'Ep 3', loss: 0.41, accuracy: 85 },
-    { epoch: 'Ep 4', loss: 0.28, accuracy: 91 },
-    { epoch: 'Ep 5', loss: 0.19, accuracy: 96 }
-  ]);
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="p-3 bg-slate-900/60 border border-cyan-500/20 rounded-xl">
+          <div class="text-[10px] font-mono text-cyan-400/70">MOTEUR DE RAISONNEMENT</div>
+          <div id="hud-model" class="text-sm font-semibold text-slate-100 mt-1">—</div>
+        </div>
+        <div class="p-3 bg-slate-900/60 border border-cyan-500/20 rounded-xl">
+          <div class="text-[10px] font-mono text-cyan-400/70">CLÉ API</div>
+          <div id="hud-key" class="text-sm font-semibold mt-1">—</div>
+        </div>
+      </div>
 
-  const chatEndRef = useRef(null);
+      <p class="text-xs font-mono text-cyan-400/80 mb-2">Modules spécialisés</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button data-go="math" class="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-slate-100">📐 Mathématiques</div><div class="text-[10px] text-slate-400">Analyse et algèbre</div></button>
+        <button data-go="data" class="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-slate-100">📊 Data science</div><div class="text-[10px] text-slate-400">Python et analyse</div></button>
+        <button data-go="finance" class="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-slate-100">📈 Finance</div><div class="text-[10px] text-slate-400">Black-Scholes</div></button>
+        <button data-go="english" class="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl text-left"><div class="text-xs font-bold text-slate-100">🌐 Anglais technique</div><div class="text-[10px] text-slate-400">Articles et vocabulaire</div></button>
+      </div>
+      <button data-go="chat" class="w-full mt-3 p-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.4)]">Ouvrir le terminal</button>
+    </section>
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+    <!-- Terminal -->
+    <section id="tab-chat" class="tab flex-col h-full max-w-2xl mx-auto">
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-2 text-xs">
+        <button class="preset px-3 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50" data-p="Conçois un pipeline Python complet avec Pandas et Scikit-Learn pour la détection d'anomalies sur des transactions financières.">⚡ Pipeline de données</button>
+        <button class="preset px-3 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50" data-p="Démontre mathématiquement la règle de mise à jour de la descente de gradient pour un perceptron multicouche.">📐 Démonstration</button>
+        <button class="preset px-3 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50" data-p="Explique la simulation de Monte-Carlo pour la valorisation d'options, avec rigueur.">📈 Finance quantitative</button>
+      </div>
+      <div id="chat-log" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+      <form id="chat-form" class="mt-3 flex gap-2 items-center bg-slate-900/90 border border-cyan-500/30 p-2 rounded-xl">
+        <input id="chat-input" type="text" autocomplete="off" placeholder="Posez votre question (maths, Python, finance, anglais)…" class="flex-1 bg-transparent px-2 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none">
+        <button id="chat-send" type="submit" class="px-3 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-800 text-slate-950 text-xs font-bold rounded-lg">Envoyer</button>
+      </form>
+    </section>
 
-  // Handle Gemini API Requests
-  const callJarvisAPI = async (prompt, systemInstruction = "") => {
-    const defaultSystem = "You are JARVIS, an elite AI assistant far exceeding senior human data scientists and engineers. You excel in advanced mathematics, deep learning architecture, quantitative finance, and technical English. Respond with extreme precision, clean code, mathematical rigor, and conciseness.";
-    const fullSystem = systemInstruction ? `${defaultSystem}\n${systemInstruction}` : defaultSystem;
+    <!-- Maths -->
+    <section id="tab-math" class="tab max-w-xl mx-auto space-y-4">
+      <div class="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">MOTEUR DE MATHÉMATIQUES</h2>
+        <p class="text-xs text-slate-400 mb-3">Dérivées, intégrales, matrices et équations différentielles, résolues pas à pas.</p>
+        <textarea id="math-input" rows="3" class="w-full bg-slate-950 border border-cyan-500/20 rounded-xl p-3 text-xs text-cyan-100 focus:outline-none focus:border-cyan-400 mb-3">d/dx (x^3 * sin(x) + e^(2x))</textarea>
+        <button id="math-run" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl">Résoudre pas à pas</button>
+      </div>
+      <div id="math-out" class="hidden p-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed"></div>
+    </section>
 
+    <!-- Data -->
+    <section id="tab-data" class="tab max-w-xl mx-auto space-y-4">
+      <div class="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">DATA SCIENCE ET PYTHON</h2>
+        <p class="text-xs text-slate-400 mb-3">Courbes d'entraînement d'exemple et générateur de code Python.</p>
+        <div class="bg-slate-950 p-2 rounded-xl border border-cyan-500/20 mb-3">
+          <div class="text-[10px] font-mono text-cyan-400 mb-1">ENTRAÎNEMENT : <span class="text-cyan-300">précision (%)</span> et <span class="text-rose-400">perte</span></div>
+          <svg id="chart" viewBox="0 0 320 140" class="w-full h-36"></svg>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="preset p-2.5 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs" data-p="Écris un script Python performant pour entraîner un modèle XGBoost avec réglage des hyperparamètres via Optuna.">
+            <div class="font-bold text-slate-200">XGBoost + Optuna</div><div class="text-[10px] text-slate-400">Code de pipeline ML</div></button>
+          <button class="preset p-2.5 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs" data-p="Génère une boucle d'entraînement PyTorch personnalisée avec précision mixte et accumulation de gradient.">
+            <div class="font-bold text-slate-200">Entraîneur PyTorch</div><div class="text-[10px] text-slate-400">Code de deep learning</div></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Finance -->
+    <section id="tab-finance" class="tab max-w-xl mx-auto space-y-4">
+      <div class="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">CALCULATEUR BLACK-SCHOLES</h2>
+        <p class="text-xs text-slate-400 mb-3">Valorisation d'options européennes et sensibilités (Grecques). Fonctionne hors ligne.</p>
+        <div class="grid grid-cols-2 gap-3 mb-3 text-xs font-mono">
+          <label class="text-slate-400 text-[10px]">PRIX DE L'ACTION<input id="f-S" type="number" value="100" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+          <label class="text-slate-400 text-[10px]">PRIX D'EXERCICE<input id="f-K" type="number" value="100" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+          <label class="text-slate-400 text-[10px]">JOURS AVANT ÉCHÉANCE<input id="f-T" type="number" value="30" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+          <label class="text-slate-400 text-[10px]">VOLATILITÉ (%)<input id="f-v" type="number" value="25" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+          <label class="text-slate-400 text-[10px] col-span-2">TAUX SANS RISQUE (%)<input id="f-r" type="number" value="5" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+        </div>
+        <button id="f-run" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl">Calculer le prix et les Grecques</button>
+        <p id="f-err" class="hidden text-xs text-rose-400 mt-2">Vérifiez les valeurs : prix, échéance et volatilité doivent être supérieurs à 0.</p>
+      </div>
+      <div id="f-out" class="hidden p-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl grid grid-cols-2 gap-3 font-mono text-xs"></div>
+    </section>
+
+    <!-- Anglais -->
+    <section id="tab-english" class="tab max-w-xl mx-auto space-y-4">
+      <div class="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
+        <h2 class="text-sm font-bold text-cyan-300 font-mono mb-1">ANGLAIS TECHNIQUE ET ACADÉMIQUE</h2>
+        <p class="text-xs text-slate-400 mb-3">Reformulez un résumé, relisez un texte ou construisez votre vocabulaire.</p>
+        <textarea id="en-input" rows="4" placeholder="Collez ici le texte à corriger ou à reformuler en anglais académique…" class="w-full bg-slate-950 border border-cyan-500/20 rounded-xl p-3 text-xs text-cyan-100 focus:outline-none focus:border-cyan-400 mb-3"></textarea>
+        <button id="en-run" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl mb-2">Reformuler en anglais académique</button>
+        <button class="preset w-full p-3 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs" data-p="Fournis un lexique complet des termes statistiques avancés en anglais avec leurs définitions en français.">
+          <div class="font-bold text-slate-200">Lexique de data science</div><div class="text-[10px] text-slate-400">Terminologie bilingue</div></button>
+      </div>
+      <div id="en-out" class="hidden p-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed"></div>
+    </section>
+
+    <!-- Notes -->
+    <section id="tab-notes" class="tab max-w-xl mx-auto space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 id="notes-title" class="text-sm font-bold text-cyan-300 font-mono"></h2>
+        <button id="notes-clear" class="text-[10px] text-slate-400 hover:text-rose-400">Tout effacer</button>
+      </div>
+      <div id="notes-list" class="space-y-3"></div>
+    </section>
+  </main>
+
+  <!-- Navigation -->
+  <nav class="flex items-center justify-around bg-slate-900/90 border-t border-cyan-500/20 py-2 px-1" style="padding-bottom:calc(0.5rem + env(safe-area-inset-bottom))">
+    <button class="nav-btn on flex flex-col items-center gap-0.5 text-slate-500" data-go="hud"><span>◉</span><span class="text-[9px] font-mono">Accueil</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-go="chat"><span>⌨</span><span class="text-[9px] font-mono">Terminal</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-go="math"><span>∑</span><span class="text-[9px] font-mono">Maths</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-go="data"><span>▤</span><span class="text-[9px] font-mono">Data</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-go="finance"><span>$</span><span class="text-[9px] font-mono">Finance</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-go="english"><span>A</span><span class="text-[9px] font-mono">Anglais</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-go="notes"><span>★</span><span class="text-[9px] font-mono">Notes</span></button>
+  </nav>
+</div>
+
+<!-- Fenêtre : réglages -->
+<div id="modal-settings" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center p-4 z-50">
+  <div class="bg-slate-900 border border-cyan-500/40 rounded-2xl p-5 max-w-sm w-full font-mono text-xs space-y-3">
+    <h3 class="text-cyan-300 font-bold">Réglages</h3>
+    <label class="block text-slate-400 text-[10px]">CLÉ API GEMINI
+      <input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+    <label class="block text-slate-400 text-[10px]">MODÈLE
+      <input id="set-model" type="text" class="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1 text-xs"></label>
+    <p class="text-[10px] text-slate-400 leading-relaxed">La clé est enregistrée uniquement dans ce navigateur (stockage local). Créez-en une gratuitement sur aistudio.google.com. Ne la publiez jamais dans le code sur GitHub.</p>
+    <div class="flex gap-2">
+      <button id="set-cancel" class="flex-1 py-2 bg-slate-800 text-slate-200 rounded-xl">Annuler</button>
+      <button id="set-save" class="flex-1 py-2 bg-cyan-600 text-slate-950 font-bold rounded-xl">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fenêtre : installation -->
+<div id="modal-help" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center p-4 z-50">
+  <div class="bg-slate-900 border border-cyan-500/40 rounded-2xl p-5 max-w-sm w-full font-mono text-xs text-slate-300 space-y-2 leading-relaxed">
+    <h3 class="text-cyan-300 font-bold">Installer Louis</h3>
+    <p class="font-bold text-cyan-400">Ordinateur (Chrome ou Edge)</p>
+    <p>Cliquez sur l'icône d'installation à droite de la barre d'adresse, ou menu ⋮ → « Diffuser, enregistrer et partager » → « Installer la page en tant qu'application ». Louis s'ouvre alors dans sa propre fenêtre et vous pouvez l'épingler au bureau ou à la barre des tâches.</p>
+    <p class="font-bold text-cyan-400 pt-1">Android (Chrome)</p>
+    <p>Menu ⋮ → « Ajouter à l'écran d'accueil » ou « Installer l'application ».</p>
+    <p class="font-bold text-cyan-400 pt-1">iPhone (Safari)</p>
+    <p>Bouton Partager → « Sur l'écran d'accueil ».</p>
+    <button id="help-close" class="w-full py-2 bg-cyan-600 text-slate-950 font-bold rounded-xl mt-2">Compris</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const store = {
+    get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+
+  let settings = store.get('jarvis.settings', { key: '', model: 'gemini-3-flash-preview' });
+  let notes = store.get('jarvis.notes', []);
+  let messages = store.get('jarvis.messages', []);
+  let busy = false;
+  let speakingId = null;
+
+  const now = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+  if (!messages.length) {
+    messages.push({ id: 1, sender: 'jarvis', ts: now(),
+      text: "Louis Core en ligne. Je suis à votre disposition en mathématiques, data science, finance quantitative et anglais technique. Pour activer mes réponses, ajoutez votre clé API dans les réglages." });
+  }
+
+  /* ---------- Navigation ---------- */
+  function go(tab) {
+    $$('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + tab));
+    $$('.nav-btn').forEach(b => b.classList.toggle('on', b.dataset.go === tab));
+    if (tab === 'chat') scrollChat();
+    if (tab === 'notes') renderNotes();
+  }
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]');
+    if (g) go(g.dataset.go);
+    const p = e.target.closest('.preset');
+    if (p) { go('chat'); send(p.dataset.p); }
+  });
+
+  /* ---------- Statut ---------- */
+  function refreshHud() {
+    $('#hud-model').textContent = settings.model;
+    const ok = !!settings.key;
+    $('#hud-key').textContent = ok ? 'Configurée' : 'À configurer';
+    $('#hud-key').className = 'text-sm font-semibold mt-1 ' + (ok ? 'text-emerald-400' : 'text-amber-400');
+  }
+
+  /* ---------- API Gemini ---------- */
+  async function callLouis(prompt, extra = '') {
+    if (!settings.key) return "Clé API manquante. Ouvrez « Réglages » et collez votre clé Gemini pour activer cette fonction.";
+    const base = "Tu es LOUIS, un assistant expert en mathématiques avancées, data science, ingénierie financière et anglais technique. Réponds en français sauf demande contraire, avec précision, rigueur et concision. Fournis du code propre quand c'est utile.";
+    const system = extra ? base + '\n' + extra : base;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(settings.model)}:generateContent`;
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
+      const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          systemInstruction: { parts: [{ text: fullSystem }] }
+          systemInstruction: { parts: [{ text: system }] }
         })
       });
-
-      const data = await response.json();
-      const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || "System Error: Unable to process request.";
-      return answer;
+      const data = await res.json();
+      if (!res.ok) return `Erreur API (${res.status}) : ${data?.error?.message || 'requête refusée'}`;
+      return data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || "Aucune réponse reçue. Reformulez votre demande.";
     } catch (err) {
-      console.error(err);
-      return "Network Exception: Unable to reach Jarvis Neural Core.";
+      return "Connexion impossible. Vérifiez votre accès à Internet.";
     }
-  };
+  }
 
-  const handleSendMessage = async (customPrompt) => {
-    const textToSend = customPrompt || inputQuery;
-    if (!textToSend.trim()) return;
-
-    const userMsg = {
-      id: Date.now(),
-      sender: 'user',
-      text: textToSend,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages(prev => [...prev, userMsg]);
-    if (!customPrompt) setInputQuery('');
-    setIsLoading(true);
-
-    const jarvisResponseText = await callJarvisAPI(textToSend);
-
-    const jarvisMsg = {
-      id: Date.now() + 1,
-      sender: 'jarvis',
-      text: jarvisResponseText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages(prev => [...prev, jarvisMsg]);
-    setIsLoading(false);
-  };
-
-  // Text to Speech
-  const speakText = (text, id) => {
-    if ('speechSynthesis' in window) {
-      if (speakingMsgId === id) {
-        window.speechSynthesis.cancel();
-        setSpeakingMsgId(null);
-        return;
+  /* ---------- Terminal ---------- */
+  function renderChat() {
+    const log = $('#chat-log');
+    log.innerHTML = '';
+    messages.forEach(m => {
+      const wrap = document.createElement('div');
+      wrap.className = 'flex flex-col ' + (m.sender === 'user' ? 'items-end' : 'items-start');
+      const bubble = document.createElement('div');
+      bubble.className = 'max-w-[88%] p-3.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ' +
+        (m.sender === 'user' ? 'bg-cyan-600 text-slate-950 font-medium rounded-tr-none'
+                             : 'bg-slate-900/90 border border-cyan-500/30 text-slate-200 rounded-tl-none font-mono');
+      bubble.textContent = m.text;
+      wrap.appendChild(bubble);
+      if (m.sender === 'jarvis') {
+        const bar = document.createElement('div');
+        bar.className = 'flex items-center gap-3 mt-1 px-1 text-[10px] text-slate-500 font-mono';
+        bar.innerHTML = `<span>${m.ts}</span>`;
+        const mk = (label, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = 'hover:text-cyan-400'; b.onclick = fn; bar.appendChild(b); };
+        mk(speakingId === m.id ? 'Arrêter' : 'Écouter', () => speak(m.text, m.id));
+        mk('Copier', () => navigator.clipboard?.writeText(m.text));
+        mk('Enregistrer', () => saveNote('Réponse du terminal', m.text));
+        wrap.appendChild(bar);
       }
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text.replace(/[*#`]/g, ''));
-      utterance.rate = 1.0;
-      utterance.pitch = 0.9;
-      utterance.onend = () => setSpeakingMsgId(null);
-      setSpeakingMsgId(id);
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  // Save to Notes
-  const saveToNotes = (title, content, category) => {
-    const newNote = {
-      id: Date.now(),
-      title,
-      content,
-      category,
-      date: new Date().toLocaleDateString()
-    };
-    setSavedNotes(prev => [newNote, ...prev]);
-    alert("Saved to Jarvis Notebook!");
-  };
-
-  // Math Derivation Engine
-  const runMathDerivation = async () => {
-    if (!mathInput) return;
-    setMathLoading(true);
-    const prompt = `Solve and step-by-step derive this math/calculus problem. Provide clear explanations and clean mathematical formatting:\n${mathInput}`;
-    const result = await callJarvisAPI(prompt, "You are a World-Class Pure & Applied Mathematician.");
-    setMathSolution(result);
-    setMathLoading(false);
-  };
-
-  // Black-Scholes Calculation (Financial Engineering)
-  const calculateBlackScholes = () => {
-    const { stockPrice, strikePrice, daysToExp, volatility, interestRate } = finForm;
-    const S = parseFloat(stockPrice);
-    const K = parseFloat(strikePrice);
-    const T = parseFloat(daysToExp) / 365;
-    const v = parseFloat(volatility) / 100;
-    const r = parseFloat(interestRate) / 100;
-
-    if (!S || !K || !T || !v) return;
-
-    const d1 = (Math.log(S / K) + (r + (v * v) / 2) * T) / (v * Math.sqrt(T));
-    const d2 = d1 - v * Math.sqrt(T);
-
-    // Standard Normal CDF approximation
-    const cdf = (x) => {
-      const t = 1 / (1 + 0.2316419 * Math.abs(x));
-      const d = 0.3989423 * Math.exp(-x * x / 2);
-      const prob = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
-      return x >= 0 ? 1 - prob : prob;
-    };
-
-    const callPrice = S * cdf(d1) - K * Math.exp(-r * T) * cdf(d2);
-    const putPrice = K * Math.exp(-r * T) * cdf(-d2) - S * cdf(-d1);
-    const deltaCall = cdf(d1);
-    const gamma = (Math.exp(-d1 * d1 / 2) / (S * v * Math.sqrt(2 * Math.PI * T)));
-
-    setFinResult({
-      call: callPrice.toFixed(2),
-      put: putPrice.toFixed(2),
-      delta: deltaCall.toFixed(3),
-      gamma: gamma.toFixed(4)
+      log.appendChild(wrap);
     });
+    if (busy) {
+      const l = document.createElement('div');
+      l.className = 'text-cyan-400 font-mono text-xs p-2 bg-slate-900/50 rounded-lg w-fit border border-cyan-500/20';
+      l.textContent = 'Louis analyse votre demande…';
+      log.appendChild(l);
+    }
+    scrollChat();
+  }
+  function scrollChat() { const l = $('#chat-log'); l.scrollTop = l.scrollHeight; }
+  function persistMessages() { store.set('jarvis.messages', messages.slice(-60)); }
+
+  async function send(text) {
+    text = (text || '').trim();
+    if (!text || busy) return;
+    messages.push({ id: Date.now(), sender: 'user', text, ts: now() });
+    busy = true; $('#chat-send').disabled = true; renderChat();
+    const reply = await callLouis(text);
+    messages.push({ id: Date.now() + 1, sender: 'jarvis', text: reply, ts: now() });
+    busy = false; $('#chat-send').disabled = false;
+    persistMessages(); renderChat();
+  }
+  $('#chat-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const i = $('#chat-input'); const t = i.value; i.value = ''; send(t);
+  });
+
+  /* ---------- Synthèse vocale ---------- */
+  function speak(text, id) {
+    if (!('speechSynthesis' in window)) return;
+    const wasSame = speakingId === id;
+    speechSynthesis.cancel();
+    if (wasSame) { speakingId = null; renderChat(); return; }
+    const u = new SpeechSynthesisUtterance(text.replace(/[*#`]/g, ''));
+    u.lang = 'fr-FR'; u.pitch = 0.9;
+    u.onend = () => { speakingId = null; renderChat(); };
+    speakingId = id; speechSynthesis.speak(u); renderChat();
+  }
+
+  /* ---------- Notes ---------- */
+  function saveNote(title, content) {
+    notes.unshift({ id: Date.now(), title, content, date: new Date().toLocaleDateString('fr-FR') });
+    store.set('jarvis.notes', notes);
+    $('#status').textContent = 'Statut : note enregistrée';
+    setTimeout(() => $('#status').textContent = 'Statut : en ligne', 2000);
+  }
+  function renderNotes() {
+    $('#notes-title').textContent = `CARNET LOUIS (${notes.length})`;
+    const list = $('#notes-list'); list.innerHTML = '';
+    if (!notes.length) {
+      list.innerHTML = '<div class="text-center py-12 text-slate-500 text-xs font-mono">Aucune note. Enregistrez une réponse depuis le terminal ou un module.</div>';
+      return;
+    }
+    notes.forEach(n => {
+      const d = document.createElement('div');
+      d.className = 'p-3 bg-slate-900/80 border border-cyan-500/20 rounded-xl font-mono text-xs space-y-1';
+      const h = document.createElement('div');
+      h.className = 'flex justify-between items-center text-cyan-400 font-bold';
+      h.innerHTML = '<span></span><span class="text-[10px] text-slate-500 font-normal"></span>';
+      h.children[0].textContent = n.title; h.children[1].textContent = n.date;
+      const p = document.createElement('p');
+      p.className = 'text-slate-300 text-[11px] whitespace-pre-wrap max-h-40 overflow-y-auto'; p.textContent = n.content;
+      const del = document.createElement('button');
+      del.className = 'text-[10px] text-slate-500 hover:text-rose-400'; del.textContent = 'Supprimer';
+      del.onclick = () => { notes = notes.filter(x => x.id !== n.id); store.set('jarvis.notes', notes); renderNotes(); };
+      d.append(h, p, del); list.appendChild(d);
+    });
+  }
+  $('#notes-clear').onclick = () => { if (notes.length && confirm('Effacer toutes les notes ?')) { notes = []; store.set('jarvis.notes', notes); renderNotes(); } };
+
+  /* ---------- Modules IA (maths, anglais) ---------- */
+  async function runModule(btn, out, prompt, extra, title) {
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Calcul en cours…';
+    out.classList.remove('hidden'); out.textContent = 'Louis analyse votre demande…';
+    const r = await callLouis(prompt, extra);
+    out.textContent = '';
+    const head = document.createElement('div');
+    head.className = 'flex justify-between items-center mb-2 pb-2 border-b border-cyan-500/20';
+    head.innerHTML = '<span class="text-cyan-400 font-bold">RÉSULTAT</span>';
+    const sv = document.createElement('button'); sv.textContent = 'Enregistrer'; sv.className = 'text-slate-400 hover:text-cyan-300';
+    sv.onclick = () => saveNote(title, r); head.appendChild(sv);
+    const body = document.createElement('div'); body.textContent = r;
+    out.append(head, body);
+    btn.disabled = false; btn.textContent = label;
+  }
+  $('#math-run').onclick = e => {
+    const v = $('#math-input').value.trim(); if (!v) return;
+    runModule(e.currentTarget, $('#math-out'),
+      `Résous et démontre pas à pas ce problème de mathématiques, avec des explications claires :\n${v}`,
+      "Tu es un mathématicien de premier plan, en mathématiques pures et appliquées.", 'Dérivation mathématique');
+  };
+  $('#en-run').onclick = e => {
+    const v = $('#en-input').value.trim(); if (!v) return;
+    runModule(e.currentTarget, $('#en-out'),
+      `Reformule ce texte en anglais académique de niveau publication (IEEE/Nature), puis liste brièvement en français les corrections apportées :\n\n${v}`,
+      "Tu es un relecteur scientifique anglophone.", 'Anglais académique');
   };
 
-  return (
-    <div className="flex flex-col h-screen w-full bg-slate-950 text-cyan-40 font-sans overflow-hidden select-none">
-      
-      {/* TOP HEADER / STATUS BAR */}
-      <header className="flex items-center justify-between px-4 py-3 bg-slate-900/80 backdrop-blur-md border-b border-cyan-500/20 z-10">
-        <div className="flex items-center gap-2">
-          <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-cyan-950 border border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.4)]">
-            <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-widest text-cyan-100 uppercase font-mono">JARVIS // CORE</h1>
-            <p className="text-[10px] text-cyan-400/70 font-mono">NEURAL STATUS: ONLINE</p>
-          </div>
-        </div>
+  /* ---------- Graphique d'entraînement (SVG) ---------- */
+  (function drawChart() {
+    const pts = [[1,.85,62],[2,.62,74],[3,.41,85],[4,.28,91],[5,.19,96]];
+    const W = 320, H = 140, pad = 18;
+    const x = i => pad + (i - 1) * (W - 2 * pad) / 4;
+    const yAcc = a => H - pad - (a / 100) * (H - 2 * pad);
+    const yLoss = l => H - pad - (l / 1) * (H - 2 * pad);
+    const line = (f, k, col) => `<polyline fill="none" stroke="${col}" stroke-width="2" points="${pts.map(p => `${x(p[0])},${f(p[k])}`).join(' ')}"/>` +
+      pts.map(p => `<circle cx="${x(p[0])}" cy="${f(p[k])}" r="2.5" fill="${col}"/>`).join('');
+    let g = '';
+    for (let i = 0; i < 4; i++) { const y = pad + i * (H - 2 * pad) / 3; g += `<line x1="${pad}" x2="${W - pad}" y1="${y}" y2="${y}" stroke="#1e293b" stroke-dasharray="3 3"/>`; }
+    const lbl = pts.map(p => `<text x="${x(p[0])}" y="${H - 3}" fill="#64748b" font-size="9" text-anchor="middle">Ép. ${p[0]}</text>`).join('');
+    $('#chart').innerHTML = g + line(yAcc, 2, '#06b6d4') + line(yLoss, 1, '#f43f5e') + lbl;
+  })();
 
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={() => setShowInstallModal(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition-all"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Install App</span>
-          </button>
-          <div className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            100%
-          </div>
-        </div>
-      </header>
+  /* ---------- Black-Scholes ---------- */
+  const cdf = x => {
+    const t = 1 / (1 + 0.2316419 * Math.abs(x));
+    const d = 0.3989423 * Math.exp(-x * x / 2);
+    const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+    return x >= 0 ? 1 - p : p;
+  };
+  $('#f-run').onclick = () => {
+    const S = parseFloat($('#f-S').value), K = parseFloat($('#f-K').value);
+    const T = parseFloat($('#f-T').value) / 365, v = parseFloat($('#f-v').value) / 100;
+    const r = (parseFloat($('#f-r').value) || 0) / 100;
+    const out = $('#f-out'), err = $('#f-err');
+    if (!(S > 0 && K > 0 && T > 0 && v > 0)) { err.classList.remove('hidden'); out.classList.add('hidden'); return; }
+    err.classList.add('hidden');
+    const sq = v * Math.sqrt(T);
+    const d1 = (Math.log(S / K) + (r + v * v / 2) * T) / sq, d2 = d1 - sq;
+    const call = S * cdf(d1) - K * Math.exp(-r * T) * cdf(d2);
+    const put = K * Math.exp(-r * T) * cdf(-d2) - S * cdf(-d1);
+    const gamma = Math.exp(-d1 * d1 / 2) / (S * sq * Math.sqrt(2 * Math.PI));
+    const vega = S * Math.exp(-d1 * d1 / 2) / Math.sqrt(2 * Math.PI) * Math.sqrt(T) / 100;
+    const cell = (l, val, c) => `<div class="p-2 bg-slate-950 rounded-lg border border-cyan-500/10"><div class="text-[10px] text-slate-400">${l}</div><div class="text-lg font-bold ${c}">${val}</div></div>`;
+    out.innerHTML = cell('PRIX DU CALL', call.toFixed(2), 'text-emerald-400') + cell('PRIX DU PUT', put.toFixed(2), 'text-rose-400') +
+      cell('DELTA (Δ) du call', cdf(d1).toFixed(3), 'text-cyan-300') + cell('GAMMA (Γ)', gamma.toFixed(4), 'text-cyan-300') +
+      cell('VEGA (pour 1 % de vol.)', vega.toFixed(3), 'text-cyan-300');
+    out.classList.remove('hidden');
+  };
 
-      {/* MAIN CONTENT AREA */}
-      <main className="flex-1 overflow-y-auto p-4 relative text-slate-200">
-        
-        {/* TAB 0: HUD DASHBOARD */}
-        {activeTab === 'hud' && (
-          <div className="flex flex-col items-center justify-between h-full max-w-xl mx-auto py-4">
-            
-            {/* Holographic AI Core Animation */}
-            <div className="relative my-8 flex items-center justify-center">
-              <div className="absolute w-56 h-56 rounded-full border border-cyan-500/20 animate-[spin_10s_linear_infinite]" />
-              <div className="absolute w-48 h-48 rounded-full border border-dashed border-cyan-400/40 animate-[spin_15s_linear_infinite_reverse]" />
-              <div className="absolute w-40 h-40 rounded-full border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)] animate-pulse" />
-              
-              <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-cyan-900 via-slate-900 to-cyan-500/20 border border-cyan-300/50 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.5)]">
-                <Cpu className="w-12 h-12 text-cyan-300 animate-pulse" />
-                <span className="text-[9px] font-mono tracking-widest text-cyan-200 mt-1">CORE ACTIVE</span>
-              </div>
-            </div>
+  /* ---------- Réglages ---------- */
+  const show = (id, on) => $(id).classList.toggle('hidden', !on);
+  $('#btn-settings').onclick = () => { $('#set-key').value = settings.key; $('#set-model').value = settings.model; show('#modal-settings', true); };
+  $('#set-cancel').onclick = () => show('#modal-settings', false);
+  $('#set-save').onclick = () => {
+    settings = { key: $('#set-key').value.trim(), model: $('#set-model').value.trim() || 'gemini-3-flash-preview' };
+    store.set('jarvis.settings', settings); refreshHud(); show('#modal-settings', false);
+  };
+  $('#btn-help').onclick = () => show('#modal-help', true);
+  $('#help-close').onclick = () => show('#modal-help', false);
 
-            {/* Quick Status Widgets */}
-            <div className="w-full grid grid-cols-2 gap-3 mb-6">
-              <div className="p-3 bg-slate-900/60 border border-cyan-500/20 rounded-xl backdrop-blur">
-                <div className="text-[10px] font-mono text-cyan-400/70">REASONING ENGINE</div>
-                <div className="text-sm font-semibold text-slate-100 flex items-center justify-between mt-1">
-                  Gemini 3 Flash <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                </div>
-              </div>
+  /* ---------- Installation (PWA) ---------- */
+  let deferred = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferred = e;
+    $('#btn-install').classList.remove('hidden'); $('#btn-help').classList.add('hidden');
+  });
+  $('#btn-install').onclick = async () => {
+    if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null;
+    $('#btn-install').classList.add('hidden'); $('#btn-help').classList.remove('hidden');
+  };
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
-              <div className="p-3 bg-slate-900/60 border border-cyan-500/20 rounded-xl backdrop-blur">
-                <div className="text-[10px] font-mono text-cyan-400/70">QUANT MODULE</div>
-                <div className="text-sm font-semibold text-slate-100 flex items-center justify-between mt-1">
-                  Active / 100% <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                </div>
-              </div>
-            </div>
-
-            {/* Core Action Launchers */}
-            <div className="w-full space-y-2">
-              <p className="text-xs font-mono text-cyan-400/80 uppercase tracking-wider mb-2">Engage Specialized Modules</p>
-              
-              <div className="grid grid-cols-2 gap-2">
-                <button 
-                  onClick={() => setActiveTab('math')}
-                  className="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl flex items-center gap-3 transition-all text-left"
-                >
-                  <Calculator className="w-5 h-5 text-cyan-400" />
-                  <div>
-                    <div className="text-xs font-bold text-slate-100">Mathematics</div>
-                    <div className="text-[10px] text-slate-400">Calculus & Algebra</div>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('data')}
-                  className="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl flex items-center gap-3 transition-all text-left"
-                >
-                  <BarChart3 className="w-5 h-5 text-cyan-400" />
-                  <div>
-                    <div className="text-xs font-bold text-slate-100">Data Science</div>
-                    <div className="text-[10px] text-slate-400">Python & Analytics</div>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('finance')}
-                  className="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl flex items-center gap-3 transition-all text-left"
-                >
-                  <TrendingUp className="w-5 h-5 text-cyan-400" />
-                  <div>
-                    <div className="text-xs font-bold text-slate-100">Finance</div>
-                    <div className="text-[10px] text-slate-400">Black-Scholes & Quant</div>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('english')}
-                  className="p-3 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 rounded-xl flex items-center gap-3 transition-all text-left"
-                >
-                  <Languages className="w-5 h-5 text-cyan-400" />
-                  <div>
-                    <div className="text-xs font-bold text-slate-100">Tech English</div>
-                    <div className="text-[10px] text-slate-400">Papers & Grammar</div>
-                  </div>
-                </button>
-              </div>
-
-              <button 
-                onClick={() => setActiveTab('chat')}
-                className="w-full mt-3 p-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all"
-              >
-                <Terminal className="w-4 h-4" /> Open Interactive Terminal
-              </button>
-            </div>
-
-          </div>
-        )}
-
-        {/* TAB 1: INTERACTIVE CHAT & TERMINAL */}
-        {activeTab === 'chat' && (
-          <div className="flex flex-col h-full max-w-2xl mx-auto">
-            
-            {/* Quick Prompt Presets */}
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-none text-xs">
-              <button 
-                onClick={() => handleSendMessage("Design a complete Python pipeline using Pandas and Scikit-Learn for anomaly detection on financial transactions.")}
-                className="px-3 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50"
-              >
-                ⚡ Data Pipeline
-              </button>
-              <button 
-                onClick={() => handleSendMessage("Derive the gradient descent update rule for a multi-layer perceptron mathematically.")}
-                className="px-3 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50"
-              >
-                📐 Derive Math
-              </button>
-              <button 
-                onClick={() => handleSendMessage("Explain Monte Carlo simulation for option pricing in rigorous technical English.")}
-                className="px-3 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 whitespace-nowrap hover:bg-cyan-950/50"
-              >
-                📈 Quant Finance
-              </button>
-            </div>
-
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-              {messages.map((msg) => (
-                <div 
-                  key={msg.id} 
-                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
-                >
-                  <div 
-                    className={`max-w-[88%] p-3.5 rounded-2xl text-xs leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-cyan-600 text-slate-950 font-medium rounded-tr-none'
-                        : 'bg-slate-900/90 border border-cyan-500/30 text-slate-200 rounded-tl-none font-mono whitespace-pre-wrap'
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-
-                  {/* Actions for Jarvis messages */}
-                  {msg.sender === 'jarvis' && (
-                    <div className="flex items-center gap-2 mt-1 px-1">
-                      <span className="text-[10px] text-slate-500 font-mono">{msg.timestamp}</span>
-                      <button 
-                        onClick={() => speakText(msg.text, msg.id)}
-                        className={`text-slate-400 hover:text-cyan-400 p-1 ${speakingMsgId === msg.id ? 'text-cyan-400 animate-pulse' : ''}`}
-                        title="Read Aloud"
-                      >
-                        <Volume2 className="w-3 h-3" />
-                      </button>
-                      <button 
-                        onClick={() => navigator.clipboard.writeText(msg.text)}
-                        className="text-slate-400 hover:text-cyan-400 p-1"
-                        title="Copy text"
-                      >
-                        <Copy className="w-3 h-3" />
-                      </button>
-                      <button 
-                        onClick={() => saveToNotes("Jarvis Terminal Response", msg.text, "Chat")}
-                        className="text-slate-400 hover:text-cyan-400 p-1"
-                        title="Save to Notes"
-                      >
-                        <Bookmark className="w-3 h-3" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs p-2 bg-slate-900/50 rounded-lg w-fit border border-cyan-500/20">
-                  <Sparkles className="w-3.5 h-3.5 animate-spin" /> Jarvis is processing complex neural reasoning...
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Input Bar */}
-            <form 
-              onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
-              className="mt-3 flex gap-2 items-center bg-slate-900/90 border border-cyan-500/30 p-2 rounded-xl backdrop-blur-md"
-            >
-              <input 
-                type="text" 
-                value={inputQuery}
-                onChange={(e) => setInputQuery(e.target.value)}
-                placeholder="Ask Jarvis (Math, Python, Data Science, Finance)..."
-                className="flex-1 bg-transparent px-2 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none font-mono"
-              />
-              <button 
-                type="submit"
-                disabled={isLoading || !inputQuery.trim()}
-                className="p-2 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-800 text-slate-950 rounded-lg transition-all"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
-
-          </div>
-        )}
-
-        {/* TAB 2: MATHEMATICS MODULE */}
-        {activeTab === 'math' && (
-          <div className="max-w-xl mx-auto space-y-4">
-            <div className="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
-              <h2 className="text-sm font-bold text-cyan-300 font-mono flex items-center gap-2 mb-1">
-                <Calculator className="w-4 h-4" /> MATHEMATICS & CALCULUS ENGINE
-              </h2>
-              <p className="text-xs text-slate-400 mb-3">Solve derivatives, integrals, matrix operations, and differential equations step-by-step.</p>
-
-              <textarea 
-                value={mathInput}
-                onChange={(e) => setMathInput(e.target.value)}
-                rows={3}
-                placeholder="Enter mathematical expression or problem..."
-                className="w-full bg-slate-950 border border-cyan-500/20 rounded-xl p-3 text-xs text-cyan-100 font-mono focus:outline-none focus:border-cyan-400 mb-3"
-              />
-
-              <button 
-                onClick={runMathDerivation}
-                disabled={mathLoading}
-                className="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2"
-              >
-                {mathLoading ? <Sparkles className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                Derive Step-by-Step Solution
-              </button>
-            </div>
-
-            {mathSolution && (
-              <div className="p-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed">
-                <div className="flex justify-between items-center mb-2 pb-2 border-b border-cyan-500/20">
-                  <span className="text-cyan-400 font-bold">DERIVATION RESULT</span>
-                  <button onClick={() => saveToNotes("Math Derivation", mathSolution, "Math")} className="text-slate-400 hover:text-cyan-300">
-                    <Bookmark className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                {mathSolution}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 3: DATA SCIENCE MODULE */}
-        {activeTab === 'data' && (
-          <div className="max-w-xl mx-auto space-y-4">
-            <div className="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
-              <h2 className="text-sm font-bold text-cyan-300 font-mono flex items-center gap-2 mb-1">
-                <BarChart3 className="w-4 h-4" /> DATA SCIENCE & PYTHON SIMULATOR
-              </h2>
-              <p className="text-xs text-slate-400 mb-3">Live neural network training simulation and automated Python snippet generator.</p>
-
-              {/* Loss / Accuracy Chart */}
-              <div className="h-44 w-full bg-slate-950 p-2 rounded-xl border border-cyan-500/20 mb-3">
-                <div className="text-[10px] font-mono text-cyan-400 mb-1">MODEL TRAINING METRICS (LOSS VS ACCURACY)</div>
-                <ResponsiveContainer width="100%" height="85%">
-                  <AreaChart data={dataPoints}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                    <XAxis dataKey="epoch" stroke="#64748b" fontSize={10} />
-                    <YAxis stroke="#64748b" fontSize={10} />
-                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#06b6d4', fontSize: '10px' }} />
-                    <Area type="monotone" dataKey="accuracy" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.2} name="Accuracy %" />
-                    <Area type="monotone" dataKey="loss" stroke="#f43f5e" fill="#f43f5e" fillOpacity={0.1} name="Loss" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <button 
-                  onClick={() => handleSendMessage("Write a high-performance Python script for training a XGBoost model with hyperparameter tuning using Optuna.")}
-                  className="p-2.5 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs"
-                >
-                  <Code className="w-4 h-4 text-cyan-400 mb-1" />
-                  <div className="font-bold text-slate-200">XGBoost + Optuna</div>
-                  <div className="text-[10px] text-slate-400">ML Pipeline code</div>
-                </button>
-
-                <button 
-                  onClick={() => handleSendMessage("Generate a PyTorch custom training loop with mixed precision and gradient accumulation.")}
-                  className="p-2.5 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs"
-                >
-                  <Cpu className="w-4 h-4 text-cyan-400 mb-1" />
-                  <div className="font-bold text-slate-200">PyTorch Trainer</div>
-                  <div className="text-[10px] text-slate-400">Deep Learning Code</div>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: FINANCIAL ENGINEERING MODULE */}
-        {activeTab === 'finance' && (
-          <div className="max-w-xl mx-auto space-y-4">
-            <div className="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
-              <h2 className="text-sm font-bold text-cyan-300 font-mono flex items-center gap-2 mb-1">
-                <TrendingUp className="w-4 h-4" /> BLACK-SCHOLES OPTIONS PRICER
-              </h2>
-              <p className="text-xs text-slate-400 mb-3">Quantitative option valuation engine and Greek risk sensitivities.</p>
-
-              <div className="grid grid-cols-2 gap-3 mb-3 text-xs font-mono">
-                <div>
-                  <label className="text-slate-400 text-[10px]">STOCK PRICE ($)</label>
-                  <input 
-                    type="number" 
-                    value={finForm.stockPrice} 
-                    onChange={e => setFinForm({...finForm, stockPrice: e.target.value})}
-                    className="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1" 
-                  />
-                </div>
-                <div>
-                  <label className="text-slate-400 text-[10px]">STRIKE PRICE ($)</label>
-                  <input 
-                    type="number" 
-                    value={finForm.strikePrice} 
-                    onChange={e => setFinForm({...finForm, strikePrice: e.target.value})}
-                    className="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1" 
-                  />
-                </div>
-                <div>
-                  <label className="text-slate-400 text-[10px]">DAYS TO EXPIRY</label>
-                  <input 
-                    type="number" 
-                    value={finForm.daysToExp} 
-                    onChange={e => setFinForm({...finForm, daysToExp: e.target.value})}
-                    className="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1" 
-                  />
-                </div>
-                <div>
-                  <label className="text-slate-400 text-[10px]">VOLATILITY (%)</label>
-                  <input 
-                    type="number" 
-                    value={finForm.volatility} 
-                    onChange={e => setFinForm({...finForm, volatility: e.target.value})}
-                    className="w-full bg-slate-950 border border-cyan-500/20 rounded-lg p-2 text-cyan-100 mt-1" 
-                  />
-                </div>
-              </div>
-
-              <button 
-                onClick={calculateBlackScholes}
-                className="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl"
-              >
-                Calculate Valuation & Greeks
-              </button>
-            </div>
-
-            {finResult && (
-              <div className="p-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl grid grid-cols-2 gap-3 font-mono text-xs">
-                <div className="p-2 bg-slate-950 rounded-lg border border-cyan-500/10">
-                  <div className="text-[10px] text-slate-400">CALL PRICE</div>
-                  <div className="text-lg font-bold text-emerald-400">${finResult.call}</div>
-                </div>
-                <div className="p-2 bg-slate-950 rounded-lg border border-cyan-500/10">
-                  <div className="text-[10px] text-slate-400">PUT PRICE</div>
-                  <div className="text-lg font-bold text-rose-400">${finResult.put}</div>
-                </div>
-                <div className="p-2 bg-slate-950 rounded-lg border border-cyan-500/10">
-                  <div className="text-[10px] text-slate-400">DELTA (Δ)</div>
-                  <div className="text-sm font-bold text-cyan-300">{finResult.delta}</div>
-                </div>
-                <div className="p-2 bg-slate-950 rounded-lg border border-cyan-500/10">
-                  <div className="text-[10px] text-slate-400">GAMMA (Γ)</div>
-                  <div className="text-sm font-bold text-cyan-300">{finResult.gamma}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 5: TECHNICAL ENGLISH ASSISTANT */}
-        {activeTab === 'english' && (
-          <div className="max-w-xl mx-auto space-y-4">
-            <div className="p-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl">
-              <h2 className="text-sm font-bold text-cyan-300 font-mono flex items-center gap-2 mb-1">
-                <Languages className="w-4 h-4" /> TECHNICAL ENGLISH & ACADEMIC REFINER
-              </h2>
-              <p className="text-xs text-slate-400 mb-3">Refine papers, rewrite technical abstracts, or translate complex concepts into native-level research English.</p>
-
-              <div className="space-y-2">
-                <button 
-                  onClick={() => handleSendMessage("Rewrite the following text into high-impact academic research English suitable for Nature or IEEE:\n\n'We tested this model on some data and it gave pretty good accuracy results on stock market prediction.'")}
-                  className="w-full p-3 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs"
-                >
-                  <div className="font-bold text-slate-200">Refine Paper Abstract</div>
-                  <div className="text-[10px] text-slate-400">Elevate tone to IEEE / Nature academic standard</div>
-                </button>
-
-                <button 
-                  onClick={() => handleSendMessage("Provide a comprehensive vocabulary cheat sheet of advanced statistical terms in English with French definitions.")}
-                  className="w-full p-3 bg-slate-950 hover:bg-slate-900 border border-cyan-500/20 rounded-xl text-left text-xs"
-                >
-                  <div className="font-bold text-slate-200">Data Science Lexicon</div>
-                  <div className="text-[10px] text-slate-400">Bilingual technical terminology guide</div>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 6: SAVED NOTES / EXPORT */}
-        {activeTab === 'notes' && (
-          <div className="max-w-xl mx-auto space-y-3">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-sm font-bold text-cyan-300 font-mono flex items-center gap-2">
-                <Bookmark className="w-4 h-4" /> SAVED JARVIS NOTEBOOK ({savedNotes.length})
-              </h2>
-            </div>
-
-            {savedNotes.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 text-xs font-mono">
-                No saved notes yet. Save outputs from chat or modules here!
-              </div>
-            ) : (
-              savedNotes.map((note) => (
-                <div key={note.id} className="p-3 bg-slate-900/80 border border-cyan-500/20 rounded-xl font-mono text-xs space-y-1">
-                  <div className="flex justify-between items-center text-cyan-400 font-bold">
-                    <span>{note.title}</span>
-                    <span className="text-[10px] text-slate-500">{note.date}</span>
-                  </div>
-                  <p className="text-slate-300 text-[11px] whitespace-pre-wrap max-h-32 overflow-y-auto">{note.content}</p>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-      </main>
-
-      {/* MOBILE PWA INSTALL MODAL */}
-      {showInstallModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-cyan-500/40 rounded-2xl p-5 max-w-sm w-full font-mono text-xs text-slate-200 space-y-4 shadow-[0_0_50px_rgba(6,182,212,0.3)]">
-            <div className="flex justify-between items-center border-b border-cyan-500/20 pb-2">
-              <h3 className="text-cyan-300 font-bold flex items-center gap-2">
-                <Smartphone className="w-4 h-4" /> INSTALL JARVIS TO HOME SCREEN
-              </h3>
-              <button onClick={() => setShowInstallModal(false)} className="text-slate-400 hover:text-slate-200">✕</button>
-            </div>
-
-            <div className="space-y-2 text-slate-300 leading-relaxed text-[11px]">
-              <p className="font-bold text-cyan-400">For iOS (Safari):</p>
-              <p>1. Tap the <span className="text-cyan-300 font-bold">Share button</span> (square with arrow up) at the bottom.</p>
-              <p>2. Scroll down and tap <span className="text-cyan-300 font-bold">'Add to Home Screen'</span>.</p>
-              
-              <div className="my-2 border-t border-slate-800" />
-
-              <p className="font-bold text-cyan-400">For Android (Chrome):</p>
-              <p>1. Tap the <span className="text-cyan-300 font-bold">three dots menu (⋮)</span> in top right.</p>
-              <p>2. Select <span className="text-cyan-300 font-bold">'Add to Home screen'</span> or 'Install App'.</p>
-            </div>
-
-            <button 
-              onClick={() => setShowInstallModal(false)}
-              className="w-full py-2 bg-cyan-600 text-slate-950 font-bold rounded-xl mt-2"
-            >
-              Got it, Sir
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* BOTTOM NAVIGATION BAR */}
-      <nav className="flex items-center justify-around bg-slate-900/90 border-t border-cyan-500/20 py-2 px-1 backdrop-blur-lg">
-        <button 
-          onClick={() => setActiveTab('hud')}
-          className={`flex flex-col items-center gap-1 ${activeTab === 'hud' ? 'text-cyan-400' : 'text-slate-500'}`}
-        >
-          <Cpu className="w-4 h-4" />
-          <span className="text-[9px] font-mono">HUD</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('chat')}
-          className={`flex flex-col items-center gap-1 ${activeTab === 'chat' ? 'text-cyan-400' : 'text-slate-500'}`}
-        >
-          <Terminal className="w-4 h-4" />
-          <span className="text-[9px] font-mono">Terminal</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('math')}
-          className={`flex flex-col items-center gap-1 ${activeTab === 'math' ? 'text-cyan-400' : 'text-slate-500'}`}
-        >
-          <Calculator className="w-4 h-4" />
-          <span className="text-[9px] font-mono">Math</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('data')}
-          className={`flex flex-col items-center gap-1 ${activeTab === 'data' ? 'text-cyan-400' : 'text-slate-500'}`}
-        >
-          <BarChart3 className="w-4 h-4" />
-          <span className="text-[9px] font-mono">Data</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('notes')}
-          className={`flex flex-col items-center gap-1 ${activeTab === 'notes' ? 'text-cyan-400' : 'text-slate-500'}`}
-        >
-          <Bookmark className="w-4 h-4" />
-          <span className="text-[9px] font-mono">Saved</span>
-        </button>
-      </nav>
-
-    </div>
-  );
-}
+  refreshHud(); renderChat();
+})();
+</script>
+</body>
+</html>
