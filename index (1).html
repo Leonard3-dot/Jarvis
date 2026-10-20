@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Louis // Core · Assistant IA</title>
+<meta name="theme-color" content="#030610">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js"></script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+  html, body { height: 100%; margin: 0; background: #030610; color: #e2e8f0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { background: radial-gradient(70% 50% at 50% -10%, rgba(37,99,235,.28), transparent 70%), radial-gradient(50% 40% at 100% 100%, rgba(34,211,238,.12), transparent 70%), #030610; background-attachment: fixed; overscroll-behavior: none; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px); background-size: 36px 36px; -webkit-mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent); mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent); }
+  .tab { display: none; position: absolute; inset: 0; overflow-y: auto; padding: 14px; overscroll-behavior: contain; }
+  .tab.active { display: block; }
+  .hud { position: relative; border: 1px solid rgba(56,140,255,.35); border-radius: 18px; padding: 14px; background: linear-gradient(160deg, rgba(10,22,48,.75), rgba(3,7,16,.88)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 28px rgba(56,140,255,.07), 0 0 22px rgba(37,99,235,.10); }
+  .lbl { font: 600 10px ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: rgba(125,190,255,.85); }
+  .btn-neon { background: linear-gradient(135deg, #2563eb, #0891b2); color: #fff; font-weight: 700; border-radius: 14px; box-shadow: 0 0 18px rgba(56,140,255,.4); }
+  .btn-neon:hover { filter: brightness(1.1); }
+  .btn-neon:disabled { opacity: .4; box-shadow: none; }
+  .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(56,140,255,.35); background: rgba(56,140,255,.08); color: #bfdbfe; font-size: 12px; white-space: nowrap; }
+  .chip:hover { background: rgba(56,140,255,.18); }
+  .chip.on { background: rgba(56,140,255,.3); border-color: #60a5fa; color: #fff; }
+  .tile { text-align: left; padding: 10px; border-radius: 14px; border: 1px solid rgba(56,140,255,.25); background: rgba(2,8,20,.55); }
+  .tile:hover { border-color: #60a5fa; background: rgba(56,140,255,.10); }
+  .ico { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 800; color: #fff; margin: 0 auto 6px; box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.28); text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .tile { transition: transform .15s, border-color .15s, background .15s; }
+  .tile:active { transform: scale(.96); }
+  .fld { width: 100%; margin-top: 4px; padding: 8px; border-radius: 10px; border: 1px solid rgba(56,140,255,.28); background: rgba(0,0,0,.5); color: #e0efff; font-size: 13px; outline: none; }
+  .fld:focus { border-color: #60a5fa; }
+  .stage { position: relative; margin: 0 auto; }
+  .holo { filter: drop-shadow(0 0 14px rgba(56,170,255,.55)); }
+  .scan { transform-box: fill-box; animation: scan 4.5s linear infinite; }
+  @keyframes scan { 0% { transform: translateY(-5%); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(105%); opacity: 0; } }
+  .av-img { width: 100%; height: 100%; object-fit: cover; object-position: top; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
+  .speaking .av-img { animation: glowp .8s ease-in-out infinite alternate; }
+  @keyframes glowp { from { filter: brightness(1); } to { filter: brightness(1.25) drop-shadow(0 0 14px #38bdf8); } }
+  .bub { max-width: 94%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+  .bub-ai { background: rgba(6,14,30,.9); border: 1px solid rgba(56,140,255,.3); border-top-left-radius: 4px; }
+  .bub-user { background: linear-gradient(135deg, #2563eb, #0e7490); color: #fff; border-top-right-radius: 4px; white-space: pre-wrap; }
+  .bub-ai code { background: rgba(56,140,255,.14); color: #bfdbfe; padding: 1px 5px; border-radius: 5px; font-size: .9em; }
+  .bub-ai strong { color: #dbeafe; }
+  .md-h { font-weight: 700; color: #7dd3fc; margin: 10px 0 4px; }
+  .md-li { padding-left: 14px; text-indent: -12px; margin: 2px 0; }
+  .bub-ai hr { border: 0; border-top: 1px solid rgba(56,140,255,.25); margin: 8px 0; }
+  .cb { margin: 8px 0; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; background: #02050a; }
+  .cb-h { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: rgba(56,140,255,.1); font: 11px ui-monospace, monospace; color: #7dd3fc; }
+  .cb-h button { margin-left: 12px; color: #bfdbfe; }
+  .cb pre { margin: 0; padding: 10px; overflow-x: auto; font: 12px/1.5 ui-monospace, monospace; color: #e2e8f0; white-space: pre; }
+  .wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 34px; }
+  .wave i { display: block; width: 3px; height: 5px; border-radius: 2px; background: linear-gradient(#7dd3fc, #2563eb); }
+  .wave.on i { animation: wv .9s ease-in-out infinite; }
+  @keyframes wv { 0%, 100% { height: 5px; } 50% { height: var(--h); } }
+  .eye { animation: blink 6s infinite, eyehide 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  .mb { transform-box: fill-box; transform-origin: center; }
+  .core { animation: cp 3s ease-in-out infinite; }
+  @keyframes cp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  /* Sourire de Louis */
+  .smile, .hap { transform-box: fill-box; transform-origin: center; }
+  .hap { opacity: 0; animation: eyeshow 5s ease-in-out infinite; }
+  .smile { animation: grin 5s ease-in-out infinite; }
+  @keyframes grin { 0%, 35%, 85%, 100% { transform: scale(1); } 45%, 75% { transform: scale(1.2, 1.5); } }
+  @keyframes eyeshow { 0%, 35%, 85%, 100% { opacity: 0; } 45%, 75% { opacity: 1; } }
+  @keyframes eyehide { 0%, 35%, 85%, 100% { opacity: 1; } 45%, 75% { opacity: 0; } }
+  .speaking .smile { animation: talk .32s ease-in-out infinite alternate; }
+  @keyframes talk { from { transform: scale(1); } to { transform: scale(1.05, 1.9); } }
+  .orb { width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; background: radial-gradient(circle, #0b1b3d 45%, #0a2a66); border: 3px solid #3b82f6; box-shadow: 0 0 26px rgba(59,130,246,.85), inset 0 0 18px rgba(59,130,246,.6); }
+  .mic-ico { width: 1.15em; height: 1.15em; vertical-align: -0.2em; display: inline-block; }
+  .orb { color: #e0f2fe; background: radial-gradient(circle at 35% 30%, #1e4fb8, #0a1f4d 70%); }
+  .orb .mic-ico { width: 36px; height: 36px; filter: drop-shadow(0 0 6px #38bdf8); }
+  .orb-sm .mic-ico { width: 26px; height: 26px; }
+  .mic-btn.listening { outline: 2px solid #60a5fa; }
+  .orb.listening { animation: micp 1.3s ease-out infinite; }
+  @keyframes micp { 0% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 0 rgba(96,165,250,.7); } 100% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 22px rgba(96,165,250,0); } }
+  .orb-sm { width: 54px; height: 54px; font-size: 22px; margin-top: -22px; border-width: 2px; }
+  #tab-chat *:not(.live *), .still:not(.speaking) * { animation: none !important; transition: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { background: rgba(56,140,255,.3); border-radius: 3px; }
+  .chk { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #60a5fa; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #04101f; }
+  .chk.done { background: #22d3ee; border-color: #22d3ee; }
+  .bub-ai a { color: #7dd3fc; text-decoration: underline; }
+  .bub-ai em { color: #e0f2fe; }
+  .katex-display { overflow-x: auto; overflow-y: hidden; }
+  .bub-ai .katex { font-size: 1.05em; }
+  .hud { border-radius: 6px 20px 6px 20px; }
+  .hud::before, .hud::after { content: ""; position: absolute; width: 12px; height: 12px; pointer-events: none; opacity: .85; }
+  .hud::before { top: 5px; left: 5px; border-top: 2px solid #22d3ee; border-left: 2px solid #22d3ee; }
+  .hud::after { bottom: 5px; right: 5px; border-bottom: 2px solid #a78bfa; border-right: 2px solid #a78bfa; }
+  .tile { border-radius: 10px 3px 10px 3px; }
+  .cut { clip-path: polygon(0 12px, 12px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 12px)); border-radius: 0 !important; }
+  .cut::before, .cut::after { display: none; }
+  body::after { content: ""; position: fixed; left: 0; right: 0; top: -140px; height: 140px; pointer-events: none; background: linear-gradient(transparent, rgba(34,211,238,.06), transparent); animation: sweep 8s linear infinite; }
+  @keyframes sweep { to { transform: translateY(calc(100vh + 280px)); } }
+  .ring { transform-origin: 150px 180px; animation: spin 26s linear infinite; }
+  .ring.r2 { animation-duration: 38s; animation-direction: reverse; }
+  .ring.r3 { animation-duration: 9s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .gauge { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: rgba(2,8,20,.55); border: 1px solid rgba(56,140,255,.22); border-radius: 10px 3px 10px 3px; }
+  .gauge circle:nth-child(2) { transition: stroke-dasharray .8s, stroke .8s; filter: drop-shadow(0 0 3px #22d3ee); }
+  .bl { opacity: 0; animation: fadein .5s forwards; }
+  @keyframes fadein { to { opacity: 1; } }
+  #chat-log { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .bub { max-width: 100%; border-radius: 3px; font-size: 13px; padding: 8px 12px; }
+  .bub-user { background: rgba(34,211,238,.07); border: 0; border-left: 2px solid #22d3ee; color: #cffafe; }
+  .bub-user::before { content: "❯ "; color: #22d3ee; font-weight: 700; }
+  .bub-ai { background: transparent; border: 0; border-left: 2px solid rgba(96,165,250,.35); }
+  .bub-ai::before { content: "◆ LOUIS"; display: block; font-size: 9px; letter-spacing: .18em; color: #38bdf8; margin-bottom: 4px; }
+  .bub.streaming::after { content: "▍"; color: #22d3ee; animation: blinkdot 1s steps(2) infinite; }
+  #chat-input { resize: none; line-height: 1.5; font-family: ui-monospace, Menlo, Consolas, monospace; max-height: 60vh; }
+  @media (pointer: coarse) { #chat-input { font-size: 16px; } }
+  #chat-log { font-family: inherit; }
+  .bub { font-size: 14.5px; line-height: 1.6; }
+  .bub-user { align-self: flex-end; max-width: 86%; background: linear-gradient(135deg, rgba(37,99,235,.92), rgba(8,145,178,.88)); border: 0; border-radius: 20px 20px 5px 20px; color: #fff; padding: 10px 14px; box-shadow: 0 4px 18px rgba(37,99,235,.25); }
+  .bub-user::before, .bub-ai::before { content: none; }
+  .bub-ai { max-width: 100%; background: transparent; border: 0; border-radius: 0; padding: 2px 0; }
+  .dots i { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: #38bdf8; animation: blinkdot 1s ease-in-out infinite; }
+  .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+  .composer { background: rgba(10,18,36,.85); border: 1px solid rgba(96,165,250,.28); border-radius: 26px; padding: 10px 12px 8px; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 8px 30px rgba(0,0,0,.45); transition: border-color .2s, box-shadow .2s; }
+  .composer:focus-within { border-color: rgba(34,211,238,.6); box-shadow: 0 0 24px rgba(34,211,238,.18), 0 8px 30px rgba(0,0,0,.45); }
+  #chat-input { display: block; width: 100%; background: transparent; outline: none; border: 0; padding: 2px 6px 8px; font-family: inherit; font-size: 15px; line-height: 1.5; color: #e2e8f0; resize: none; max-height: 60vh; }
+  #chat-input::placeholder { color: #64748b; }
+  @media (pointer: coarse) { #chat-input { font-size: 16px; } }
+  .cbtn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9db8e0; font-size: 16px; flex-shrink: 0; }
+  .cbtn:hover, .cbtn.on { background: rgba(34,211,238,.16); color: #67e8f9; }
+  .send { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #06b6d4); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 16px rgba(34,211,238,.45); }
+  .send .i-stop { display: none; } .send[data-s=stop] .i-send { display: none; } .send[data-s=stop] .i-stop { display: block; }
+  .live.speaking { box-shadow: 0 0 20px rgba(34,211,238,.65); }
+  .mouth { opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .speaking .smile { animation: none; opacity: 0; }
+  .speaking .mouth { opacity: 1; animation: talk2 .7s linear infinite; }
+  @keyframes talk2 { 0% { transform: scaleY(.25); } 20% { transform: scaleY(1.4); } 40% { transform: scaleY(.6); } 60% { transform: scaleY(1.7); } 80% { transform: scaleY(.4); } 100% { transform: scaleY(1.2); } }
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0" aria-hidden="true"><defs>
+  <linearGradient id="gHolo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc" stop-opacity=".85"/><stop offset=".55" stop-color="#2563eb" stop-opacity=".55"/><stop offset="1" stop-color="#1e3a8a" stop-opacity=".12"/></linearGradient>
+  <linearGradient id="gHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1e4a"/><stop offset="1" stop-color="#1d4ed8" stop-opacity=".8"/></linearGradient>
+  <linearGradient id="gBlack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b434f"/><stop offset=".35" stop-color="#12161c"/><stop offset="1" stop-color="#020304"/></linearGradient>
+  <linearGradient id="gVisor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1a22"/><stop offset="1" stop-color="#010304"/></linearGradient>
+  <radialGradient id="gGlow" cx="50%" cy="45%" r="50%"><stop offset="0" stop-color="#3b82f6" stop-opacity=".40"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/></radialGradient>
+  <pattern id="gScan" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="1.2" fill="#bae6fd" opacity=".16"/></pattern>
+  <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+</defs></svg>
+
+<div class="flex flex-col h-[100dvh] w-full overflow-hidden relative">
+
+  <header class="relative z-10 flex items-center justify-between px-4 py-2.5 border-b border-blue-400/15 bg-black/50 backdrop-blur-md" style="padding-top:calc(.625rem + env(safe-area-inset-top))">
+    <div class="flex items-center gap-3">
+      <div id="avatar-sm" class="w-10 h-10 rounded-xl border border-blue-400/40 bg-black overflow-hidden still"></div>
+      <div><div class="font-bold tracking-[.25em] text-sm text-blue-50">LOUIS // CORE</div><div id="status" class="lbl" style="font-size:9px">Prêt</div></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btn-install" class="chip hidden">Installer</button>
+      <button id="btn-help" class="chip">Aide</button>
+      <button id="btn-settings" class="chip" aria-label="Réglages">⚙</button>
+    </div>
+  </header>
+
+  <main class="relative flex-1 min-h-0">
+
+    <!-- ACCUEIL -->
+    <section id="tab-hud" class="tab active">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div class="hud cut flex items-center justify-between !p-3">
+          <div>
+            <div class="lbl">Louis // Core · en ligne</div>
+            <div class="text-sm font-bold text-blue-50 mt-1" id="home-hello">Bonjour Monsieur</div>
+            <div class="text-[11px] text-zinc-400">Que puis-je faire pour vous ?</div>
+          </div>
+          <div class="text-right">
+            <div id="h-time" class="text-2xl font-bold text-cyan-200" style="font-family:ui-monospace,monospace;text-shadow:0 0 14px rgba(34,211,238,.7)">--:--</div>
+            <div id="h-date" class="text-[10px] text-zinc-400">—</div>
+            <div class="text-[10px] text-zinc-400">🔋 <span id="sys-bat">—</span></div>
+          </div>
+        </div>
+
+        <div class="stage" style="width:min(80vw,330px)">
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 300 340" aria-hidden="true">
+            <g class="ring"><circle cx="150" cy="180" r="146" fill="none" stroke="#22d3ee" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="3 9"/></g>
+            <g class="ring r2"><circle cx="150" cy="180" r="130" fill="none" stroke="#a78bfa" stroke-opacity=".6" stroke-width="2" stroke-dasharray="60 40 14 40"/></g>
+            <g class="ring r3"><path d="M150 34A146 146 0 0 1 296 180" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity=".85"/></g>
+          </svg>
+          <div id="robot-big" class="relative"></div>
+        </div>
+
+        <div class="hud cut !p-3">
+          <div class="flex items-center justify-between mb-2"><div class="lbl">Performance de l'appareil</div><div id="health" class="lbl" style="color:#67e8f9">…</div></div>
+          <div class="h-1.5 rounded bg-white/10 overflow-hidden mb-3"><div id="health-bar" class="h-full" style="width:0;background:linear-gradient(90deg,#22d3ee,#a78bfa);box-shadow:0 0 10px #22d3ee;transition:width .8s"></div></div>
+          <div id="gauges" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <button class="mic-btn tile !text-center !p-2"><div class="text-lg"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></div><div class="text-[11px] text-blue-100">Mode vocal</div></button>
+          <button data-go="chat" data-focus class="tile !text-center !p-2"><div class="text-lg">💬</div><div class="text-[11px] text-blue-100">Mode texte</div></button>
+          <button data-go="apps" class="tile !text-center !p-2"><div class="text-lg">⚡</div><div class="text-[11px] text-blue-100">Mode actions</div></button>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <button class="mic-btn orb" aria-label="Parler à Louis"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+          <div id="wave" class="wave w-full mt-1"></div>
+          <div id="voice-state" class="text-xs text-blue-200/80">Prêt</div>
+          <div class="flex gap-2 mt-2"><button data-vt class="chip">Voix OFF</button><button class="chip hands-btn" data-l="🎧 Conversation">🎧 Conversation</button></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button class="mic-btn tile"><div class="text-sm font-bold text-blue-50"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg> Parler</div><div class="text-[10px] text-zinc-400">Pose ta question à voix haute</div></button>
+          <button data-go="chat" data-focus class="tile"><div class="text-sm font-bold text-blue-50">💬 Chat</div><div class="text-[10px] text-zinc-400">Écris ton message</div></button>
+          <button data-go="apps" class="tile"><div class="text-sm font-bold text-blue-50">⚡ Actions</div><div class="text-[10px] text-zinc-400">Modules et outils</div></button>
+        </div>
+
+        <div class="hud !p-3">
+          <div class="flex items-center justify-between mb-2"><div class="lbl">Accès rapide</div><button id="lk-edit" class="text-[11px] text-blue-300/70 hover:text-blue-200">Modifier</button></div>
+          <div id="links" class="grid grid-cols-4 gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section id="tab-chat" class="tab" style="overflow:hidden">
+      <div class="max-w-3xl mx-auto h-full flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2"><div id="avatar-chat" class="live w-12 h-12 rounded-2xl border border-blue-400/40 bg-black overflow-hidden transition-shadow"></div><div><div class="text-sm font-bold text-blue-50">Chat</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
+          <div class="flex gap-2"><button id="web-btn" class="chip" aria-label="Recherche web">🌐</button><button class="chip hands-btn" data-l="🎧" aria-label="Mode conversation">🎧</button><button id="conv-open" class="chip" aria-label="Conversations">🗂</button><button id="new-chat" class="chip">＋ Nouvelle</button></div>
+        </div>
+        <div id="modes" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
+        <div id="chips" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
+        <div id="chat-log" class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1" style="overscroll-behavior:contain"></div>
+        <div id="mem-bar" class="hud hidden !p-2 text-xs flex items-center gap-2 shrink-0"><span id="mem-txt" class="flex-1 text-blue-100"></span><button id="mem-yes" type="button" class="chip on">Retenir</button><button id="mem-no" type="button" class="chip">Non</button></div>
+        <button id="to-bottom" type="button" class="hidden absolute right-4 z-20 w-9 h-9 rounded-full bg-black/80 border border-cyan-300/50 text-cyan-200 text-lg" style="top:0" aria-label="Aller en bas">↓</button>
+        <div id="att-bar" class="hidden flex gap-2 overflow-x-auto shrink-0"></div>
+        <div id="slash" class="hidden shrink-0 max-h-40 overflow-y-auto rounded-2xl border border-blue-400/30 bg-black/85"></div>
+        <form id="chat-form" class="composer shrink-0">
+          <textarea id="chat-input" rows="2" autocomplete="off" enterkeyhint="enter" placeholder="Écris à Louis…"></textarea>
+          <div class="flex items-center gap-1">
+            <button type="button" id="att-btn" class="cbtn" aria-label="Joindre une image ou un PDF">📎</button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
+            <button type="button" class="mic-btn cbtn" aria-label="Parler"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+            <button type="button" data-vt class="cbtn" aria-label="Voix">🔇</button>
+            <span id="tbar-txt" class="flex-1 min-w-0 truncate text-right px-2 text-[10px] text-zinc-500"></span>
+            <button type="button" id="tbar-exp" class="cbtn" aria-label="Agrandir la zone de saisie">⤢</button>
+            <button id="chat-send" type="submit" class="send" aria-label="Envoyer"><svg class="i-send" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><svg class="i-stop" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TÂCHES -->
+    <section id="tab-tasks" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Tâches</div><div class="text-xs text-zinc-400">Organise ta journée</div></div>
+        <div class="flex gap-2" id="task-filters">
+          <button class="chip on" data-tf="all">Toutes</button><button class="chip" data-tf="todo">En cours</button><button class="chip" data-tf="done">Terminées</button>
+        </div>
+        <form id="task-form" class="hud flex gap-2 !p-2">
+          <input id="task-input" type="text" autocomplete="off" placeholder="Nouvelle tâche…" class="flex-1 min-w-0 bg-transparent text-sm px-2 py-2 outline-none placeholder-zinc-500">
+          <input id="task-time" type="time" class="bg-transparent text-xs text-blue-200 outline-none">
+          <button class="btn-neon px-4 py-2 text-sm" type="submit">＋</button>
+        </form>
+        <div id="task-list" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- APPLICATIONS -->
+    <section id="tab-apps" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Applications</div><div class="text-xs text-zinc-400">Modules et outils à portée de main</div></div>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-mode="code" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">💻</div><div class="text-xs font-bold text-blue-50">Programmation</div><div class="text-[10px] text-zinc-400">Sites, apps</div></button>
+          <button data-mode="anglais" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#22c55e,#15803d)">🌐</div><div class="text-xs font-bold text-blue-50">Anglais</div><div class="text-[10px] text-zinc-400">Réviser</div></button>
+          <button data-mode="devoirs" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">📚</div><div class="text-xs font-bold text-blue-50">Devoirs</div><div class="text-[10px] text-zinc-400">Exercices</div></button>
+          <button data-mode="maths" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#a855f7,#6d28d9)">📐</div><div class="text-xs font-bold text-blue-50">Maths, finance</div><div class="text-[10px] text-zinc-400">Preuves, code</div></button>
+          <button data-go="lab" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">∑</div><div class="text-xs font-bold text-blue-50">Labo</div><div class="text-[10px] text-zinc-400">Monte-Carlo</div></button>
+          <button data-go="notes" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#fbbf24,#d97706)">★</div><div class="text-xs font-bold text-blue-50">Notes</div><div class="text-[10px] text-zinc-400">Carnet</div></button>
+          <button data-go="sys" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#14b8a6,#0f766e)">📊</div><div class="text-xs font-bold text-blue-50">Système</div><div class="text-[10px] text-zinc-400">Appareil</div></button>
+          <button data-go="improve" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#ec4899,#be185d)">🧠</div><div class="text-xs font-bold text-blue-50">Évolution</div><div id="imp-sub" class="text-[10px] text-zinc-400">Mémoire, règles</div></button>
+          <button id="apps-settings" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#64748b,#334155)">⚙</div><div class="text-xs font-bold text-blue-50">Réglages</div><div class="text-[10px] text-zinc-400">Clé, voix</div></button>
+        </div>
+        <div class="lbl pt-1">Applications suggérées</div>
+        <div id="apps-ext" class="grid grid-cols-3 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- ÉVOLUTION -->
+    <section id="tab-improve" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Évolution</div><div id="imp-stats" class="text-xs text-zinc-400"></div></div>
+        <div class="hud">
+          <div class="lbl mb-2">Bilan d'amélioration</div>
+          <p class="text-xs text-zinc-400 mb-3">Louis analyse vos derniers échanges et vos 👍 / 👎, puis propose des règles et signale ce qui lui manque. Rien n'est appliqué sans votre accord.</p>
+          <button id="bilan-run" class="btn-neon w-full py-2.5 text-sm">Faire le bilan</button>
+          <div id="bilan-out" class="mt-3 space-y-2"></div>
+        </div>
+        <div class="hud"><div class="lbl mb-2">Règles apprises</div><div id="rule-list" class="space-y-2"></div></div>
+        <div class="hud">
+          <div class="lbl mb-2">Mémoire</div>
+          <form id="mem-form" class="flex gap-2 mb-2"><input id="mem-input" type="text" autocomplete="off" placeholder="Ajouter un fait à retenir…" class="fld !mt-0"><button class="chip on" type="submit">＋</button></form>
+          <div id="mem-list" class="space-y-2"></div>
+        </div>
+        <div class="hud">
+          <div class="lbl mb-2">Sauvegarde</div>
+          <div class="flex gap-2"><button id="bk-export" class="chip flex-1 !rounded-xl !py-2.5">Exporter</button><label class="chip flex-1 !rounded-xl !py-2.5 text-center cursor-pointer">Importer<input id="bk-import" type="file" accept="application/json" class="hidden"></label></div>
+          <p class="text-[10px] text-zinc-500 mt-2">La clé API n'est jamais exportée.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTÈME -->
+    <section id="tab-sys" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div><div class="text-lg font-bold text-blue-50">Système</div><div class="text-xs text-zinc-400">Informations sur l'appareil</div></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="tile"><div class="lbl" style="font-size:9px">Batterie</div><div id="sys-bat2" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile"><div class="lbl" style="font-size:9px">Stockage</div><div id="sys-sto" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile"><div class="lbl" style="font-size:9px">Mémoire</div><div id="sys-ram" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile"><div class="lbl" style="font-size:9px">Cœurs</div><div id="sys-cpu" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+          <div class="tile col-span-2"><div class="lbl" style="font-size:9px">Réseau</div><div id="sys-net" class="text-sm font-semibold text-blue-50 mt-1">—</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LABO -->
+    <section id="tab-lab" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div class="hud">
+          <div class="lbl mb-1">Simulation Monte-Carlo</div>
+          <p class="text-xs text-zinc-400 mb-3">Trajectoires de prix (mouvement brownien géométrique), distribution finale, risque et prix d'un call. Calculé sur votre appareil.</p>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <label class="lbl" style="font-size:9px">Prix initial<input id="s-S0" type="number" value="100" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Prix d'exercice<input id="s-K" type="number" value="100" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Rendement attendu (%/an)<input id="s-mu" type="number" value="8" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Taux sans risque (%)<input id="s-r" type="number" value="3" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Volatilité (%/an)<input id="s-sig" type="number" value="25" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Jours<input id="s-days" type="number" value="252" class="fld"></label>
+            <label class="lbl col-span-2" style="font-size:9px">Nombre de simulations<input id="s-n" type="number" value="5000" class="fld"></label>
+          </div>
+          <button id="s-run" class="btn-neon w-full py-2.5 text-sm">Lancer la simulation</button>
+          <p id="s-err" class="hidden text-xs text-rose-400 mt-2">Vérifiez les valeurs : prix, volatilité, jours (au moins 1) et simulations (au moins 10).</p>
+        </div>
+        <div id="s-out" class="hidden space-y-3"></div>
+        <div class="hud">
+          <div class="lbl mb-1">Black-Scholes</div>
+          <div class="grid grid-cols-2 gap-3 my-3">
+            <label class="lbl" style="font-size:9px">Prix de l'action<input id="f-S" type="number" value="100" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Prix d'exercice<input id="f-K" type="number" value="100" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Jours avant échéance<input id="f-T" type="number" value="30" class="fld"></label>
+            <label class="lbl" style="font-size:9px">Volatilité (%)<input id="f-v" type="number" value="25" class="fld"></label>
+            <label class="lbl col-span-2" style="font-size:9px">Taux sans risque (%)<input id="f-r" type="number" value="5" class="fld"></label>
+          </div>
+          <button id="f-run" class="btn-neon w-full py-2.5 text-sm">Calculer le prix et les Grecques</button>
+          <p id="f-err" class="hidden text-xs text-rose-400 mt-2">Prix, échéance et volatilité doivent être supérieurs à 0.</p>
+          <div id="f-out" class="hidden grid grid-cols-2 gap-2 mt-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section id="tab-notes" class="tab">
+      <div class="max-w-xl mx-auto space-y-3">
+        <div class="flex justify-between items-center"><div id="notes-title" class="lbl"></div><button id="notes-clear" class="text-[11px] text-zinc-400 hover:text-rose-400">Tout effacer</button></div>
+        <div id="notes-list" class="space-y-3"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="relative z-10 flex items-end justify-around border-t border-blue-400/15 bg-black/70 backdrop-blur-md pt-2" style="padding-bottom:calc(.5rem + env(safe-area-inset-bottom))">
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-blue-300" data-go="hud"><span class="text-lg leading-none">⌂</span><span class="lbl" style="font-size:9px;color:inherit">Accueil</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="chat" data-focus><span class="text-lg leading-none">💬</span><span class="lbl" style="font-size:9px;color:inherit">Chat</span></button>
+    <button class="mic-btn orb orb-sm" aria-label="Parler à Louis"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="tasks"><span class="text-lg leading-none">☑</span><span class="lbl" style="font-size:9px;color:inherit">Tâches</span></button>
+    <button class="nav-btn flex flex-col items-center gap-0.5 text-zinc-500" data-go="apps"><span class="text-lg leading-none">▦</span><span class="lbl" style="font-size:9px;color:inherit">Apps</span></button>
+  </nav>
+</div>
+
+<!-- Réglages -->
+<div id="modal-settings" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+  <div class="hud w-full max-w-sm max-h-[90vh] overflow-y-auto space-y-3" style="background:#050a16">
+    <div class="lbl">Réglages</div>
+    <label class="lbl block" style="font-size:9px">Votre prénom<input id="set-name" type="text" class="fld"></label>
+    <div class="lbl" style="font-size:9px">Thème de couleur</div><div id="theme-row" class="flex gap-3"></div>
+    <label class="flex items-center gap-2 text-[12px] text-blue-100"><input id="set-greet" type="checkbox" class="accent-cyan-400"> Salutation vocale au démarrage</label>
+    <label class="lbl block" style="font-size:9px">Clé API Gemini<input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="fld"></label>
+    <button id="set-keytest" type="button" class="chip w-full !rounded-xl">Tester la clé</button>
+    <label class="lbl block" style="font-size:9px">Modèle<select id="set-model" class="fld"></select></label>
+    <label class="lbl block" style="font-size:9px">Voix de Louis<select id="set-voice" class="fld"></select></label>
+    <button id="set-test" type="button" class="chip w-full !rounded-xl">Écouter cette voix</button>
+    <label class="lbl block" style="font-size:9px">Instructions personnelles (facultatif)<textarea id="set-notes" rows="3" placeholder="Ex. : mon niveau en anglais, mes objectifs, mes cours…" class="fld"></textarea></label>
+    <p class="text-[11px] text-zinc-400 leading-relaxed">Tout reste enregistré uniquement sur cet appareil. Clé gratuite : aistudio.google.com. Ne la publiez jamais sur GitHub.</p>
+    <div class="flex gap-2"><button id="set-cancel" class="chip flex-1 !rounded-xl !py-2.5">Annuler</button><button id="set-save" class="btn-neon flex-1 py-2.5 text-sm">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- Conversations -->
+<div id="modal-convs" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+  <div class="hud w-full max-w-sm max-h-[85vh] flex flex-col gap-2" style="background:#050a16">
+    <div class="flex items-center justify-between"><div class="lbl">Conversations</div><button id="conv-close" class="chip on">Fermer</button></div>
+    <div id="fold-bar" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
+    <input id="conv-q" type="search" placeholder="Rechercher…" class="fld !mt-0">
+    <div id="conv-list" class="space-y-2 overflow-y-auto"></div>
+    <div class="flex gap-2"><button id="conv-exp" class="chip flex-1">⬇ Cette conversation</button><button id="conv-exp-all" class="chip flex-1">⬇ Tout (JSON)</button></div>
+  </div>
+</div>
+
+<!-- Bibliothèque -->
+<div id="modal-lib" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+  <div class="hud w-full max-w-sm max-h-[85vh] flex flex-col gap-2" style="background:#050a16">
+    <div class="flex items-center justify-between"><div class="lbl">Mes fichiers</div><button id="lib-close" class="chip on">Fermer</button></div>
+    <p class="text-[11px] text-zinc-400">Enregistrés sur cet appareil. Touchez « Joindre » pour les renvoyer à Louis.</p>
+    <div id="lib-list" class="space-y-2 overflow-y-auto"></div>
+    <label class="chip text-center cursor-pointer">＋ Ajouter à la bibliothèque<input id="lib-add" type="file" accept="image/*,application/pdf" multiple class="hidden"></label>
+  </div>
+</div>
+
+<!-- Installation -->
+<div id="modal-help" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+  <div class="hud w-full max-w-sm space-y-2 text-xs text-zinc-300 leading-relaxed" style="background:#050a16">
+    <div class="lbl">Installer Louis</div>
+    <p><b class="text-blue-300">Ordinateur (Chrome ou Edge)</b><br>Icône d'installation à droite de la barre d'adresse, ou menu ⋮ puis « Installer la page en tant qu'application ».</p>
+    <p><b class="text-blue-300">Android (Chrome)</b><br>Menu ⋮ puis « Installer l'application ».</p>
+    <p><b class="text-blue-300">iPhone (Safari)</b><br>Partager puis « Sur l'écran d'accueil ».</p>
+    <p><b class="text-blue-300">Images et PDF</b><br>Touchez 📎 dans le chat (jusqu'à 5 fichiers), ou collez une image dans la zone de texte.</p>
+    <button id="help-close" class="btn-neon w-full py-2.5 text-sm mt-2">Compris</button>
+  </div>
+</div>
+
+<!-- Démarrage -->
+<div id="boot" class="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-4 p-6 text-center transition-opacity duration-500" style="background:radial-gradient(60% 45% at 50% 40%,rgba(37,99,235,.35),#02040a 70%)">
+  <div id="boot-robot" style="width:min(60vw,220px)"></div>
+  <div class="lbl" style="font-size:12px;letter-spacing:.3em">LOUIS // CORE</div>
+  <div class="text-[11px] text-cyan-200/80 space-y-1" style="font-family:ui-monospace,monospace">
+    <div class="bl" style="animation-delay:.2s">› noyau ............ OK</div>
+    <div class="bl" style="animation-delay:.7s">› voix ............. OK</div>
+    <div class="bl" style="animation-delay:1.2s">› capteurs ......... OK</div>
+  </div>
+  <button id="boot-go" class="btn-neon px-8 py-3 text-sm">▶ Réveiller Louis</button>
+  <button id="boot-mute" class="text-[11px] text-zinc-500">Entrer sans voix</button>
+</div>
+
+<!-- Aperçu de code -->
+<div id="modal-prev" class="hidden fixed inset-0 bg-black z-50 flex flex-col">
+  <div class="flex items-center justify-between p-3 border-b border-blue-400/20" style="padding-top:calc(.75rem + env(safe-area-inset-top))">
+    <div class="lbl">Aperçu</div>
+    <div class="flex gap-2"><button id="prev-dl" class="chip">Télécharger</button><button id="prev-close" class="chip on">Fermer</button></div>
+  </div>
+  <iframe id="prev-frame" class="flex-1 w-full bg-white" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+</div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const store = {
+    get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const escH = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const unesc = x => x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  const now = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const toast = m => { const s = $('#status'); s.textContent = m; clearTimeout(toast.t); toast.t = setTimeout(() => s.textContent = 'Prêt', 2800); };
+
+  /* ---------- Données ---------- */
+  let settings = Object.assign({ key: '', model: 'gemini-2.5-flash', voice: '', notes: '', name: 'Leonard', v: 0 }, store.get('jarvis.settings', {}));
+  if (settings.v < 3) { if (!settings.model || settings.model === 'gemini-3-flash-preview') settings.model = 'gemini-2.5-flash'; settings.v = 3; store.set('jarvis.settings', settings); }
+  let notes = store.get('jarvis.notes', []);
+  let mem = store.get('louis.mem', []), rules = store.get('louis.rules', []), fb = store.get('louis.fb', []), pendingMem = [], lastRegles = [];
+  let tasks = store.get('louis.tasks', []);
+  let tfilter = 'all';
+  let big = false, hIdx = -1, pT = 0, dT = 0;
+  let folders = store.get('louis.folders', []), fsel = 'all';
+  let web = store.get('louis.web', true), hands = false, wl = null, hT = 0;
+  let convs = store.get('louis.convs', []), curId = store.get('louis.cur', 0), messages = [], cur;
+  if (!convs.length) { const old = store.get('louis.chat2', []); if (old.length > 1) convs.push({ id: Date.now(), title: 'Ancienne conversation', ts: Date.now(), mode: 'general', messages: old }); }
+  let mode = store.get('louis.mode', 'general');
+  let autoVoice = store.get('louis.voice2', false);
+  let busy = false, abortCtl = null;
+  let exch = store.get('louis.exch', 0), bilanAt = store.get('louis.bilanAt', 0);
+  const greet = () => ({ id: 1, sender: 'jarvis', ts: now(), text: 'Bonjour Monsieur', greet: true });
+  const newConv = () => { const c = { id: Date.now(), title: 'Nouvelle conversation', ts: Date.now(), mode, folder: fsel === 'all' ? undefined : fsel, messages: [greet()] }; convs.unshift(c); return c; };
+  cur = convs.find(c => c.id === curId) || convs[0] || newConv(); messages = cur.messages; mode = cur.mode || mode;
+  const strip = c => ({ ...c, messages: c.messages.filter(m => !m.pending).map(({ files, ...m }) => m) });
+  const ldb = () => new Promise((res, rej) => { const r = indexedDB.open('louis-db', 1); r.onupgradeneeded = () => r.result.createObjectStore('c', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const dbTx = async (md, fn) => { try { const d = await ldb(); return await new Promise(res => { const t = d.transaction('c', md), o = fn(t.objectStore('c')); t.oncomplete = () => res(o && o.result !== undefined ? o.result : true); t.onerror = () => res(null); }); } catch { return null; } };
+  const dbAll = async () => (await dbTx('readonly', s => s.getAll())) || [];
+  const dbPut = c => dbTx('readwrite', s => s.put(c));
+  const dbDel = id => dbTx('readwrite', s => s.delete(id));
+  const dbReplace = async list => { await dbTx('readwrite', s => s.clear()); for (const c of list) await dbPut(c); };
+  const persist = () => { cur.messages = messages; cur.ts = Date.now(); store.set('louis.cur', cur.id); store.set('louis.convs', convs.slice(0, 15).map(c => { const x = strip(c); return { ...x, messages: x.messages.slice(-40) }; })); clearTimeout(pT); pT = setTimeout(() => dbPut(strip(cur)), 300); };
+  const hello = () => `Bonjour Monsieur ${settings.name || ''}, que puis-je faire pour vous ?`;
+  $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || '');
+
+  /* ---------- Robot noir de Louis (il sourit) ---------- */
+  const robot = full => `<svg viewBox="${full ? '0 0 300 340' : '52 14 196 200'}" class="w-full h-full" role="img" aria-label="Louis">
+    ${full ? `<ellipse cx="150" cy="190" rx="150" ry="160" fill="url(#gGlow)"/>
+    <path d="M14 340C16 268 58 232 108 222L192 222C242 232 284 268 286 340Z" fill="url(#gBlack)" stroke="#22d3ee" stroke-opacity=".35"/>
+    <path d="M30 318C36 268 70 242 108 232M270 318C264 268 230 242 192 232" fill="none" stroke="#67e8f9" stroke-opacity=".4" stroke-width="1.5"/>
+    <path d="M104 248L196 248L184 326L116 326Z" fill="#080b0f" stroke="#22d3ee" stroke-opacity=".3"/>
+    <circle cx="150" cy="284" r="14" fill="#031418" stroke="#22d3ee" stroke-opacity=".8"/><circle class="core" cx="150" cy="284" r="5.5" fill="#67e8f9" filter="url(#blur2)"/>
+    <path d="M118 262H134M166 262H182M122 306H138M162 306H178" stroke="#22d3ee" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+    <rect x="128" y="190" width="44" height="40" rx="7" fill="#0b0e12" stroke="#22d3ee" stroke-opacity=".25"/>
+    <path d="M132 202H168M132 212H168M132 222H168" stroke="#22d3ee" stroke-opacity=".18"/>` : ''}
+    <rect x="56" y="98" width="15" height="46" rx="5" fill="#0a0d11" stroke="#22d3ee" stroke-opacity=".5"/><rect x="229" y="98" width="15" height="46" rx="5" fill="#0a0d11" stroke="#22d3ee" stroke-opacity=".5"/>
+    <rect x="60" y="108" width="3" height="26" rx="1.5" fill="#22d3ee" opacity=".8"/><rect x="237" y="108" width="3" height="26" rx="1.5" fill="#22d3ee" opacity=".8"/>
+    <path d="M150 24C208 24 232 68 230 118C228 166 198 198 150 204C102 198 72 166 70 118C68 68 92 24 150 24Z" fill="url(#gBlack)" stroke="#67e8f9" stroke-opacity=".4" stroke-width="1.5"/>
+    <path d="M98 54C120 34 180 34 202 54" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="3" stroke-linecap="round"/>
+    <path d="M138 60L150 70L162 60" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    <path d="M92 98C92 86 106 84 150 84C194 84 208 86 208 98L208 132C208 144 194 148 150 148C106 148 92 144 92 132Z" fill="url(#gVisor)" stroke="#22d3ee" stroke-opacity=".65"/>
+    <g class="eye"><ellipse cx="124" cy="116" rx="15" ry="8" fill="#22d3ee" filter="url(#blur2)" opacity=".9"/><ellipse cx="124" cy="116" rx="9" ry="3.6" fill="#cffafe"/></g>
+    <g class="eye"><ellipse cx="176" cy="116" rx="15" ry="8" fill="#22d3ee" filter="url(#blur2)" opacity=".9"/><ellipse cx="176" cy="116" rx="9" ry="3.6" fill="#cffafe"/></g>
+    <g class="hap" fill="none" stroke="#cffafe" stroke-width="5" stroke-linecap="round"><path d="M110 122Q124 106 138 122"/><path d="M162 122Q176 106 190 122"/></g>
+    <ellipse cx="102" cy="164" rx="11" ry="6" fill="#22d3ee" opacity=".16"/><ellipse cx="198" cy="164" rx="11" ry="6" fill="#22d3ee" opacity=".16"/>
+    <path class="smile" d="M120 165Q150 190 180 165" fill="none" stroke="#22d3ee" stroke-width="4.5" stroke-linecap="round"/>
+    <ellipse class="mouth" cx="150" cy="172" rx="15" ry="7" fill="#031418" stroke="#22d3ee" stroke-width="2.5"/>
+  </svg>`;
+  $('#robot-big').innerHTML = robot(true);
+  $('#avatar-sm').innerHTML = robot(false);
+  $('#avatar-chat').innerHTML = robot(false);
+  $('#wave').innerHTML = Array.from({ length: 30 }, (_, i) => `<i style="--h:${8 + Math.round(Math.abs(Math.sin(i * 1.7)) * 24)}px;animation-delay:${(i % 7) * .09}s"></i>`).join('');
+
+  /* ---------- Navigation ---------- */
+  const GROUP = { lab: 'apps', notes: 'apps', sys: 'apps', improve: 'apps' };
+  function go(tab, focus) {
+    $$('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + tab));
+    const g = GROUP[tab] || tab;
+    $$('.nav-btn').forEach(b => { const on = b.dataset.go === g; b.classList.toggle('text-blue-300', on); b.classList.toggle('text-zinc-500', !on); });
+    if (tab === 'notes') renderNotes();
+    if (tab === 'tasks') renderTasks();
+    if (tab === 'sys') sysInfo();
+    if (tab === 'hud') startFps();
+    if (tab === 'improve') renderImprove();
+    if (tab === 'chat') { const log = $('#chat-log'); log.scrollTop = log.scrollHeight; if (focus) setTimeout(() => $('#chat-input').focus(), 50); }
+  }
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go, g.hasAttribute('data-focus'));
+    const m = e.target.closest('[data-mode]'); if (m) { startFresh(m.dataset.mode); go('chat', true); }
+    const v = e.target.closest('[data-vt]'); if (v) toggleVoice();
+    if (e.target.closest('.hands-btn')) toggleHands();
+    const mic = e.target.closest('.mic-btn'); if (mic) startMic();
+  });
+
+  /* ---------- Modes ---------- */
+  const MODES = {
+    general: { n: 'Général', e: '💬', x: '', chips: [
+      ['💡 Que sais-tu faire ?', 'Présente en quelques lignes ce que tu peux faire pour moi (programmation, anglais, devoirs, maths, finance, organisation, analyse d\'images et de PDF).', true],
+      ['🗓 Organiser ma semaine', "Aide-moi à organiser ma semaine : pose-moi d'abord les questions utiles, puis propose un planning concret.", true],
+      ['📄 E-mail, CV, lettre', 'Rédige pour moi : ', false]] },
+    code: { n: 'Programmation', e: '💻', x: "MODE PROGRAMMATION : tu es ingénieur logiciel senior et architecte. Tu crées uniquement ce qui est demandé : sites web, applications, interfaces modernes et responsives, scripts, API, bases de données, projets Python, R, JavaScript, SQL, VBA. Pour un site, une application ou une interface : fournis UN fichier HTML complet et autonome (CSS et JavaScript inclus) dans un seul bloc de code html, moderne, soigné et responsive, directement prévisualisable. Pour un projet multi-fichiers : donne d'abord l'arborescence, puis chaque fichier dans son propre bloc, avec son nom en titre juste avant. Explique brièvement comment le lancer. Pour le débogage : identifie la cause, corrige, explique. Vérifie mentalement ton code avant de répondre. N'ajoute aucune fonctionnalité non demandée.", chips: [
+      ['🌐 Créer un site web', 'Crée un site web moderne et responsive pour : ', false],
+      ['📱 Créer une application', 'Crée une application web complète (HTML, CSS, JavaScript) qui : ', false],
+      ['🎨 Interface stylée', 'Conçois une interface moderne, sombre et élégante pour : ', false],
+      ['🐞 Corriger mon code', 'Voici mon code, trouve l\'erreur et corrige-la :\n', false]] },
+    anglais: { n: 'Anglais', e: '🌐', x: "MODE ANGLAIS : tu es un professeur d'anglais expert (académique, professionnel, examens TOEIC, IELTS, baccalauréat). Évalue le niveau d'après ses messages. Corrige avec le format : faute, correction, règle en une phrase. Ne lance un quiz, une conversation ou un exercice que si l'utilisateur le demande ; dans ce cas, une question à la fois, tu attends la réponse puis tu corriges. Adapte la part de français au niveau (beaucoup si débutant, peu si avancé).", chips: [
+      ['🎯 Quiz de vocabulaire', "Fais-moi un quiz de vocabulaire anglais adapté à mon niveau : pose UNE question à la fois, attends ma réponse, corrige-moi puis enchaîne. Commence par évaluer mon niveau en 3 questions rapides.", true],
+      ['🗣 Conversation orale', "Let's have a spoken conversation in English. Start with a simple question, keep your sentences short, and briefly correct my mistakes after each answer.", true],
+      ['✍️ Corriger mon texte', 'Corrige ce texte anglais, explique mes fautes et propose une version améliorée :\n', false],
+      ['📘 Règle de grammaire', 'Explique clairement cette règle de grammaire anglaise avec exemples : ', false],
+      ['📝 Préparer un examen', "Prépare-moi à un examen d'anglais (TOEIC, IELTS, bac…) : ", false]] },
+    maths: { n: 'Maths et finance', e: '📐', x: "MODE MATHS, FINANCE ET DATA : raisonne avec rigueur. Pour une démonstration, détaille chaque étape et vérifie les conditions de régularité, d'intégrabilité et de convergence. Pour la finance, annonce les hypothèses et les limites du modèle (queues épaisses, volatilité stochastique, sauts). Pour le code, fournis Python (pandas, NumPy, SciPy, Numba) ou R (tidyverse, ggplot2) propre, vectorisé et commenté, ainsi que Excel et Power BI (DAX) seulement si demandé.", chips: [
+      ['📐 Démontrer', 'Démontre rigoureusement : ', false],
+      ['📈 Graphique simulé', "Simule 5 trajectoires de prix d'une action (mouvement brownien géométrique, 60 jours, volatilité 25 %) et affiche-les dans un graphique.", true],
+      ['🐍 Python / R', 'Écris le code Python (ou R) pour : ', false],
+      ['📊 Excel / Power BI', 'Aide-moi sur Excel ou Power BI : ', false]] },
+    devoirs: { n: 'Devoirs', e: '📚', x: "MODE DEVOIRS : tu traites le devoir ou l'exercice demandé (maths, sciences, informatique, économie, langues, rédaction). Résous-le correctement, pas à pas, avec la méthode, le résultat final clairement indiqué et une vérification. Si l'énoncé est incomplet, demande la précision utile. Ne propose pas d'exercice supplémentaire sauf demande.", chips: [
+      ['📚 Résoudre un exercice', 'Résous cet exercice pas à pas : ', false],
+      ['🧠 Explique simplement', 'Explique-moi simplement : ', false],
+      ['📝 Préparer un contrôle', 'Prépare-moi à un contrôle sur : ', false]] }
+  };
+  function setMode(k) { mode = MODES[k] ? k : 'general'; if (cur) cur.mode = mode; store.set('louis.mode', mode); renderModes(); if (messages.length === 1 && messages[0].greet) renderChat(); }
+  function renderModes() {
+    $('#modes').innerHTML = Object.entries(MODES).map(([k, m]) => `<button class="chip ${k === mode ? 'on' : ''}" data-setmode="${k}">${m.e} ${m.n}</button>`).join('');
+    $('#chips').innerHTML = MODES[mode].chips.map((c, i) => `<button class="chip" data-chip="${i}" style="background:rgba(255,255,255,.04);color:#cbd5e1">${c[0]}</button>`).join('');
+    $('#chips').insertAdjacentHTML('beforeend', '<button class="chip" data-lib style="background:rgba(255,255,255,.04);color:#cbd5e1">📚 Mes fichiers</button>');
+    $('#mode-name').textContent = 'Mode · ' + MODES[mode].n;
+  }
+  $('#modes').addEventListener('click', e => { const b = e.target.closest('[data-setmode]'); if (b) setMode(b.dataset.setmode); });
+  $('#chips').addEventListener('click', e => {
+    if (e.target.closest('[data-lib]')) { renderLib(); show('#modal-lib', true); return; }
+    const b = e.target.closest('[data-chip]'); if (!b) return;
+    const c = MODES[mode].chips[+b.dataset.chip];
+    if (c[2]) send(c[1]); else { const i = $('#chat-input'); i.value = c[1]; i.focus(); fit(); }
+  });
+
+  /* ---------- Intelligence ---------- */
+  function buildSystem() {
+    const base = `Tu es LOUIS, un assistant personnel de niveau expert (ingénieur logiciel, analyste quantitatif, data scientist, professeur d'anglais seniors). Tu réponds en français sauf demande contraire.
+
+RÈGLE ABSOLUE — OBÉIR, SANS INITIATIVE : tu ne fais que ce que l'utilisateur demande, exactement. Tu ne lances rien, ne crées rien, ne planifies rien, ne proposes aucun exercice, plan, outil ou fonctionnalité sans qu'on te l'ait demandé. Tu restes concentré sur la demande en cours, sans digresser. Si la demande est ambiguë ou incomplète, pose UNE question courte avant d'agir. Tu ne fais une suggestion que lorsqu'elle est vraiment nécessaire (risque d'erreur, étape manquante, meilleure option évidente) : une phrase, en fin de réponse, sans liste d'offres et sans « Veux-tu que… ? » systématique.
+
+COMPÉTENCES : programmation (Python, R, JavaScript, HTML/CSS, SQL, VBA, Git, sites, applications, interfaces) ; Excel avancé ; Power BI (DAX, Power Query M) ; mathématiques, statistiques, machine learning, finance quantitative ; anglais (grammaire, vocabulaire, examens, anglais académique et professionnel) ; devoirs et exercices de toutes matières ; organisation et tâches (planning, études, carrière, CV, lettres, e-mails, budget, projets).
+
+FICHIERS : si une image ou un PDF est joint, analyse-le précisément (texte, tableaux, schémas, énoncés d'exercices, graphiques) et réponds à la demande. Si le fichier est illisible ou incomplet, dis-le.
+
+ADAPTATION : repère le niveau et les objectifs de l'utilisateur d'après ses messages et ses instructions personnelles, puis adapte vocabulaire, profondeur et exemples. Si le niveau est inconnu pour un travail d'apprentissage demandé, pose UNE question courte.
+
+RIGUEUR : annonce tes hypothèses ; signale les limites des modèles ; dans une démonstration, détaille chaque étape ; fournis un code propre, commenté et testé mentalement ; tiens compte des contraintes réelles (frais, spread, liquidité). N'invente jamais de chiffres : si une donnée manque, dis-le.
+
+VITESSE : réponds directement, sans préambule ni répétition de la demande ; longueur proportionnée (courte pour une question simple, détaillée pour un projet ou une démonstration).
+
+GRAPHIQUES : si (et seulement si) un graphique, une simulation ou une visualisation est demandé, calcule réellement les valeurs et affiche-les avec un bloc de code de langage chart contenant un JSON valide : {"type":"line|area|bar","title":"...","labels":["..."],"series":[{"name":"...","data":[nombres]}]}, au plus 60 points par série, nombres arrondis, puis une courte interprétation.
+
+STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses structurées et précises ; Markdown (titres, listes, gras, blocs de code).`;
+    const who = settings.name ? `\n\nL'utilisateur s'appelle ${settings.name} ; tu l'appelles « Monsieur ${settings.name} », uniquement pour saluer, pas à chaque phrase.` : '';
+    const mine = settings.notes ? `\n\nINSTRUCTIONS PERSONNELLES DE L'UTILISATEUR : ${settings.notes}` : '';
+    const memo = mem.length ? '\n\nMÉMOIRE (faits durables validés par l\'utilisateur) :\n- ' + mem.slice(0, 30).map(m => m.t).join('\n- ') : '';
+    const lessons = rules.length ? '\n\nRÈGLES APPRISES (validées par l\'utilisateur, à appliquer) :\n- ' + rules.map(r => r.t).join('\n- ') : '';
+    const tag = "\n\nMÉMORISATION : seulement si l'utilisateur te donne un fait durable le concernant (objectif, niveau, préférence, contrainte) ou te demande de retenir quelque chose, ajoute à la toute fin de ta réponse une ligne [[mem: fait court à retenir]]. N'écris jamais cette ligne autrement. L'utilisateur validera avant tout enregistrement.";
+    const fo = curFolder(), todo = tasks.filter(t => !t.done).slice(0, 10);
+    const ctx = "\n\nCONTEXTE : date et heure actuelles " + new Date().toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) + (todo.length ? " ; tâches en cours de l'utilisateur : " + todo.map(t => t.text + (t.time ? ' (' + t.time + ')' : '')).join(' ; ') : '') + '.';
+    const dos = fo && fo.instr ? "\n\nDOSSIER « " + fo.name + " » — INSTRUCTIONS : " + fo.instr : '';
+    const sug = "\n\nSUITES : à la fin de chaque réponse, sauf salutation, réponse très courte ou commande, ajoute une dernière ligne [[suite: question 1 | question 2 | question 3]] avec 2 ou 3 suites courtes et utiles que l'utilisateur pourrait demander ensuite. N'écris jamais cette ligne autrement.";
+    return base + who + mine + memo + lessons + tag + ctx + dos + sug + (web ? "\n\nRECHERCHE WEB : tu peux chercher sur le web ; fais-le pour l'actualité, les prix, les cours et toute donnée récente, puis réponds sans inventer." : '') + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
+  }
+  const genCfg = model => /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
+
+  async function ask(history, onDelta, sysText) {
+    if (!settings.key) setTimeout(openSettings, 300);
+    if (!settings.key) return { error: true, text: "Clé API manquante. Ouvrez ⚙ Réglages et collez votre clé Gemini (gratuite sur aistudio.google.com)." };
+    const models = [...new Set([settings.model, 'gemini-2.5-flash', 'gemini-2.5-flash-lite'])];
+    let last = '';
+    abortCtl = new AbortController();
+    for (const model of models) {
+      let full = '', src = [];
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
+          signal: abortCtl.signal,
+          body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: sysText || buildSystem() }] }, generationConfig: genCfg(model), ...(web && !sysText ? { tools: [{ google_search: {} }] } : {}) })
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          last = `Erreur (${res.status}) : ${d?.error?.message || 'requête refusée'}`;
+          if (res.status === 403 || /API key/i.test(last)) return { error: true, text: last + '\n\nVérifiez votre clé dans ⚙ Réglages.' };
+          continue;
+        }
+        const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '';
+        for (;;) {
+          const { done, value } = await reader.read(); if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split('\n'); buf = lines.pop();
+          for (const ln of lines) {
+            if (!ln.startsWith('data:')) continue;
+            try { const j = JSON.parse(ln.slice(5)); (j.candidates?.[0]?.groundingMetadata?.groundingChunks || []).forEach(c => { if (c.web?.uri && !src.some(x => x.u === c.web.uri)) src.push({ t: c.web.title || c.web.uri, u: c.web.uri }); }); const t = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''); if (t) { full += t; onDelta(full); } } catch {}
+          }
+        }
+        if (full.trim()) return { error: false, text: full, src };
+        last = 'Aucune réponse reçue.';
+      } catch (err) {
+        if (err && err.name === 'AbortError') return { error: !full.trim(), text: full.trim() ? full + '\n\n(Arrêté)' : 'Arrêté.' };
+        if (full.trim()) return { error: false, text: full + '\n\n(Connexion interrompue)' };
+        last = 'Connexion impossible. Vérifiez votre accès à Internet.';
+      }
+    }
+    return { error: true, text: last || 'Erreur inconnue.' };
+  }
+
+  /* ---------- Rendu Markdown, code, graphiques ---------- */
+  const CODES = {};
+  function md(t, mid) {
+    const blocks = [];
+    t = escH(t).replace(/```([\w+#-]*)[^\n]*\n?([\s\S]*?)(?:```|$)/g, (_, l, c) => { blocks.push({ l: l.toLowerCase(), c: c.replace(/\n$/, '') }); return '@@B' + (blocks.length - 1) + '@@'; });
+    const codes = [], maths = [];
+    t = t.replace(/`([^`\n]+)`/g, (_, c) => { codes.push(c); return '@@C' + (codes.length - 1) + '@@'; });
+    t = t.replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$([^\s$](?:[^$\n]*?[^\s$])?)\$/g, (_, a, b, c, d) => { maths.push({ d: a !== undefined || b !== undefined, c: unesc(a ?? b ?? c ?? d) }); return '@@M' + (maths.length - 1) + '@@'; });
+    t = t.replace(/^(\|.+\|)[ \t]*\n(\|[ \t:|-]+\|)[ \t]*\n((?:\|.+\|[ \t]*(?:\n|$))*)/gm, (_, h, sep, body) => { const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(x => x.trim()); return '<div class="overflow-x-auto my-2"><table class="text-[12px] border-collapse"><thead><tr>' + cells(h).map(x => '<th class="border border-blue-400/30 px-2 py-1 text-sky-300">' + x + '</th>').join('') + '</tr></thead><tbody>' + body.trim().split('\n').filter(Boolean).map(r => '<tr>' + cells(r).map(x => '<td class="border border-blue-400/20 px-2 py-1">' + x + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>'; });
+    t = t
+      .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/^#{1,6}\s*(.+)$/gm, '<div class="md-h">$1</div>')
+      .replace(/^\s*[*-]\s+(.+)$/gm, '<div class="md-li">• $1</div>')
+      .replace(/^\s*(\d+)[.)]\s+(.+)$/gm, '<div class="md-li">$1. $2</div>')
+      .replace(/^---+$/gm, '<hr>')
+      .replace(/(^|[^*\w])\*([^\s*][^*\n]*?)\*/g, '$1<em>$2</em>')
+      .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)"]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/<\/div>\n/g, '</div>').replace(/<hr>\n/g, '<hr>').replace(/\n/g, '<br>')
+      .replace(/<br>(@@B\d+@@)/g, '$1').replace(/(@@B\d+@@)<br>/g, '$1');
+    t = t.replace(/@@C(\d+)@@/g, (_, i) => '<code>' + codes[i] + '</code>').replace(/@@M(\d+)@@/g, (_, i) => { const m = maths[i]; try { if (window.katex) return (m.d ? '<div class="overflow-x-auto">' : '') + katex.renderToString(m.c, { displayMode: m.d, throwOnError: false }) + (m.d ? '</div>' : ''); } catch {} return '<code>' + escH(m.c) + '</code>'; });
+    return t.replace(/@@B(\d+)@@/g, (_, i) => {
+      const b = blocks[i], code = unesc(b.c), key = mid + '_' + i;
+      if (b.l === 'chart') { try { return chartSVG(JSON.parse(code)); } catch {} }
+      CODES[key] = code;
+      const isHtml = ['html', 'htm'].includes(b.l) || /<!doctype html|<html/i.test(code);
+      return `<div class="cb"><div class="cb-h"><span>${escH(b.l || 'code')}</span><span><button data-act="copy" data-k="${key}">Copier</button>${isHtml ? `<button data-act="prev" data-k="${key}">Aperçu</button>` : ''}</span></div><pre>${b.c}</pre></div>`;
+    });
+  }
+  const PAL = ['#38bdf8', '#a78bfa', '#f472b6', '#fbbf24', '#34d399', '#60a5fa'];
+  function chartSVG(spec) {
+    try {
+      const W = 320, H = 170, L = 36, R = 8, T = 12, B = 26;
+      const type = ['line', 'area', 'bar'].includes(spec.type) ? spec.type : 'line';
+      const labels = spec.labels || [];
+      const ser = (spec.series || []).filter(s => Array.isArray(s.data) && s.data.length);
+      if (!ser.length) return '';
+      const n = Math.max(...ser.map(s => s.data.length));
+      const all = ser.flatMap(s => s.data.map(Number)).filter(Number.isFinite);
+      let lo = Math.min(...all), hi = Math.max(...all);
+      if (type !== 'line') lo = Math.min(lo, 0);
+      if (lo === hi) hi = lo + 1;
+      const pad = (hi - lo) * 0.06; hi += pad; if (type === 'line') lo -= pad;
+      const x = i => L + (n === 1 ? 0 : i * (W - L - R) / (n - 1));
+      const y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+      const fmt = v => Math.abs(v) >= 1000 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2);
+      let g = '';
+      for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, yy = y(v); g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="#fff" stroke-opacity=".08"/><text x="${L - 4}" y="${yy + 3}" fill="#94a3b8" font-size="8" text-anchor="end">${fmt(v)}</text>`; }
+      const step = Math.ceil(n / 6), gw = (W - L - R) / n;
+      for (let i = 0; i < n; i += step) { const lb = labels[i] !== undefined ? labels[i] : i + 1, xx = type === 'bar' ? L + (i + .5) * gw : x(i); g += `<text x="${xx}" y="${H - 10}" fill="#94a3b8" font-size="8" text-anchor="middle">${escH(lb)}</text>`; }
+      ser.forEach((s, si) => {
+        const c = s.color || PAL[si % PAL.length], d = s.data.map(Number);
+        if (type === 'bar') {
+          const bw = gw * 0.7 / ser.length;
+          d.forEach((v, i) => { const y0 = y(Math.max(v, 0)), y1 = y(Math.min(v, 0)); g += `<rect x="${L + i * gw + gw * .15 + si * bw}" y="${y0}" width="${bw}" height="${Math.max(1, y1 - y0)}" rx="1.5" fill="${c}" fill-opacity=".85"/>`; });
+        } else {
+          const pts = d.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' '), base = y(Math.max(lo, 0));
+          if (type === 'area') g += `<polygon points="${x(0)},${base} ${pts} ${x(d.length - 1)},${base}" fill="${c}" fill-opacity=".18"/>`;
+          g += `<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="${ser.length > 8 ? 1 : 2}" stroke-opacity="${ser.length > 8 ? .55 : 1}" stroke-linejoin="round"/>`;
+        }
+      });
+      const legend = ser.length <= 6 ? '<div class="flex flex-wrap gap-3 mt-1 text-[10px] text-zinc-300">' + ser.map((s, si) => `<span><span style="color:${s.color || PAL[si % PAL.length]}">●</span> ${escH(s.name || 'Série ' + (si + 1))}</span>`).join('') + '</div>' : '';
+      return `<div class="my-2 p-2 rounded-xl border border-blue-400/25 bg-black/50">${spec.title ? `<div class="text-[11px] font-bold text-sky-300 mb-1">${escH(spec.title)}</div>` : ''}<svg viewBox="0 0 ${W} ${H}" class="w-full">${g}</svg>${legend}</div>`;
+    } catch { return '<div class="text-rose-400 text-[11px]">Graphique invalide.</div>'; }
+  }
+
+  /* ---------- Chat ---------- */
+  const stripTags = t => String(t || '').replace(/\[\[(?:mem|suite):[\s\S]*?(\]\]|$)|\[\[[a-z]{0,5}$/g, '').trimEnd();
+  const msgEl = m => {
+    const w = document.createElement('div'); w.id = 'm-' + m.id; w.className = 'flex flex-col items-start';
+    const b = document.createElement('div'); b.id = 'b-' + m.id; b.className = 'bub ' + (m.sender === 'user' ? 'bub-user' : 'bub-ai');
+    fill(b, m); w.appendChild(b);
+    if (m.src && m.src.length) { const s = document.createElement('div'); s.className = 'flex flex-wrap gap-1 mt-1 max-w-[94%]'; m.src.slice(0, 6).forEach(x => { const a = document.createElement('a'); a.href = x.u; a.target = '_blank'; a.rel = 'noopener'; a.className = 'chip !text-[10px] !py-0.5'; a.textContent = '🔗 ' + String(x.t).slice(0, 28); s.appendChild(a); }); w.appendChild(s); }
+    if (m.sender === 'jarvis' && !m.pending) {
+      const a = document.createElement('div'); a.className = 'flex items-center gap-3 mt-1 px-1 text-[11px] text-zinc-500';
+      a.innerHTML = `<span>${m.ts}</span><button data-act="say" data-id="${m.id}" class="hover:text-sky-300">Écouter</button><button data-act="copym" data-id="${m.id}" class="hover:text-sky-300">Copier</button><button data-act="note" data-id="${m.id}" class="hover:text-sky-300">Enregistrer</button>${m.greet ? '' : `<button data-act="up" data-id="${m.id}" class="${m.fb === 1 ? 'text-emerald-400' : 'hover:text-emerald-400'}">👍</button><button data-act="down" data-id="${m.id}" class="${m.fb === -1 ? 'text-rose-400' : 'hover:text-rose-400'}">👎</button><button data-act="regen" data-id="${m.id}" class="hover:text-sky-300">Refaire</button>`}`;
+      w.appendChild(a);
+    }
+    if (m.sender === 'user' && !m.greet) { const e = document.createElement('div'); e.className = 'self-end mt-1 px-1 text-[11px] text-zinc-500'; e.innerHTML = `<button data-act="edit" data-id="${m.id}" class="hover:text-sky-300">Modifier</button>`; w.appendChild(e); }
+    if (m.next && m.next.length && m === messages[messages.length - 1]) { const e = document.createElement('div'); e.className = 'sug flex flex-wrap gap-2 mt-2'; m.next.forEach(t => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip !whitespace-normal text-left'; b.textContent = '↳ ' + t; b.dataset.sug = t; e.appendChild(b); }); w.appendChild(e); }
+    return w;
+  };
+  function fill(b, m) {
+    b.classList.toggle('streaming', !!m.pending);
+    if (m.sender === 'user') b.textContent = m.text;
+    else if (m.pending && !m.text) b.innerHTML = '<span class="dots live"><i></i><i></i><i></i></span>';
+    else b.innerHTML = md(stripTags(m.text), m.id);
+  }
+  function renderChat() { const log = $('#chat-log'); log.innerHTML = ''; messages.forEach(m => log.appendChild(msgEl(m))); log.scrollTop = log.scrollHeight; if (messages.length === 1 && messages[0].greet) { const e = document.createElement('div'); e.id = 'empty-st'; e.className = 'py-6 text-center'; e.innerHTML = '<div class="text-lg font-bold text-blue-50 neon">Comment puis-je t\'aider ?</div><div class="text-xs text-zinc-400 mt-1 mb-4">Choisis une idée ou écris ton message</div><div class="grid grid-cols-2 gap-2 text-left">' + MODES[mode].chips.map((c, k) => `<button data-card="${k}" class="tile !p-3 text-[12px] text-blue-100">${c[0]}</button>`).join('') + '</div>'; e.querySelectorAll('[data-card]').forEach(b => b.onclick = () => $('#chips').querySelector(`[data-chip="${b.dataset.card}"]`)?.click()); log.appendChild(e); }
+    const i = $('#chat-input'); if (i) { i.value = cur.draft || ''; fit(); } }
+  let raf = 0;
+  function live(a) {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0; const log = $('#chat-log'), b = $('#b-' + a.id); if (!b) return;
+      const near = log.scrollHeight - log.scrollTop - log.clientHeight < 90;
+      fill(b, a); if (near) log.scrollTop = log.scrollHeight;
+    });
+  }
+
+  let sp = { idx: 0 };
+  function feedSpeech(text, final) {
+    if (!(autoVoice || sp.on) || !('speechSynthesis' in window)) return;
+    const k = text.search(/\[\[(?:mem|suite):/); if (k >= 0) text = text.slice(0, k);
+    const open = (text.match(/```/g) || []).length % 2 === 1;
+    const limit = open ? text.lastIndexOf('```') : text.length;
+    let seg = text.slice(sp.idx, limit);
+    if (!final) {
+      const ms = [...seg.matchAll(/[.!?…]\s|\n/g)]; if (!ms.length) return;
+      seg = seg.slice(0, ms[ms.length - 1].index + 1);
+      if (seg.trim().length < 30) return;
+    }
+    if (!seg.trim()) return;
+    sp.idx += seg.length; enqueueSpeech(seg);
+  }
+  async function send(text, viaVoice) {
+    text = (text || '').trim(); if (!text && atts.length) text = 'Analyse ce fichier.'; if (!text || busy) return;
+    const lc = atts.length ? null : localCmd(text);
+    if (lc) { const u0 = { id: Date.now(), sender: 'user', raw: text, text, ts: now() }, a0 = { id: u0.id + 1, sender: 'jarvis', text: lc, ts: now() }; messages.push(u0, a0); if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42); renderChat(); persist(); if (viaVoice) enqueueSpeech(lc); resumeHands(); return; }
+    const F = atts; atts = []; paintAtt();
+    stopSpeech(); busy = true; $('#chat-send').dataset.s = 'stop'; exch++; store.set('louis.exch', exch);
+    const u = { id: Date.now(), sender: 'user', raw: text, text: text + (F.length ? '\n' + F.map(f => '📎 ' + f.name).join('\n') : ''), files: F, ts: now() };
+    const a = { id: u.id + 1, sender: 'jarvis', text: '', ts: now(), pending: true };
+    messages.push(u, a); persist();
+    if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42);
+    const log = $('#chat-log'); $('#empty-st')?.remove(); $$('.sug').forEach(x => x.remove()); log.appendChild(msgEl(u)); log.appendChild(msgEl(a)); log.scrollTop = log.scrollHeight;
+    const withF = messages.filter(m => m.files && m.files.length).slice(-2);
+    const hist = messages.filter(m => m !== a && !m.greet && !m.err && m.text).slice(-30).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [...(withF.includes(m) ? m.files.map(f => ({ inlineData: { mimeType: f.mime, data: f.data } })) : []), { text: m.text }] }));
+    while (hist.length && hist[0].role !== 'user') hist.shift();
+    sp = { idx: 0, on: !!viaVoice };
+    const res = await ask(hist, part => { a.text = part; live(a); feedSpeech(part, false); });
+    a.pending = false; a.err = res.error; a.src = res.src || [];
+    const tags = [...res.text.matchAll(/\[\[mem:\s*([^\]]+?)\s*\]\]/g)].map(x => x[1]);
+    a.text = stripTags(res.text); const nx = (res.text.match(/\[\[suite:\s*([^\]]+?)\s*\]\]/) || [])[1]; a.next = nx && !res.error ? nx.split('|').map(x => x.trim()).filter(Boolean).slice(0, 3) : [];
+    cancelAnimationFrame(raf); raf = 0;
+    const w = $('#m-' + a.id); if (w) w.replaceWith(msgEl(a));
+    if (!res.error) { feedSpeech(a.text, true); tags.forEach(proposeMem); }
+    busy = false; $('#chat-send').dataset.s = ''; persist(); updateBadge(); resumeHands();
+    if (!res.error && !cur.titleAI && messages.filter(m => m.sender === 'user').length === 1) autoTitle(cur, text, a.text);
+  }
+  $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (busy) { if (abortCtl) abortCtl.abort(); return; } const i = $('#chat-input'), t = i.value; i.value = ''; cur.draft = ''; hIdx = -1; fit(); $('#slash').classList.add('hidden'); send(t); });
+
+  /* ---------- Conversations séparées ---------- */
+  function startFresh(k) {
+    if (busy) return;
+    if (messages.some(m => m.sender === 'user')) { cur = newConv(); messages = cur.messages; renderChat(); }
+    if (k) setMode(k);
+    persist();
+  }
+  $('#new-chat').onclick = () => { stopSpeech(); startFresh(); toast('Nouvelle conversation'); };
+  $('#conv-open').onclick = () => { renderConvs(); show('#modal-convs', true); };
+  $('#conv-close').onclick = () => show('#modal-convs', false);
+  $('#conv-q').oninput = renderConvs;
+  function renderConvs() {
+    renderFolders();
+    const q = $('#conv-q').value.trim().toLowerCase(), box = $('#conv-list');
+    const rows = [...convs].filter(c => fsel === 'all' || c.folder === fsel).sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || b.ts - a.ts).filter(c => !q || c.title.toLowerCase().includes(q) || c.messages.some(m => String(m.text).toLowerCase().includes(q)));
+    box.innerHTML = rows.length ? '' : '<div class="text-xs text-zinc-500">Aucune conversation.</div>';
+    rows.forEach(c => {
+      const r = document.createElement('div'); r.className = 'tile flex items-center gap-2 !p-2' + (c.id === cur.id ? ' !border-sky-400' : '');
+      r.innerHTML = '<button class="flex-1 min-w-0 text-left"><div class="text-[13px] text-blue-50 truncate"></div><div class="text-[10px] text-zinc-400"></div></button><button class="text-zinc-500 text-sm" aria-label="Renommer">✎</button><button class="text-zinc-500 hover:text-rose-400 text-sm" aria-label="Supprimer">✕</button>';
+      r.children[0].children[0].textContent = (c.pin ? '📌 ' : '') + c.title;
+      r.children[0].children[1].textContent = (MODES[c.mode] ? MODES[c.mode].e + ' ' + MODES[c.mode].n : '') + ' · ' + new Date(c.ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + c.messages.filter(m => m.sender === 'user').length + ' msg' + (folders.find(f => f.id === c.folder) ? ' · 📁 ' + folders.find(f => f.id === c.folder).name : '');
+      r.children[0].onclick = () => { if (busy) return toast('Réponse en cours'); stopSpeech(); cur = c; messages = c.messages; mode = MODES[c.mode] ? c.mode : 'general'; store.set('louis.mode', mode); renderModes(); persist(); renderChat(); show('#modal-convs', false); go('chat'); };
+      r.children[1].onclick = () => { const t = prompt('Nouveau titre ?', c.title); if (t && t.trim()) { c.title = t.trim().slice(0, 60); persist(); renderConvs(); } };
+      r.children[2].onclick = () => { if (busy || !confirm('Supprimer cette conversation ?')) return; convs = convs.filter(x => x !== c); dbDel(c.id); if (c === cur) { cur = convs[0] || newConv(); messages = cur.messages; renderChat(); } persist(); renderConvs(); };
+      box.appendChild(r);
+    });
+  }
+
+  $('#chat-log').addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const act = b.dataset.act, m = messages.find(x => x.id === +b.dataset.id);
+    if (act === 'copy') { navigator.clipboard?.writeText(CODES[b.dataset.k] || ''); b.textContent = 'Copié'; setTimeout(() => b.textContent = 'Copier', 1500); }
+    else if (act === 'prev') openPreview(CODES[b.dataset.k] || '');
+    else if (act === 'say' && m) { if (speakCount) stopSpeech(); else enqueueSpeech(m.greet ? hello() : m.text); }
+    else if (act === 'copym' && m) { navigator.clipboard?.writeText(m.text); toast('Copié'); }
+    else if (act === 'note' && m) { saveNote('Réponse de Louis', m.text); }
+    else if ((act === 'up' || act === 'down') && m) { rate(m, act === 'up' ? 1 : -1); }
+    else if (act === 'regen' && m) { regen(m); }
+    else if (act === 'edit' && m) { editMsg(m); }
+  });
+
+  /* ---------- Images et PDF ---------- */
+  let atts = [];
+  function paintAtt() {
+    const bar = $('#att-bar'); bar.classList.toggle('hidden', !atts.length); bar.innerHTML = '';
+    atts.forEach((f, i) => { const c = document.createElement('button'); c.type = 'button'; c.className = 'chip on'; c.textContent = (f.mime === 'application/pdf' ? '📄 ' : '🖼 ') + f.name.slice(0, 20) + ' ✕'; c.onclick = () => { atts.splice(i, 1); paintAtt(); }; bar.appendChild(c); });
+    $('#att-btn').textContent = atts.length ? '📎' + atts.length : '📎';
+  }
+  const idb = () => new Promise((res, rej) => { const r = indexedDB.open('louis-lib', 1); r.onupgradeneeded = () => r.result.createObjectStore('f', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const lib = {
+    all: async () => { try { const d = await idb(); return await new Promise(res => { const q = d.transaction('f').objectStore('f').getAll(); q.onsuccess = () => res(q.result.sort((a, b) => b.ts - a.ts)); q.onerror = () => res([]); }); } catch { return []; } },
+    put: async f => { try { const d = await idb(); await new Promise(res => { const t = d.transaction('f', 'readwrite'); t.objectStore('f').put(f); t.oncomplete = res; t.onerror = res; }); } catch {} },
+    del: async id => { try { const d = await idb(); await new Promise(res => { const t = d.transaction('f', 'readwrite'); t.objectStore('f').delete(id); t.oncomplete = res; t.onerror = res; }); } catch {} }
+  };
+  const keep = (a, f, libOnly) => { if (!libOnly) { atts.push(a); paintAtt(); } lib.put({ ...a, id: f.name + '_' + f.size, size: f.size, ts: Date.now() }).then(() => { if (libOnly) { toast('Ajouté à la bibliothèque'); renderLib(); } }); };
+  function addFile(f) { readFile(f, false); }
+  function readFile(f, libOnly) {
+    if (!f) return;
+    if (!libOnly && atts.length >= 5) return toast('5 fichiers maximum');
+    const isImg = f.type.startsWith('image/'), isPdf = f.type === 'application/pdf';
+    if (!isImg && !isPdf) return toast('Images et PDF seulement');
+    if (f.size > 15e6) return toast('Fichier trop lourd (15 Mo max)');
+    const r = new FileReader();
+    r.onload = () => {
+      const url = r.result;
+      if (isPdf) { keep({ mime: f.type, data: url.split(',')[1], name: f.name }, f, libOnly); return; }
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        keep({ mime: 'image/jpeg', data: c.toDataURL('image/jpeg', .85).split(',')[1], name: f.name }, f, libOnly);
+      };
+      img.onerror = () => toast('Image illisible');
+      img.src = url;
+    };
+    r.readAsDataURL(f);
+  }
+  $('#att-btn').onclick = () => $('#att-file').click();
+  $('#att-file').onchange = e => { [...e.target.files].forEach(addFile); e.target.value = ''; };
+  $('#chat-input').addEventListener('paste', e => { const fs = [...(e.clipboardData?.files || [])]; if (fs.length) { e.preventDefault(); fs.forEach(addFile); } });
+  $('#tab-chat').addEventListener('dragover', e => e.preventDefault());
+  $('#tab-chat').addEventListener('drop', e => { e.preventDefault(); [...e.dataTransfer.files].forEach(addFile); });
+
+  /* ---------- Aperçu de code ---------- */
+  let prevCode = '';
+  function openPreview(code) { prevCode = code; $('#prev-frame').srcdoc = code; $('#modal-prev').classList.remove('hidden'); }
+  $('#prev-close').onclick = () => { $('#modal-prev').classList.add('hidden'); $('#prev-frame').srcdoc = ''; };
+  $('#prev-dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([prevCode], { type: 'text/html' })); a.download = 'projet-louis.html'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+
+  /* ---------- Voix ---------- */
+  let speakToken = 0, speakCount = 0, listening = false;
+  const hasTTS = 'speechSynthesis' in window;
+  if (hasTTS) speechSynthesis.getVoices();
+  function setSpeaking(on) {
+    $('#robot-big').classList.toggle('speaking', on); ['#avatar-chat', '#avatar-sm'].forEach(q => $(q).classList.toggle('speaking', on)); $('#wave').classList.toggle('on', on);
+    $('#voice-state').textContent = on ? 'Louis parle…' : (listening ? "J'écoute…" : 'Prêt'); if (!on) resumeHands();
+  }
+  function stopSpeech() { speakToken++; speakCount = 0; if (hasTTS) speechSynthesis.cancel(); setSpeaking(false); }
+  function cleanForSpeech(t) { return t.replace(/```[\s\S]*?(```|$)/g, " Le détail est affiché à l'écran. ").replace(/https?:\/\/\S+/g, '').replace(/[*#`_>~|•]/g, '').replace(/\s+/g, ' ').trim(); }
+  function toChunks(t) {
+    const parts = t.match(/[^.!?;:\n]+[.!?;:]?/g) || [], out = []; let cur2 = '';
+    parts.forEach(p => { if ((cur2 + p).length > 180 && cur2) { out.push(cur2.trim()); cur2 = p; } else cur2 += p; });
+    if (cur2.trim()) out.push(cur2.trim());
+    return out;
+  }
+  function detectLang(c) {
+    const en = (c.match(/\b(the|and|is|are|was|to|of|you|that|with|for|this|have|it|in|on|your|my|what|how)\b/gi) || []).length;
+    const fr = (c.match(/\b(le|la|les|des|et|est|que|pour|une|un|vous|dans|sur|je|il|pas|qui|ce|en)\b/gi) || []).length;
+    return en > fr + (mode === 'anglais' ? 0 : 1) ? 'en-US' : 'fr-FR';
+  }
+  const voiceByURI = uri => uri && hasTTS ? speechSynthesis.getVoices().find(v => v.voiceURI === uri) : null;
+  function pickVoice(lang) {
+    const pre = lang.slice(0, 2);
+    if (pre === 'fr') { const c = voiceByURI(settings.voice); if (c) return c; }
+    const vs = speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith(pre));
+    const male = pre === 'fr' ? /\bmale\b|frd|fre\b|homme|thomas|paul|henri|nicolas|antoine|daniel|jean|claude/i : /\bmale\b|david|daniel|alex|guy|ryan|mark|fred|james|rjs|gbb|tpd/i;
+    return vs.find(v => male.test(v.name + ' ' + v.voiceURI)) || vs[0] || null;
+  }
+  function enqueueSpeech(raw) {
+    if (!hasTTS) return;
+    const chunks = toChunks(cleanForSpeech(raw)); if (!chunks.length) return;
+    const tok = speakToken;
+    chunks.forEach(c => {
+      const lang = detectLang(c), u = new SpeechSynthesisUtterance(c);
+      u.lang = lang; const v = pickVoice(lang); if (v) u.voice = v; u.pitch = 0.8; u.rate = 1;
+      speakCount++; setSpeaking(true);
+      const done = () => { if (tok !== speakToken) return; speakCount = Math.max(0, speakCount - 1); if (!speakCount) setSpeaking(false); };
+      u.onend = done; u.onerror = done; speechSynthesis.speak(u);
+    });
+  }
+  function paintVT() { $$('[data-vt]').forEach(b => { b.textContent = b.closest('#tab-chat') ? (autoVoice ? '🔊' : '🔇') : (autoVoice ? 'Voix ON' : 'Voix OFF'); b.classList.toggle('on', autoVoice); }); }
+  function toggleVoice() { autoVoice = !autoVoice; store.set('louis.voice2', autoVoice); if (!autoVoice) stopSpeech(); paintVT(); }
+  paintVT();
+
+  /* ---------- Micro : écoute seulement quand on appuie ---------- */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  function startMic() {
+    if (!SR) { toast('Micro non pris en charge : utilisez Chrome'); return; }
+    if (listening) { rec.stop(); return; }
+    stopSpeech(); rec = new SR(); rec.lang = mode === 'anglais' ? 'en-US' : 'fr-FR'; rec.interimResults = false;
+    rec.onstart = () => { listening = true; $('#wave').classList.add('on'); $('#voice-state').textContent = "J'écoute…"; $$('.mic-btn').forEach(b => b.classList.add('listening')); };
+    rec.onend = () => { listening = false; if (!speakCount) { $('#wave').classList.remove('on'); $('#voice-state').textContent = 'Prêt'; } $$('.mic-btn').forEach(b => b.classList.remove('listening')); resumeHands(); };
+    rec.onerror = e => { if (hands && /not-allowed|service-not-allowed/.test(e.error)) { hands = false; paintHands(); toast('Micro refusé'); } };
+    rec.onresult = e => { go('chat'); send(e.results[0][0].transcript, true); };
+    rec.start();
+  }
+
+  /* ---------- Horloge, système, raccourcis ---------- */
+  function clock() {
+    const d = new Date();
+    $('#h-time').textContent = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    $('#h-date').textContent = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+  clock(); setInterval(clock, 30000);
+  function sysInfo() {
+    $('#sys-cpu').textContent = navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' cœurs' : '—';
+    $('#sys-ram').textContent = navigator.deviceMemory ? '≈ ' + navigator.deviceMemory + ' Go' : '—';
+    $('#sys-net').textContent = navigator.onLine ? ((navigator.connection && navigator.connection.effectiveType) || 'en ligne').toUpperCase() : 'HORS LIGNE';
+    if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => { $('#sys-sto').textContent = (e.usage / 1e6).toFixed(1) + ' Mo / ' + (e.quota / 1e9).toFixed(1) + ' Go'; }).catch(() => {});
+  }
+  sysInfo(); addEventListener('online', sysInfo); addEventListener('offline', sysInfo);
+  if (navigator.getBattery) navigator.getBattery().then(b => { const u = () => { const t = Math.round(b.level * 100) + ' %' + (b.charging ? ' ⚡' : ''); $('#sys-bat').textContent = t; $('#sys-bat2').textContent = t; }; u(); b.onlevelchange = b.onchargingchange = u; }).catch(() => {});
+  let links = store.get('louis.links', [
+    { n: 'Gmail', u: 'https://mail.google.com', i: '✉' }, { n: 'YouTube', u: 'https://www.youtube.com', i: '▶' },
+    { n: 'GitHub', u: 'https://github.com', i: '⌘' }, { n: 'Drive', u: 'https://drive.google.com', i: '☁' }]);
+  const APPS = [
+    { n: 'Google', u: 'https://www.google.com', i: 'G', c: 'linear-gradient(135deg,#4285f4,#34a853)' },
+    { n: 'YouTube', u: 'https://www.youtube.com', i: '▶', c: '#ff0033' },
+    { n: 'Gmail', u: 'https://mail.google.com', i: '✉', c: 'linear-gradient(135deg,#ea4335,#fbbc04)' },
+    { n: 'Spotify', u: 'https://open.spotify.com', i: '♫', c: '#1db954' },
+    { n: 'Drive', u: 'https://drive.google.com', i: '△', c: 'linear-gradient(135deg,#fbbc04,#0f9d58,#4285f4)' },
+    { n: 'Traduction', u: 'https://translate.google.com', i: '文', c: 'linear-gradient(135deg,#4285f4,#1a73e8)' },
+    { n: 'Maps', u: 'https://maps.google.com', i: '⌖', c: 'linear-gradient(135deg,#34a853,#ea4335)' },
+    { n: 'Agenda', u: 'https://calendar.google.com', i: '▦', c: 'linear-gradient(135deg,#4285f4,#1967d2)' },
+    { n: 'GitHub', u: 'https://github.com', i: '⌘', c: '#2b3137' }];
+  const brand = l => {
+    const a = APPS.find(x => x.n.toLowerCase() === String(l.n).toLowerCase());
+    if (a) return { c: a.c, i: a.i };
+    let h = 0; for (const ch of String(l.n)) h = (h * 31 + ch.charCodeAt(0)) % 360;
+    return { c: `linear-gradient(135deg,hsl(${h},75%,52%),hsl(${(h + 40) % 360},70%,38%))`, i: l.i };
+  };
+  function renderApps() {
+    $('#apps-ext').innerHTML = APPS.map(a => `<a href="${a.u}" target="_blank" rel="noopener" class="tile text-center block !p-2"><div class="ico" style="background:${a.c}">${a.i}</div><div class="text-[11px] text-blue-50 truncate">${a.n}</div></a>`).join('');
+  }
+  let linkEdit = false;
+  function renderLinks() {
+    $('#links').innerHTML = links.map((l, i) => `<a href="${escH(l.u)}" target="_blank" rel="noopener" class="tile text-center relative block !p-2"><div class="ico" style="background:${brand(l).c}">${escH(brand(l).i)}</div><div class="text-[10px] text-zinc-300 truncate">${escH(l.n)}</div>${linkEdit ? `<span data-del="${i}" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[11px] leading-5">✕</span>` : ''}</a>`).join('') +
+      `<button id="lk-add" class="tile text-center !p-2"><div class="ico" style="background:rgba(56,140,255,.15);border:1px dashed rgba(96,165,250,.6);box-shadow:none;color:#93c5fd">＋</div><div class="text-[10px] text-zinc-400">Ajouter</div></button>`;
+  }
+  $('#links').addEventListener('click', e => {
+    const d = e.target.closest('[data-del]'); if (d) { e.preventDefault(); links.splice(+d.dataset.del, 1); store.set('louis.links', links); renderLinks(); return; }
+    if (e.target.closest('#lk-add')) {
+      const n = prompt('Nom du raccourci ?'); if (!n) return; let u = prompt('Adresse du site (ex. https://…) ?'); if (!u) return;
+      if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+      links.push({ n: n.trim().slice(0, 14), u, i: n.trim()[0].toUpperCase() }); store.set('louis.links', links); renderLinks();
+    }
+  });
+  $('#lk-edit').onclick = () => { linkEdit = !linkEdit; $('#lk-edit').textContent = linkEdit ? 'Terminer' : 'Modifier'; renderLinks(); };
+
+  /* ---------- Tâches (créées uniquement par vous) + rappels ---------- */
+  function renderTasks() {
+    $$('#task-filters [data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === tfilter));
+    const list = $('#task-list'); list.innerHTML = '';
+    const shown = tasks.filter(t => tfilter === 'all' || (tfilter === 'done' ? t.done : !t.done));
+    if (!shown.length) { list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Aucune tâche.</div>'; return; }
+    shown.forEach(t => {
+      const r = document.createElement('div'); r.className = 'hud !p-3 flex items-center gap-3';
+      r.innerHTML = '<button class="chk"></button><div class="flex-1 min-w-0"><div class="text-sm text-blue-50 break-words"></div><div class="text-[10px] text-zinc-400"></div></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      const chk = r.children[0]; chk.classList.toggle('done', t.done); chk.textContent = t.done ? '✓' : '';
+      r.children[1].children[0].textContent = t.text; if (t.done) r.children[1].children[0].style.textDecoration = 'line-through';
+      r.children[1].children[1].textContent = (t.done ? 'Terminée' : 'En cours') + (t.time ? ' · ' + t.time : '');
+      chk.onclick = () => { t.done = !t.done; store.set('louis.tasks', tasks); renderTasks(); };
+      r.children[2].onclick = () => { tasks = tasks.filter(x => x.id !== t.id); store.set('louis.tasks', tasks); renderTasks(); };
+      list.appendChild(r);
+    });
+  }
+  $('#task-form').addEventListener('submit', e => {
+    e.preventDefault(); const i = $('#task-input'), tm = $('#task-time'), text = i.value.trim(); if (!text) return;
+    if (tm.value && window.Notification && Notification.permission === 'default') Notification.requestPermission();
+    tasks.unshift({ id: Date.now(), text: text.slice(0, 200), time: tm.value, done: false }); store.set('louis.tasks', tasks); i.value = ''; tm.value = ''; renderTasks();
+  });
+  $('#task-filters').addEventListener('click', e => { const b = e.target.closest('[data-tf]'); if (b) { tfilter = b.dataset.tf; renderTasks(); } });
+  setInterval(() => {
+    const d = new Date(), hm = d.toTimeString().slice(0, 5), day = d.toDateString();
+    tasks.forEach(t => {
+      if (!t.done && t.time === hm && t.nd !== day) {
+        t.nd = day; store.set('louis.tasks', tasks); toast('⏰ ' + t.text); navigator.vibrate?.(300);
+        if (window.Notification && Notification.permission === 'granted') new Notification('Louis · Tâche', { body: t.text, icon: 'icon-192.png' });
+      }
+    });
+  }, 20000);
+
+  /* ---------- Notes ---------- */
+  function saveNote(title, content) { notes.unshift({ id: Date.now(), title, content, date: new Date().toLocaleDateString('fr-FR') }); store.set('jarvis.notes', notes); toast('Note enregistrée'); }
+  function renderNotes() {
+    $('#notes-title').textContent = `Carnet (${notes.length})`;
+    const list = $('#notes-list'); list.innerHTML = '';
+    if (!notes.length) { list.innerHTML = '<div class="text-center py-12 text-zinc-500 text-xs">Aucune note. Enregistrez une réponse depuis le chat.</div>'; return; }
+    notes.forEach(n => {
+      const d = document.createElement('div'); d.className = 'hud text-xs space-y-1';
+      d.innerHTML = '<div class="flex justify-between text-sky-300 font-bold"><span></span><span class="text-[10px] text-zinc-500 font-normal"></span></div><p class="text-zinc-300 text-[12px] whitespace-pre-wrap max-h-44 overflow-y-auto"></p><button class="text-[10px] text-zinc-500 hover:text-rose-400">Supprimer</button>';
+      d.children[0].children[0].textContent = n.title; d.children[0].children[1].textContent = n.date; d.children[1].textContent = n.content;
+      d.children[2].onclick = () => { notes = notes.filter(x => x.id !== n.id); store.set('jarvis.notes', notes); renderNotes(); };
+      list.appendChild(d);
+    });
+  }
+  $('#notes-clear').onclick = () => { if (notes.length && confirm('Effacer toutes les notes ?')) { notes = []; store.set('jarvis.notes', notes); renderNotes(); } };
+
+  /* ---------- Labo : Black-Scholes et Monte-Carlo ---------- */
+  const cdf = x => { const t = 1 / (1 + 0.2316419 * Math.abs(x)), d = 0.3989423 * Math.exp(-x * x / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x >= 0 ? 1 - p : p; };
+  const card = (l, v, c = 'text-sky-300') => `<div class="tile"><div class="lbl" style="font-size:9px">${l}</div><div class="text-sm font-bold ${c} mt-1">${v}</div></div>`;
+  $('#f-run').onclick = () => {
+    const S = parseFloat($('#f-S').value), K = parseFloat($('#f-K').value), T = parseFloat($('#f-T').value) / 365, v = parseFloat($('#f-v').value) / 100, r = (parseFloat($('#f-r').value) || 0) / 100;
+    const out = $('#f-out'), err = $('#f-err');
+    if (!(S > 0 && K > 0 && T > 0 && v > 0)) { err.classList.remove('hidden'); out.classList.add('hidden'); return; }
+    err.classList.add('hidden');
+    const sq = v * Math.sqrt(T), d1 = (Math.log(S / K) + (r + v * v / 2) * T) / sq, d2 = d1 - sq;
+    const call = S * cdf(d1) - K * Math.exp(-r * T) * cdf(d2), put = K * Math.exp(-r * T) * cdf(-d2) - S * cdf(-d1);
+    const gamma = Math.exp(-d1 * d1 / 2) / (S * sq * Math.sqrt(2 * Math.PI)), vega = S * Math.exp(-d1 * d1 / 2) / Math.sqrt(2 * Math.PI) * Math.sqrt(T) / 100;
+    out.innerHTML = card('Prix du call', call.toFixed(2), 'text-emerald-400') + card('Prix du put', put.toFixed(2), 'text-rose-400') + card('Delta du call', cdf(d1).toFixed(3)) + card('Gamma', gamma.toFixed(4)) + card('Vega (1 % de vol.)', vega.toFixed(3));
+    out.classList.remove('hidden');
+  };
+  const randn = () => { let u = 0; while (!u) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); };
+  const quant = (a, q) => a[Math.min(a.length - 1, Math.max(0, Math.floor(q * (a.length - 1))))];
+  $('#s-run').onclick = () => {
+    const g = id => parseFloat($(id).value);
+    const S0 = g('#s-S0'), K = g('#s-K'), mu = g('#s-mu') / 100, r = g('#s-r') / 100, sg = g('#s-sig') / 100, D = Math.round(g('#s-days')), N = Math.min(20000, Math.round(g('#s-n')));
+    const out = $('#s-out'), err = $('#s-err');
+    if (!(S0 > 0 && K > 0 && sg > 0 && D >= 1 && N >= 10)) { err.classList.remove('hidden'); out.classList.add('hidden'); return; }
+    err.classList.add('hidden');
+    const T = D / 252, sq = sg * Math.sqrt(T), ST = [], pay = [];
+    for (let i = 0; i < N; i++) { const z = randn(); ST.push(S0 * Math.exp((mu - sg * sg / 2) * T + sq * z)); pay.push(Math.exp(-r * T) * Math.max(S0 * Math.exp((r - sg * sg / 2) * T + sq * z) - K, 0)); }
+    const sorted = [...ST].sort((a, b) => a - b), mean = ST.reduce((a, b) => a + b, 0) / N;
+    const mc = pay.reduce((a, b) => a + b, 0) / N, se = Math.sqrt(pay.reduce((a, b) => a + (b - mc) ** 2, 0) / (N - 1)) / Math.sqrt(N);
+    const d1 = (Math.log(S0 / K) + (r + sg * sg / 2) * T) / sq, bs = S0 * cdf(d1) - K * Math.exp(-r * T) * cdf(d1 - sq);
+    const p5 = quant(sorted, .05), p95 = quant(sorted, .95), med = quant(sorted, .5), pUp = ST.filter(v => v > S0).length / N;
+    const steps = Math.min(D, 60), dt = T / steps, labels = [], paths = [];
+    for (let i = 0; i <= steps; i++) labels.push(Math.round(i * D / steps));
+    for (let p = 0; p < 25; p++) { let s = S0; const a = [s]; for (let i = 0; i < steps; i++) { s *= Math.exp((mu - sg * sg / 2) * dt + sg * Math.sqrt(dt) * randn()); a.push(+s.toFixed(2)); } paths.push({ data: a, color: '#38bdf8' }); }
+    paths.push({ name: 'Espérance', color: '#ffffff', data: labels.map((_, i) => +(S0 * Math.exp(mu * i * dt)).toFixed(2)) });
+    const lo = quant(sorted, .01), hi = quant(sorted, .99), nb = 16, w = (hi - lo) / nb || 1, cnt = new Array(nb).fill(0);
+    ST.forEach(v => { if (v >= lo && v <= hi) cnt[Math.min(nb - 1, Math.floor((v - lo) / w))]++; });
+    const f = v => v.toFixed(2);
+    out.innerHTML = chartSVG({ type: 'line', title: `Trajectoires simulées (25 sur ${N}) · ${D} jours`, labels, series: paths }) +
+      chartSVG({ type: 'bar', title: 'Distribution du prix final (% des simulations)', labels: cnt.map((_, i) => (lo + (i + .5) * w).toFixed(0)), series: [{ name: '% des simulations', data: cnt.map(c => +(c / N * 100).toFixed(1)) }] }) +
+      '<div class="grid grid-cols-2 gap-2">' + card('Prix final moyen', f(mean)) + card('Médiane', f(med)) + card('Percentile 5 %', f(p5), 'text-rose-400') + card('Percentile 95 %', f(p95), 'text-emerald-400') +
+      card('Perte max. à 95 % (VaR)', f(Math.max(0, S0 - p5)), 'text-rose-400') + card('Probabilité de hausse', (pUp * 100).toFixed(1) + ' %', 'text-emerald-400') + card('Call Monte-Carlo', f(mc) + ' ± ' + f(1.96 * se)) + card('Call Black-Scholes', f(bs)) + '</div>' +
+      '<button id="s-ask" class="chip w-full !rounded-xl !py-2.5">Faire analyser ces résultats par Louis</button>';
+    out.classList.remove('hidden');
+    $('#s-ask').onclick = () => { startFresh('maths'); go('chat'); send(`Analyse ces résultats de simulation Monte-Carlo (mouvement brownien géométrique) : S0=${S0}, K=${K}, rendement ${(mu * 100).toFixed(1)} %, taux ${(r * 100).toFixed(1)} %, volatilité ${(sg * 100).toFixed(1)} %, ${D} jours, ${N} simulations. Prix final moyen ${f(mean)}, médiane ${f(med)}, P5 ${f(p5)}, P95 ${f(p95)}, probabilité de hausse ${(pUp * 100).toFixed(1)} %, call Monte-Carlo ${f(mc)} (± ${f(1.96 * se)}) contre Black-Scholes ${f(bs)}. Commente la cohérence, les risques (queues épaisses) et les limites du modèle.`); };
+  };
+
+  /* ---------- Réglages ---------- */
+  const MODELS = [['gemini-2.5-flash', '2.5 Flash · rapide (recommandé)'], ['gemini-2.5-flash-lite', '2.5 Flash-Lite · très rapide'], ['gemini-2.5-pro', '2.5 Pro · plus profond, plus lent'], ['gemini-3-flash-preview', '3 Flash · aperçu']];
+  function fillVoices() {
+    const sel = $('#set-voice'), vs = hasTTS ? speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith('fr')) : [];
+    sel.innerHTML = '<option value="">Automatique (voix masculine)</option>' + vs.map(v => `<option value="${escH(v.voiceURI)}">${escH(v.name)} (${escH(v.lang)})</option>`).join('');
+    sel.value = settings.voice || '';
+  }
+  const show = (id, on) => $(id).classList.toggle('hidden', !on);
+  function openSettings() {
+    const ms = MODELS.slice(); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
+    $('#set-model').innerHTML = ms.map(m => `<option value="${escH(m[0])}">${escH(m[1])}</option>`).join(''); $('#set-model').value = settings.model;
+    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
+  }
+  $('#btn-settings').onclick = openSettings; $('#apps-settings').onclick = openSettings;
+  $('#set-cancel').onclick = () => show('#modal-settings', false);
+  $('#set-save').onclick = () => {
+    settings = Object.assign(settings, { greet: $('#set-greet').checked, name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
+    store.set('jarvis.settings', settings); $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || ''); show('#modal-settings', false); toast('Réglages enregistrés');
+  };
+  $('#set-test').onclick = () => {
+    if (!hasTTS) return; stopSpeech();
+    const u = new SpeechSynthesisUtterance('Bonjour, je suis Louis, votre assistant personnel.'); u.lang = 'fr-FR'; u.pitch = 0.8;
+    const v = voiceByURI($('#set-voice').value) || pickVoice('fr-FR'); if (v) u.voice = v; speechSynthesis.speak(u);
+  };
+  $('#btn-help').onclick = () => show('#modal-help', true);
+  $('#help-close').onclick = () => show('#modal-help', false);
+
+  /* ---------- Installation (PWA) ---------- */
+  let deferred = null;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('#btn-install').classList.remove('hidden'); });
+  $('#btn-install').onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btn-install').classList.add('hidden'); };
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+  /* ---------- Évolution : mémoire, retours, bilan ---------- */
+  function updateBadge() { const e = $('#imp-sub'); if (e) e.textContent = exch - bilanAt >= 10 ? 'Bilan conseillé' : 'Mémoire, règles'; }
+  function proposeMem(t) {
+    t = t.trim().slice(0, 200); if (!t || mem.some(m => m.t === t) || pendingMem.includes(t)) return;
+    pendingMem.push(t); showMem();
+  }
+  function showMem() {
+    const bar = $('#mem-bar'); if (!pendingMem.length) { bar.classList.add('hidden'); return; }
+    $('#mem-txt').textContent = 'Retenir : « ' + pendingMem[0] + ' » ?'; bar.classList.remove('hidden');
+  }
+  $('#mem-yes').onclick = () => { const t = pendingMem.shift(); if (t) { mem.unshift({ id: Date.now(), t }); store.set('louis.mem', mem); } showMem(); };
+  $('#mem-no').onclick = () => { pendingMem.shift(); showMem(); };
+  function rate(m, v) {
+    const i = messages.indexOf(m), u = messages[i - 1];
+    fb = fb.filter(x => x.id !== m.id);
+    if (m.fb === v) m.fb = 0; else { m.fb = v; fb.push({ id: m.id, v, q: u ? String(u.text).slice(0, 300) : '', a: String(m.text).slice(0, 500) }); }
+    fb = fb.slice(-40); store.set('louis.fb', fb); persist();
+    const w = $('#m-' + m.id); if (w) w.replaceWith(msgEl(m));
+    toast(m.fb === 1 ? 'Merci, noté' : m.fb === -1 ? 'Noté, je ferai mieux' : 'Retiré');
+  }
+  function regen(m) {
+    if (busy) return;
+    const i = messages.indexOf(m), u = messages[i - 1];
+    if (i !== messages.length - 1 || !u || u.sender !== 'user') { toast('Seule la dernière réponse peut être refaite'); return; }
+    messages.splice(i - 1, 2); renderChat();
+    atts = u.files && u.files.length ? [...u.files] : []; paintAtt();
+    send(u.raw !== undefined ? u.raw : u.text);
+  }
+  function listRows(el, arr, key, empty) {
+    el.innerHTML = '';
+    if (!arr.length) { el.innerHTML = `<div class="text-xs text-zinc-500">${empty}</div>`; return; }
+    arr.forEach(x => {
+      const r = document.createElement('div'); r.className = 'tile flex items-start gap-2 !p-2';
+      r.innerHTML = '<div class="flex-1 text-[12px] text-blue-100 break-words"></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      r.children[0].textContent = x.t;
+      r.children[1].onclick = () => { const k = arr.indexOf(x); arr.splice(k, 1); store.set(key, arr); renderImprove(); };
+      el.appendChild(r);
+    });
+  }
+  function renderImprove() {
+    const up = fb.filter(x => x.v === 1).length, down = fb.filter(x => x.v === -1).length;
+    $('#imp-stats').textContent = `👍 ${up} · 👎 ${down} · ${exch - bilanAt} échanges depuis le dernier bilan`;
+    listRows($('#mem-list'), mem, 'louis.mem', 'Rien en mémoire.');
+    listRows($('#rule-list'), rules, 'louis.rules', 'Aucune règle adoptée.');
+  }
+  $('#mem-form').addEventListener('submit', e => { e.preventDefault(); const i = $('#mem-input'), t = i.value.trim().slice(0, 200); if (!t) return; mem.unshift({ id: Date.now(), t }); store.set('louis.mem', mem); i.value = ''; renderImprove(); });
+  async function bilan() {
+    if (busy) return;
+    const out = $('#bilan-out'), btn = $('#bilan-run');
+    btn.disabled = true; out.innerHTML = '<div class="text-xs text-sky-300/80">Louis analyse…</div>';
+    const recent = messages.filter(m => m.text && !m.greet && !m.err).slice(-16).map(m => (m.sender === 'user' ? 'Utilisateur' : 'Louis') + ' : ' + String(m.text).slice(0, 300)).join('\n');
+    const fbs = fb.slice(-15).map(x => (x.v === 1 ? '👍' : '👎') + ' Q: ' + x.q + ' | R: ' + x.a.slice(0, 200)).join('\n');
+    const prompt = `Voici les derniers échanges et retours (👍/👎) entre un utilisateur et son assistant Louis.\n\nÉCHANGES :\n${recent || '(aucun)'}\n\nRETOURS :\n${fbs || '(aucun)'}\n\nRÈGLES DÉJÀ ADOPTÉES :\n${rules.map(r => r.t).join('\n') || '(aucune)'}\n\nPropose au plus 3 nouvelles règles de comportement courtes, concrètes et différentes des règles existantes, qui amélioreraient les réponses de Louis pour CET utilisateur, et au plus 3 capacités qui manquent à l'application. Réponds uniquement en JSON : {"regles":["..."],"manques":["..."]}. Si les données sont insuffisantes, renvoie des listes vides.`;
+    const res = await ask([{ role: 'user', parts: [{ text: prompt }] }], () => {}, "Tu analyses un assistant personnel pour l'améliorer. Tu réponds uniquement par du JSON valide, en français.");
+    btn.disabled = false;
+    if (res.error) { out.innerHTML = '<div class="text-xs text-rose-400">' + escH(res.text) + '</div>'; return; }
+    let j; try { j = JSON.parse(res.text.replace(/```(?:json)?/g, '').trim().match(/\{[\s\S]*\}/)[0]); } catch { out.innerHTML = '<div class="text-xs text-rose-400">Réponse illisible, réessayez.</div>'; return; }
+    bilanAt = exch; store.set('louis.bilanAt', bilanAt); updateBadge(); renderImprove();
+    lastRegles = (j.regles || []).map(String).slice(0, 3); const man = (j.manques || []).map(String).slice(0, 3);
+    out.innerHTML = (lastRegles.length ? '<div class="lbl">Règles proposées</div>' + lastRegles.map((r, i) => `<div class="tile flex items-start gap-2 !p-2"><div class="flex-1 text-[12px] text-blue-100">${escH(r)}</div><button data-adopt="${i}" class="chip on">Adopter</button></div>`).join('') : '<div class="text-xs text-zinc-400">Aucune règle à proposer pour l\'instant.</div>') +
+      (man.length ? '<div class="lbl mt-2">Ce qui manque</div>' + man.map(x => `<div class="text-[12px] text-zinc-300">• ${escH(x)}</div>`).join('') : '');
+  }
+  $('#bilan-run').onclick = bilan;
+  $('#bilan-out').addEventListener('click', e => {
+    const b = e.target.closest('[data-adopt]'); if (!b) return;
+    const t = lastRegles[+b.dataset.adopt]; if (t && !rules.some(r => r.t === t)) { rules.unshift({ id: Date.now(), t }); store.set('louis.rules', rules); }
+    b.textContent = 'Adoptée'; b.disabled = true; renderImprove();
+  });
+  $('#bk-export').onclick = () => {
+    const d = { v: 2, settings: Object.assign({}, settings, { key: '' }), notes, tasks, mem, rules, fb, links, convs: convs.map(strip) };
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' })); a.download = 'louis-sauvegarde.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+  $('#bk-import').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result); if (!confirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
+        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key }));
+        [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links], ['louis.convs', d.convs]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
+        if (Array.isArray(d.convs)) { dbReplace(d.convs).then(() => location.reload()); return; }
+        location.reload();
+      } catch { toast('Fichier invalide'); }
+    };
+    r.readAsText(f);
+  };
+
+  function resumeHands() { if (!hands) return; clearTimeout(hT); hT = setTimeout(() => { if (hands && !busy && !listening && !speakCount) startMic(); }, 700); }
+  function paintHands() { $$('.hands-btn').forEach(b => { b.classList.toggle('on', hands); b.textContent = hands ? '🎧 ON' : b.dataset.l; }); }
+  async function toggleHands() {
+    if (!hands && !SR) return toast('Micro non pris en charge : utilisez Chrome');
+    hands = !hands; paintHands();
+    if (hands) { go('chat'); try { wl = await navigator.wakeLock?.request('screen'); } catch {} toast('Mode conversation : parle'); if (!listening && !busy) startMic(); }
+    else { try { wl?.release(); } catch {} wl = null; if (rec && listening) rec.stop(); stopSpeech(); }
+  }
+  const paintWeb = () => { $('#web-btn').classList.toggle('on', web); $('#web-btn').title = web ? 'Recherche web activée' : 'Recherche web désactivée'; };
+  $('#web-btn').onclick = () => { web = !web; store.set('louis.web', web); paintWeb(); toast(web ? '🌐 Recherche web activée' : 'Recherche web désactivée'); };
+  async function renderLib() {
+    const box = $('#lib-list'), items = await lib.all();
+    box.innerHTML = items.length ? '' : '<div class="text-xs text-zinc-500">Aucun fichier. Ceux que vous joignez sont enregistrés ici.</div>';
+    items.forEach(f => {
+      const r = document.createElement('div'); r.className = 'tile flex items-center gap-2 !p-2';
+      r.innerHTML = '<div class="text-lg"></div><div class="flex-1 min-w-0"><div class="text-[13px] text-blue-50 truncate"></div><div class="text-[10px] text-zinc-400"></div></div><button class="chip on">Joindre</button><button class="text-zinc-500 hover:text-rose-400 text-sm" aria-label="Supprimer">✕</button>';
+      r.children[0].textContent = f.mime === 'application/pdf' ? '📄' : '🖼';
+      r.children[1].children[0].textContent = f.name;
+      r.children[1].children[1].textContent = Math.max(1, Math.round(f.data.length * .75 / 1024)) + ' Ko · ' + new Date(f.ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      r.children[2].onclick = () => { if (atts.length >= 5) return toast('5 fichiers maximum'); atts.push({ mime: f.mime, data: f.data, name: f.name }); paintAtt(); show('#modal-lib', false); go('chat', true); };
+      r.children[3].onclick = async () => { if (confirm('Supprimer ce fichier ?')) { await lib.del(f.id); renderLib(); } };
+      box.appendChild(r);
+    });
+  }
+  $('#lib-close').onclick = () => show('#modal-lib', false);
+  $('#lib-add').onchange = e => { [...e.target.files].forEach(f => readFile(f, true)); e.target.value = ''; };
+  addEventListener('load', () => { if (window.katex) renderChat(); });
+  paintWeb(); paintHands();
+  /* ---------- Tableau de bord performance ---------- */
+  const P = { bat: null, chg: false, cpu: 0, fps: 60, score: 0, h: 'OPTIMAL' };
+  const GL = [['bat', 'Batterie'], ['mem', 'Mémoire'], ['sto', 'Stockage'], ['cpu', 'Charge CPU'], ['fps', 'Fluidité'], ['net', 'Réseau']];
+  $('#gauges').innerHTML = GL.map(([k, l]) => `<div class="gauge"><svg viewBox="0 0 56 56" class="w-14 h-14"><circle cx="28" cy="28" r="22" fill="none" stroke="rgba(56,140,255,.18)" stroke-width="5"/><circle id="gc-${k}" cx="28" cy="28" r="22" fill="none" stroke="#22d3ee" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 138.2" transform="rotate(-90 28 28)"/><text id="gt-${k}" x="28" y="31" text-anchor="middle" fill="#e0f2fe" font-size="11" font-weight="700" style="font-family:ui-monospace,monospace">–</text></svg><div class="lbl" style="font-size:8px">${l}</div><div id="gs-${k}" class="text-[9px] text-zinc-400 truncate max-w-full">…</div></div>`).join('');
+  const setG = (k, p, txt, sub, good) => { p = Math.max(0, Math.min(100, p)); const c = good ? (p < 25 ? '#f43f5e' : p < 50 ? '#fbbf24' : '#22d3ee') : (p > 80 ? '#f43f5e' : p > 60 ? '#fbbf24' : '#22d3ee'); const e = $('#gc-' + k); e.setAttribute('stroke-dasharray', (p * 1.382).toFixed(1) + ' 138.2'); e.setAttribute('stroke', c); $('#gt-' + k).textContent = txt; $('#gs-' + k).textContent = sub; };
+  if (navigator.getBattery) navigator.getBattery().then(b => { const u = () => { P.bat = Math.round(b.level * 100); P.chg = b.charging; }; u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }).catch(() => {});
+  let best = 1e9, frames = 0, lastF = performance.now(), fpsRun = false;
+  const homeOn = () => document.visibilityState === 'visible' && $('#tab-hud').classList.contains('active');
+  function fpsLoop(t) { frames++; if (t - lastF >= 1000) { P.fps = Math.round(frames * 1000 / (t - lastF)); frames = 0; lastF = t; } if (homeOn()) requestAnimationFrame(fpsLoop); else fpsRun = false; }
+  function startFps() { if (fpsRun) return; fpsRun = true; frames = 0; lastF = performance.now(); requestAnimationFrame(fpsLoop); }
+  function perfTick() {
+    if (!homeOn()) return; startFps();
+    const t0 = performance.now(); let x = 0; for (let i = 0; i < 3e5; i++) x += Math.sqrt(i) * Math.sin(i);
+    const ms = Math.max(.05, performance.now() - t0 + (x > 1e30 ? 1 : 0)); best = Math.min(best, ms); P.cpu = Math.round(100 * (1 - best / ms));
+    const sc = [100 - P.cpu, Math.min(100, P.fps / 60 * 100)];
+    setG('cpu', P.cpu, P.cpu + '%', 'charge estimée', false);
+    setG('fps', P.fps / 60 * 100, P.fps, 'images / s', true);
+    if (P.bat != null) { setG('bat', P.bat, P.bat + '%', P.chg ? 'en charge ⚡' : 'sur batterie', true); sc.push(P.chg ? 100 : P.bat); } else setG('bat', 0, '—', 'indisponible', true);
+    const m = performance.memory;
+    if (m) { const p = Math.round(100 * m.usedJSHeapSize / m.jsHeapSizeLimit); setG('mem', p, p + '%', Math.round(m.usedJSHeapSize / 1048576) + ' Mo' + (navigator.deviceMemory ? ' · ≈' + navigator.deviceMemory + ' Go' : ''), false); sc.push(100 - p); }
+    else setG('mem', 0, navigator.deviceMemory ? navigator.deviceMemory + 'G' : '—', 'RAM appareil', false);
+    const c = navigator.connection;
+    if (!navigator.onLine) { setG('net', 0, 'OFF', 'hors ligne', true); sc.push(0); }
+    else { const rtt = c && c.rtt, p = rtt ? 100 - rtt / 4 : 85; setG('net', p, c && c.effectiveType ? c.effectiveType.toUpperCase() : 'OK', (c && c.downlink ? c.downlink + ' Mb/s' : 'en ligne') + (rtt ? ' · ' + rtt + ' ms' : ''), true); sc.push(Math.max(0, p)); }
+    if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => { const p = Math.round(100 * e.usage / e.quota); setG('sto', p, p + '%', (e.usage / 1e6).toFixed(0) + ' Mo', false); }).catch(() => {});
+    P.score = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length); P.h = P.score >= 75 ? 'OPTIMAL' : P.score >= 50 ? 'STABLE' : 'CHARGÉ';
+    $('#health').textContent = 'SYSTÈME ' + P.h + ' · ' + P.score; $('#health-bar').style.width = P.score + '%';
+  }
+  setInterval(perfTick, 1500); setTimeout(perfTick, 300);
+
+  /* ---------- Salutation vocale et rapport ---------- */
+  function perfSummary() { return 'Système ' + P.h.toLowerCase() + (P.bat != null ? ', batterie à ' + P.bat + ' pour cent' + (P.chg ? ', en charge' : '') : '') + ', charge processeur ' + P.cpu + ' pour cent.'; }
+  function briefText() {
+    const d = new Date(), h = d.getHours(), hm = d.toTimeString().slice(0, 5), hi = h < 5 || h >= 18 ? 'Bonsoir' : h < 12 ? 'Bonjour' : 'Bon après-midi';
+    let t = hi + ' Monsieur' + (settings.name ? ' ' + settings.name : '') + '. Louis est en ligne. ' + perfSummary();
+    const todo = tasks.filter(x => !x.done);
+    if (todo.length) { const nx = todo.filter(x => x.time && x.time >= hm).sort((a, b) => a.time.localeCompare(b.time))[0]; t += ' Vous avez ' + todo.length + ' tâche' + (todo.length > 1 ? 's' : '') + ' en cours' + (nx ? ', la prochaine à ' + nx.time.replace(':', ' heures ') + '.' : '.'); }
+    return t + ' Que puis-je faire pour vous ?';
+  }
+  function wake(speak) { const b = $('#boot'); if (!b || b.dataset.done) return; b.dataset.done = 1; if (speak && hasTTS) enqueueSpeech(briefText()); b.style.opacity = 0; b.style.pointerEvents = 'none'; setTimeout(() => b.remove(), 600); }
+  if (settings.greet === false) $('#boot').remove();
+  else { $('#boot-robot').innerHTML = robot(false); $('#boot-go').onclick = () => wake(true); $('#boot-mute').onclick = () => wake(false); }
+  $('#boot')?.addEventListener('click', e => { if (!e.target.closest('#boot-mute')) wake(true); });
+  if (settings.greet !== false && hasTTS) { try { const pr = new SpeechSynthesisUtterance('.'); pr.volume = 0; pr.onstart = () => wake(true); speechSynthesis.speak(pr); } catch {} }
+
+  /* ---------- Commandes rapides (sans passer par l'IA) ---------- */
+  function localCmd(t) {
+    if (t.startsWith('/')) return slash(t);
+    const q = t.toLowerCase().replace(/[.!?]+$/, '').trim(); let m;
+    if (/^(ouvre|affiche|montre|va)\b.*\bt[âa]ches?\b/.test(q)) { go('tasks'); return 'Voici vos tâches.'; }
+    if (/^(ouvre|affiche|montre|va)\b.*\b(accueil|tableau de bord)\b/.test(q)) { go('hud'); return "Voici l'accueil."; }
+    if (/^(ouvre|affiche|montre|va)\b.*\bfichiers?\b/.test(q)) { renderLib(); show('#modal-lib', true); return 'Voici vos fichiers.'; }
+    if (/^(nouvelle conversation|nouveau chat)$/.test(q)) { startFresh(); return 'Nouvelle conversation prête.'; }
+    if ((m = q.match(/^(?:ajoute|crée|cree|note)(?: une)? t[âa]che(?: pour| :|:)?\s+(.+)$/))) { tasks.unshift({ id: Date.now(), text: m[1].slice(0, 200), time: '', done: false }); store.set('louis.tasks', tasks); return 'Tâche ajoutée : ' + m[1] + '.'; }
+    if (/\b(désactive|desactive|coupe)\b.*\brecherche/.test(q)) { web = false; store.set('louis.web', false); paintWeb(); return 'Recherche web désactivée.'; }
+    if (/\b(active|allume)\b.*\brecherche/.test(q)) { web = true; store.set('louis.web', true); paintWeb(); return 'Recherche web activée.'; }
+    if (/(état|etat|santé|performance).*(système|systeme|appareil|téléphone)|comment va (le|mon) (système|systeme|appareil)/.test(q)) return perfSummary();
+    return null;
+  }
+  const CMDS = [['/new', 'Nouvelle conversation'], ['/clear', 'Vider cette conversation'], ['/export', 'Exporter en Markdown'], ['/pin', 'Épingler / désépingler'], ['/web', 'Recherche web on/off'], ['/voix', 'Voix on/off'], ['/mode ', 'Changer de mode (general, code, anglais, maths, devoirs)'], ['/dossier ', 'Ranger dans un dossier (ex. /dossier Anglais)'], ['/model ', 'Modèle : flash, lite ou pro'], ['/fichiers', 'Bibliothèque de fichiers'], ['/stats', 'Historique et stockage'], ['/aide', 'Liste des commandes']];
+  const tin = $('#chat-input'), coarse = matchMedia('(pointer:coarse)').matches;
+  function fit() { const mx = Math.round(innerHeight * (big ? .55 : .3)); tin.style.height = 'auto'; tin.style.height = (big ? mx : Math.min(tin.scrollHeight, mx)) + 'px'; }
+  function showSlash() {
+    const v = tin.value, box = $('#slash'), rows = v.startsWith('/') && !/\s/.test(v) ? CMDS.filter(c => c[0].startsWith(v.toLowerCase())) : [];
+    box.classList.toggle('hidden', !rows.length);
+    box.innerHTML = rows.map(c => `<button type="button" data-cmd="${c[0]}" class="block w-full text-left px-2 py-1.5 text-[12px] font-mono"><span class="text-cyan-300">${c[0].trim()}</span> <span class="text-zinc-400">${c[1]}</span></button>`).join('');
+  }
+  tin.addEventListener('input', () => { fit(); cur.draft = tin.value; clearTimeout(dT); dT = setTimeout(persist, 700); showSlash(); });
+  tin.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey && !coarse && !e.isComposing) { e.preventDefault(); $('#chat-form').requestSubmit(); return; }
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    const us = messages.filter(m => m.sender === 'user').map(m => m.raw ?? m.text);
+    if (e.key === 'ArrowUp' && us.length && (!tin.value || hIdx >= 0)) { e.preventDefault(); hIdx = Math.min(hIdx + 1, us.length - 1); tin.value = us[us.length - 1 - hIdx]; fit(); }
+    else if (e.key === 'ArrowDown' && hIdx >= 0) { e.preventDefault(); hIdx--; tin.value = hIdx >= 0 ? us[us.length - 1 - hIdx] : ''; fit(); }
+  });
+  $('#slash').addEventListener('click', e => { const b = e.target.closest('[data-cmd]'); if (!b) return; tin.value = b.dataset.cmd; $('#slash').classList.add('hidden'); fit(); tin.focus(); });
+  $('#tbar-exp').onclick = () => { big = !big; $('#tbar-exp').textContent = big ? '⤡' : '⤢'; fit(); tin.focus(); };
+  const kb = c => Math.max(1, Math.round(JSON.stringify(strip(c)).length / 1024));
+  function exportConv(c) {
+    const txt = `# ${c.title}\n\n` + c.messages.filter(m => !m.greet && m.text).map(m => `**${m.sender === 'user' ? 'Vous' : 'Louis'}** · ${m.ts || ''}\n\n${m.text}\n`).join('\n---\n\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/markdown' })); a.download = (c.title.replace(/[^\w-]+/g, '_').slice(0, 40) || 'conversation') + '.md'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  $('#conv-exp').onclick = () => exportConv(cur);
+  $('#conv-exp-all').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(convs.map(strip))], { type: 'application/json' })); a.download = 'louis-conversations.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+  function slash(t) {
+    const [c, ...r] = t.trim().split(/\s+/), arg = r.join(' ').toLowerCase();
+    switch (c.toLowerCase()) {
+      case '/new': startFresh(); return 'Nouvelle conversation prête.';
+      case '/clear': messages.splice(0, messages.length, greet()); return 'Conversation vidée.';
+      case '/export': exportConv(cur); return 'Conversation exportée en Markdown.';
+      case '/pin': cur.pin = !cur.pin; return cur.pin ? 'Conversation épinglée 📌' : 'Conversation désépinglée.';
+      case '/web': web = !web; store.set('louis.web', web); paintWeb(); return web ? 'Recherche web activée.' : 'Recherche web désactivée.';
+      case '/voix': toggleVoice(); return autoVoice ? 'Voix activée.' : 'Voix coupée.';
+      case '/dossier': { const n = r.join(' ').trim(); if (!n || n.toLowerCase() === 'aucun') { cur.folder = undefined; return 'Conversation sortie de son dossier.'; } let f = folders.find(x => x.name.toLowerCase() === n.toLowerCase()); if (!f) { f = { id: Date.now(), name: n.slice(0, 24), instr: '' }; folders.push(f); store.set('louis.folders', folders); } cur.folder = f.id; return 'Conversation rangée dans 📁 ' + f.name + '.'; }
+      case '/model': { const map = { flash: 'gemini-2.5-flash', lite: 'gemini-2.5-flash-lite', pro: 'gemini-2.5-pro' }; if (map[arg]) { settings.model = map[arg]; store.set('jarvis.settings', settings); return 'Modèle : ' + map[arg] + '.'; } return 'Modèle actuel : ' + settings.model + '. Choix : /model flash, lite ou pro.'; }
+      case '/fichiers': renderLib(); show('#modal-lib', true); return 'Voici vos fichiers.';
+      case '/mode': if (MODES[arg]) { setMode(arg); return 'Mode : ' + MODES[arg].n + '.'; } return 'Modes : ' + Object.keys(MODES).join(', ') + '.';
+      case '/stats': return `${convs.length} conversations · ${convs.reduce((n, x) => n + x.messages.length, 0)} messages · historique ≈ ${convs.reduce((n, x) => n + kb(x), 0)} Ko, enregistré sur l'appareil (IndexedDB), sans limite de longueur.`;
+      case '/aide': return 'Commandes :\n' + CMDS.map(x => '- ' + x[0].trim() + ' : ' + x[1]).join('\n');
+    }
+    return 'Commande inconnue. Tape /aide.';
+  }
+  const updateBar = () => { const n = messages.filter(m => m.sender === 'user').length; $('#tbar-txt').textContent = `${curFolder() ? '📁 ' + curFolder().name + ' · ' : ''}${MODES[mode].n} · web ${web ? 'activé' : 'coupé'} · ${n} msg`; };
+  setInterval(updateBar, 1500);
+  addEventListener('pagehide', () => { dbPut(strip(cur)); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+  const curFolder = () => folders.find(f => f.id === cur.folder);
+  function renderFolders() {
+    $('#fold-bar').innerHTML = [['all', 'Tous'], ...folders.map(f => [f.id, '📁 ' + f.name])].map(([id, n]) => `<button type="button" data-f="${id}" class="chip ${String(fsel) === String(id) ? 'on' : ''}">${escH(n)}</button>`).join('') + '<button type="button" data-f="+" class="chip">＋ Dossier</button>' + (fsel !== 'all' ? '<button type="button" data-f="edit" class="chip">✎ Instructions</button><button type="button" data-f="del" class="chip">🗑</button>' : '');
+  }
+  $('#fold-bar').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return; const id = b.dataset.f, cf = folders.find(x => x.id === fsel);
+    if (id === '+') { const n = prompt('Nom du dossier (ex. Anglais, Finance) ?'); if (n && n.trim()) { const nf = { id: Date.now(), name: n.trim().slice(0, 24), instr: '' }; folders.push(nf); fsel = nf.id; } }
+    else if (id === 'edit' && cf) { const t = prompt('Instructions de ce dossier (appliquées à toutes ses conversations) :', cf.instr || ''); if (t !== null) cf.instr = t.trim().slice(0, 1200); }
+    else if (id === 'del' && cf) { if (confirm('Supprimer ce dossier ? Les conversations sont conservées.')) { folders = folders.filter(x => x !== cf); convs.forEach(c => { if (c.folder === cf.id) { c.folder = undefined; dbPut(strip(c)); } }); fsel = 'all'; } }
+    else if (id === 'all') fsel = 'all'; else { const f = folders.find(x => String(x.id) === id); if (f) fsel = f.id; }
+    store.set('louis.folders', folders); renderConvs(); persist();
+  });
+  $('#chat-log').addEventListener('click', e => { const b = e.target.closest('[data-sug]'); if (b) send(b.dataset.sug); });
+  function editMsg(m) {
+    if (busy) return; const i = messages.indexOf(m); if (i < 1) return;
+    const t = m.raw ?? m.text; atts = m.files && m.files.length ? [...m.files] : []; paintAtt();
+    messages.splice(i); renderChat(); cur.draft = t; $('#chat-input').value = t; fit(); $('#chat-input').focus(); persist();
+  }
+  const THEMES = [['Cyan', 0], ['Vert', -60], ['Violet', 90], ['Rose', 150], ['Ambre', 220]];
+  function paintTheme() {
+    const d = settings.theme || 0; document.documentElement.style.filter = d ? `hue-rotate(${d}deg)` : '';
+    const row = $('#theme-row'); row.style.filter = `hue-rotate(${-d}deg)`;
+    row.innerHTML = THEMES.map(([n, v]) => `<button type="button" data-th="${v}" aria-label="${n}" class="w-8 h-8 rounded-full" style="background:hsl(${190 + v},85%,55%);border:2px solid ${d === v ? '#fff' : 'transparent'}"></button>`).join('');
+  }
+  $('#theme-row').addEventListener('click', e => { const b = e.target.closest('[data-th]'); if (!b) return; settings.theme = +b.dataset.th; store.set('jarvis.settings', settings); paintTheme(); });
+  paintTheme();
+  $('#set-keytest').onclick = async () => {
+    const k = $('#set-key').value.trim(); if (!k) return alert("Colle d'abord ta clé.");
+    try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${$('#set-model').value}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': k }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) }); const d = await r.json().catch(() => ({})); alert(r.ok ? '✅ Clé valide, le modèle répond.' : '❌ ' + String(d?.error?.message || r.status).slice(0, 120)); } catch { alert('❌ Connexion impossible.'); }
+  };
+  { const lg = $('#chat-log'), tb = $('#to-bottom');
+    const place = () => { const far = lg.scrollHeight - lg.scrollTop - lg.clientHeight > 160; tb.classList.toggle('hidden', !far); if (far) tb.style.top = (lg.getBoundingClientRect().bottom - $('#tab-chat').getBoundingClientRect().top - 46) + 'px'; };
+    lg.addEventListener('scroll', place); tb.onclick = () => lg.scrollTo({ top: lg.scrollHeight, behavior: 'smooth' }); }
+  addEventListener('offline', () => toast('Hors ligne')); addEventListener('online', () => toast('Connexion rétablie'));
+  async function autoTitle(c, q, ans) {
+    c.titleAI = true;
+    const r = await ask([{ role: 'user', parts: [{ text: 'Donne un titre de 3 à 5 mots, sans guillemets ni point final, pour cette conversation.\nQuestion : ' + q.slice(0, 300) + '\nRéponse : ' + ans.slice(0, 300) }] }], () => {}, 'Tu réponds uniquement par le titre demandé, en français.');
+    if (r.error) return;
+    const t = r.text.replace(/["«»*#\n]/g, ' ').replace(/\s+/g, ' ').trim().replace(/[.!?:]$/, '').slice(0, 48);
+    if (t.length > 2) { c.title = t; dbPut(strip(c)); persist(); }
+  }
+  renderModes(); renderChat(); renderLinks(); renderApps(); renderTasks(); updateBadge(); updateBar();
+  dbAll().then(list => {
+    if (!list.length) { convs.forEach(c => dbPut(strip(c))); return; }
+    if (busy) return;
+    list.sort((a, b) => b.ts - a.ts); convs = list;
+    cur = convs.find(c => c.id === curId) || convs[0]; messages = cur.messages; mode = MODES[cur.mode] ? cur.mode : mode;
+    renderModes(); renderChat();
+  });
+})();
+</script>
+</body>
+</html>
