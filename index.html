@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Louis // Core · Assistant IA</title>
 <meta name="theme-color" content="#030610">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -76,11 +78,62 @@
   .orb.listening { animation: micp 1.3s ease-out infinite; }
   @keyframes micp { 0% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 0 rgba(96,165,250,.7); } 100% { box-shadow: 0 0 26px rgba(59,130,246,.85), 0 0 0 22px rgba(96,165,250,0); } }
   .orb-sm { width: 54px; height: 54px; font-size: 22px; margin-top: -22px; border-width: 2px; }
-  #tab-chat *, .still * { animation: none !important; transition: none !important; }
+  #tab-chat *:not(.live *), .still:not(.speaking) * { animation: none !important; transition: none !important; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
   ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { background: rgba(56,140,255,.3); border-radius: 3px; }
   .chk { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #60a5fa; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #04101f; }
   .chk.done { background: #22d3ee; border-color: #22d3ee; }
+  .bub-ai a { color: #7dd3fc; text-decoration: underline; }
+  .bub-ai em { color: #e0f2fe; }
+  .katex-display { overflow-x: auto; overflow-y: hidden; }
+  .bub-ai .katex { font-size: 1.05em; }
+  .hud { border-radius: 6px 20px 6px 20px; }
+  .hud::before, .hud::after { content: ""; position: absolute; width: 12px; height: 12px; pointer-events: none; opacity: .85; }
+  .hud::before { top: 5px; left: 5px; border-top: 2px solid #22d3ee; border-left: 2px solid #22d3ee; }
+  .hud::after { bottom: 5px; right: 5px; border-bottom: 2px solid #a78bfa; border-right: 2px solid #a78bfa; }
+  .tile { border-radius: 10px 3px 10px 3px; }
+  .cut { clip-path: polygon(0 12px, 12px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 12px)); border-radius: 0 !important; }
+  .cut::before, .cut::after { display: none; }
+  body::after { content: ""; position: fixed; left: 0; right: 0; top: -140px; height: 140px; pointer-events: none; background: linear-gradient(transparent, rgba(34,211,238,.06), transparent); animation: sweep 8s linear infinite; }
+  @keyframes sweep { to { transform: translateY(calc(100vh + 280px)); } }
+  .ring { transform-origin: 150px 180px; animation: spin 26s linear infinite; }
+  .ring.r2 { animation-duration: 38s; animation-direction: reverse; }
+  .ring.r3 { animation-duration: 9s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .gauge { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: rgba(2,8,20,.55); border: 1px solid rgba(56,140,255,.22); border-radius: 10px 3px 10px 3px; }
+  .gauge circle:nth-child(2) { transition: stroke-dasharray .8s, stroke .8s; filter: drop-shadow(0 0 3px #22d3ee); }
+  .bl { opacity: 0; animation: fadein .5s forwards; }
+  @keyframes fadein { to { opacity: 1; } }
+  #chat-log { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .bub { max-width: 100%; border-radius: 3px; font-size: 13px; padding: 8px 12px; }
+  .bub-user { background: rgba(34,211,238,.07); border: 0; border-left: 2px solid #22d3ee; color: #cffafe; }
+  .bub-user::before { content: "❯ "; color: #22d3ee; font-weight: 700; }
+  .bub-ai { background: transparent; border: 0; border-left: 2px solid rgba(96,165,250,.35); }
+  .bub-ai::before { content: "◆ LOUIS"; display: block; font-size: 9px; letter-spacing: .18em; color: #38bdf8; margin-bottom: 4px; }
+  .bub.streaming::after { content: "▍"; color: #22d3ee; animation: blinkdot 1s steps(2) infinite; }
+  #chat-input { resize: none; line-height: 1.5; font-family: ui-monospace, Menlo, Consolas, monospace; max-height: 60vh; }
+  @media (pointer: coarse) { #chat-input { font-size: 16px; } }
+  #chat-log { font-family: inherit; }
+  .bub { font-size: 14.5px; line-height: 1.6; }
+  .bub-user { align-self: flex-end; max-width: 86%; background: linear-gradient(135deg, rgba(37,99,235,.92), rgba(8,145,178,.88)); border: 0; border-radius: 20px 20px 5px 20px; color: #fff; padding: 10px 14px; box-shadow: 0 4px 18px rgba(37,99,235,.25); }
+  .bub-user::before, .bub-ai::before { content: none; }
+  .bub-ai { max-width: 100%; background: transparent; border: 0; border-radius: 0; padding: 2px 0; }
+  .dots i { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: #38bdf8; animation: blinkdot 1s ease-in-out infinite; }
+  .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+  .composer { background: rgba(10,18,36,.85); border: 1px solid rgba(96,165,250,.28); border-radius: 26px; padding: 10px 12px 8px; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 8px 30px rgba(0,0,0,.45); transition: border-color .2s, box-shadow .2s; }
+  .composer:focus-within { border-color: rgba(34,211,238,.6); box-shadow: 0 0 24px rgba(34,211,238,.18), 0 8px 30px rgba(0,0,0,.45); }
+  #chat-input { display: block; width: 100%; background: transparent; outline: none; border: 0; padding: 2px 6px 8px; font-family: inherit; font-size: 15px; line-height: 1.5; color: #e2e8f0; resize: none; max-height: 60vh; }
+  #chat-input::placeholder { color: #64748b; }
+  @media (pointer: coarse) { #chat-input { font-size: 16px; } }
+  .cbtn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9db8e0; font-size: 16px; flex-shrink: 0; }
+  .cbtn:hover, .cbtn.on { background: rgba(34,211,238,.16); color: #67e8f9; }
+  .send { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #06b6d4); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 16px rgba(34,211,238,.45); }
+  .send .i-stop { display: none; } .send[data-s=stop] .i-send { display: none; } .send[data-s=stop] .i-stop { display: block; }
+  .live.speaking { box-shadow: 0 0 20px rgba(34,211,238,.65); }
+  .mouth { opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .speaking .smile { animation: none; opacity: 0; }
+  .speaking .mouth { opacity: 1; animation: talk2 .7s linear infinite; }
+  @keyframes talk2 { 0% { transform: scaleY(.25); } 20% { transform: scaleY(1.4); } 40% { transform: scaleY(.6); } 60% { transform: scaleY(1.7); } 80% { transform: scaleY(.4); } 100% { transform: scaleY(1.2); } }
 </style>
 </head>
 <body>
@@ -114,23 +167,34 @@
     <!-- ACCUEIL -->
     <section id="tab-hud" class="tab active">
       <div class="max-w-xl mx-auto space-y-3">
-        <div class="text-center">
-          <div class="lbl">Votre assistant IA</div>
-        </div>
-        <div class="grid grid-cols-[1fr_auto] gap-3 items-center">
-          <div class="hud !p-3">
-            <div class="text-sm font-bold text-blue-50" id="home-hello">Bonjour Monsieur</div>
-            <div class="text-[12px] text-zinc-300 mt-1">Je suis LOUIS. Que puis-je faire pour vous ?</div>
+        <div class="hud cut flex items-center justify-between !p-3">
+          <div>
+            <div class="lbl">Louis // Core · en ligne</div>
+            <div class="text-sm font-bold text-blue-50 mt-1" id="home-hello">Bonjour Monsieur</div>
+            <div class="text-[11px] text-zinc-400">Que puis-je faire pour vous ?</div>
           </div>
-          <div class="space-y-2 w-28">
-            <div class="tile !p-2"><div id="h-time" class="text-sm font-bold text-blue-50">--:--</div><div id="h-date" class="text-[10px] text-zinc-400">—</div></div>
-            <div class="tile !p-2"><div id="sys-bat" class="text-sm font-bold text-blue-50">—</div><div class="text-[10px] text-zinc-400">Batterie</div></div>
+          <div class="text-right">
+            <div id="h-time" class="text-2xl font-bold text-cyan-200" style="font-family:ui-monospace,monospace;text-shadow:0 0 14px rgba(34,211,238,.7)">--:--</div>
+            <div id="h-date" class="text-[10px] text-zinc-400">—</div>
+            <div class="text-[10px] text-zinc-400">🔋 <span id="sys-bat">—</span></div>
           </div>
         </div>
 
-        <div class="stage" style="width:min(78vw,320px)">
-          <div id="robot-big"></div>
+        <div class="stage" style="width:min(80vw,330px)">
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 300 340" aria-hidden="true">
+            <g class="ring"><circle cx="150" cy="180" r="146" fill="none" stroke="#22d3ee" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="3 9"/></g>
+            <g class="ring r2"><circle cx="150" cy="180" r="130" fill="none" stroke="#a78bfa" stroke-opacity=".6" stroke-width="2" stroke-dasharray="60 40 14 40"/></g>
+            <g class="ring r3"><path d="M150 34A146 146 0 0 1 296 180" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity=".85"/></g>
+          </svg>
+          <div id="robot-big" class="relative"></div>
         </div>
+
+        <div class="hud cut !p-3">
+          <div class="flex items-center justify-between mb-2"><div class="lbl">Performance de l'appareil</div><div id="health" class="lbl" style="color:#67e8f9">…</div></div>
+          <div class="h-1.5 rounded bg-white/10 overflow-hidden mb-3"><div id="health-bar" class="h-full" style="width:0;background:linear-gradient(90deg,#22d3ee,#a78bfa);box-shadow:0 0 10px #22d3ee;transition:width .8s"></div></div>
+          <div id="gauges" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
 
         <div class="grid grid-cols-3 gap-2 text-center">
           <button class="mic-btn tile !text-center !p-2"><div class="text-lg"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></div><div class="text-[11px] text-blue-100">Mode vocal</div></button>
@@ -142,7 +206,7 @@
           <button class="mic-btn orb" aria-label="Parler à Louis"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
           <div id="wave" class="wave w-full mt-1"></div>
           <div id="voice-state" class="text-xs text-blue-200/80">Prêt</div>
-          <button data-vt class="chip mt-2">Voix OFF</button>
+          <div class="flex gap-2 mt-2"><button data-vt class="chip">Voix OFF</button><button class="chip hands-btn" data-l="🎧 Conversation">🎧 Conversation</button></div>
         </div>
 
         <div class="grid grid-cols-3 gap-2">
@@ -162,20 +226,25 @@
     <section id="tab-chat" class="tab" style="overflow:hidden">
       <div class="max-w-3xl mx-auto h-full flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2"><div id="avatar-chat" class="w-8 h-8 rounded-lg border border-blue-400/40 bg-black overflow-hidden"></div><div><div class="text-sm font-bold text-blue-50">Chat</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
-          <div class="flex gap-2"><button id="conv-open" class="chip">🗂 Conversations</button><button id="new-chat" class="chip">＋ Nouvelle</button></div>
+          <div class="flex items-center gap-2"><div id="avatar-chat" class="live w-12 h-12 rounded-2xl border border-blue-400/40 bg-black overflow-hidden transition-shadow"></div><div><div class="text-sm font-bold text-blue-50">Chat</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
+          <div class="flex gap-2"><button id="web-btn" class="chip" aria-label="Recherche web">🌐</button><button class="chip hands-btn" data-l="🎧" aria-label="Mode conversation">🎧</button><button id="conv-open" class="chip" aria-label="Conversations">🗂</button><button id="new-chat" class="chip">＋ Nouvelle</button></div>
         </div>
         <div id="modes" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
         <div id="chips" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
         <div id="chat-log" class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1" style="overscroll-behavior:contain"></div>
         <div id="mem-bar" class="hud hidden !p-2 text-xs flex items-center gap-2 shrink-0"><span id="mem-txt" class="flex-1 text-blue-100"></span><button id="mem-yes" type="button" class="chip on">Retenir</button><button id="mem-no" type="button" class="chip">Non</button></div>
         <div id="att-bar" class="hidden flex gap-2 overflow-x-auto shrink-0"></div>
-        <form id="chat-form" class="hud flex items-center gap-2 !p-2 shrink-0" style="margin-bottom:2px">
-          <button type="button" data-vt class="chip">🔇</button>
-          <button type="button" id="att-btn" class="chip" aria-label="Joindre une image ou un PDF">📎</button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
-          <button type="button" class="mic-btn chip"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
-          <input id="chat-input" type="text" autocomplete="off" enterkeyhint="send" placeholder="Écris ton message…" class="flex-1 min-w-0 bg-transparent text-sm px-1 py-2 outline-none placeholder-zinc-500">
-          <button id="chat-send" type="submit" class="btn-neon px-4 py-2 text-sm">Envoyer</button>
+        <div id="slash" class="hidden shrink-0 max-h-40 overflow-y-auto rounded-2xl border border-blue-400/30 bg-black/85"></div>
+        <form id="chat-form" class="composer shrink-0">
+          <textarea id="chat-input" rows="2" autocomplete="off" enterkeyhint="enter" placeholder="Écris à Louis…"></textarea>
+          <div class="flex items-center gap-1">
+            <button type="button" id="att-btn" class="cbtn" aria-label="Joindre une image ou un PDF">📎</button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
+            <button type="button" class="mic-btn cbtn" aria-label="Parler"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
+            <button type="button" data-vt class="cbtn" aria-label="Voix">🔇</button>
+            <span id="tbar-txt" class="flex-1 min-w-0 truncate text-right px-2 text-[10px] text-zinc-500"></span>
+            <button type="button" id="tbar-exp" class="cbtn" aria-label="Agrandir la zone de saisie">⤢</button>
+            <button id="chat-send" type="submit" class="send" aria-label="Envoyer"><svg class="i-send" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><svg class="i-stop" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></button>
+          </div>
         </form>
       </div>
     </section>
@@ -312,6 +381,8 @@
   <div class="hud w-full max-w-sm max-h-[90vh] overflow-y-auto space-y-3" style="background:#050a16">
     <div class="lbl">Réglages</div>
     <label class="lbl block" style="font-size:9px">Votre prénom<input id="set-name" type="text" class="fld"></label>
+    <div class="lbl" style="font-size:9px">Thème de couleur</div><div id="theme-row" class="flex gap-3"></div>
+    <label class="flex items-center gap-2 text-[12px] text-blue-100"><input id="set-greet" type="checkbox" class="accent-cyan-400"> Salutation vocale au démarrage</label>
     <label class="lbl block" style="font-size:9px">Clé API Gemini<input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="fld"></label>
     <label class="lbl block" style="font-size:9px">Modèle<select id="set-model" class="fld"></select></label>
     <label class="lbl block" style="font-size:9px">Voix de Louis<select id="set-voice" class="fld"></select></label>
@@ -326,8 +397,20 @@
 <div id="modal-convs" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
   <div class="hud w-full max-w-sm max-h-[85vh] flex flex-col gap-2" style="background:#050a16">
     <div class="flex items-center justify-between"><div class="lbl">Conversations</div><button id="conv-close" class="chip on">Fermer</button></div>
+    <div id="fold-bar" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
     <input id="conv-q" type="search" placeholder="Rechercher…" class="fld !mt-0">
     <div id="conv-list" class="space-y-2 overflow-y-auto"></div>
+    <div class="flex gap-2"><button id="conv-exp" class="chip flex-1">⬇ Cette conversation</button><button id="conv-exp-all" class="chip flex-1">⬇ Tout (JSON)</button></div>
+  </div>
+</div>
+
+<!-- Bibliothèque -->
+<div id="modal-lib" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+  <div class="hud w-full max-w-sm max-h-[85vh] flex flex-col gap-2" style="background:#050a16">
+    <div class="flex items-center justify-between"><div class="lbl">Mes fichiers</div><button id="lib-close" class="chip on">Fermer</button></div>
+    <p class="text-[11px] text-zinc-400">Enregistrés sur cet appareil. Touchez « Joindre » pour les renvoyer à Louis.</p>
+    <div id="lib-list" class="space-y-2 overflow-y-auto"></div>
+    <label class="chip text-center cursor-pointer">＋ Ajouter à la bibliothèque<input id="lib-add" type="file" accept="image/*,application/pdf" multiple class="hidden"></label>
   </div>
 </div>
 
@@ -341,6 +424,19 @@
     <p><b class="text-blue-300">Images et PDF</b><br>Touchez 📎 dans le chat (jusqu'à 5 fichiers), ou collez une image dans la zone de texte.</p>
     <button id="help-close" class="btn-neon w-full py-2.5 text-sm mt-2">Compris</button>
   </div>
+</div>
+
+<!-- Démarrage -->
+<div id="boot" class="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-4 p-6 text-center transition-opacity duration-500" style="background:radial-gradient(60% 45% at 50% 40%,rgba(37,99,235,.35),#02040a 70%)">
+  <div id="boot-robot" style="width:min(60vw,220px)"></div>
+  <div class="lbl" style="font-size:12px;letter-spacing:.3em">LOUIS // CORE</div>
+  <div class="text-[11px] text-cyan-200/80 space-y-1" style="font-family:ui-monospace,monospace">
+    <div class="bl" style="animation-delay:.2s">› noyau ............ OK</div>
+    <div class="bl" style="animation-delay:.7s">› voix ............. OK</div>
+    <div class="bl" style="animation-delay:1.2s">› capteurs ......... OK</div>
+  </div>
+  <button id="boot-go" class="btn-neon px-8 py-3 text-sm">▶ Réveiller Louis</button>
+  <button id="boot-mute" class="text-[11px] text-zinc-500">Entrer sans voix</button>
 </div>
 
 <!-- Aperçu de code -->
@@ -372,6 +468,9 @@
   let mem = store.get('louis.mem', []), rules = store.get('louis.rules', []), fb = store.get('louis.fb', []), pendingMem = [], lastRegles = [];
   let tasks = store.get('louis.tasks', []);
   let tfilter = 'all';
+  let big = false, hIdx = -1, pT = 0, dT = 0;
+  let folders = store.get('louis.folders', []), fsel = 'all';
+  let web = store.get('louis.web', true), hands = false, wl = null, hT = 0;
   let convs = store.get('louis.convs', []), curId = store.get('louis.cur', 0), messages = [], cur;
   if (!convs.length) { const old = store.get('louis.chat2', []); if (old.length > 1) convs.push({ id: Date.now(), title: 'Ancienne conversation', ts: Date.now(), mode: 'general', messages: old }); }
   let mode = store.get('louis.mode', 'general');
@@ -379,10 +478,16 @@
   let busy = false, abortCtl = null;
   let exch = store.get('louis.exch', 0), bilanAt = store.get('louis.bilanAt', 0);
   const greet = () => ({ id: 1, sender: 'jarvis', ts: now(), text: 'Bonjour Monsieur', greet: true });
-  const newConv = () => { const c = { id: Date.now(), title: 'Nouvelle conversation', ts: Date.now(), mode, messages: [greet()] }; convs.unshift(c); return c; };
+  const newConv = () => { const c = { id: Date.now(), title: 'Nouvelle conversation', ts: Date.now(), mode, folder: fsel === 'all' ? undefined : fsel, messages: [greet()] }; convs.unshift(c); return c; };
   cur = convs.find(c => c.id === curId) || convs[0] || newConv(); messages = cur.messages; mode = cur.mode || mode;
-  const strip = c => ({ ...c, messages: c.messages.filter(m => !m.pending).slice(-200).map(({ files, ...m }) => m) });
-  const persist = () => { cur.messages = messages; cur.ts = Date.now(); store.set('louis.cur', cur.id); store.set('louis.convs', convs.slice(0, 50).map(strip)); };
+  const strip = c => ({ ...c, messages: c.messages.filter(m => !m.pending).map(({ files, ...m }) => m) });
+  const ldb = () => new Promise((res, rej) => { const r = indexedDB.open('louis-db', 1); r.onupgradeneeded = () => r.result.createObjectStore('c', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const dbTx = async (md, fn) => { try { const d = await ldb(); return await new Promise(res => { const t = d.transaction('c', md), o = fn(t.objectStore('c')); t.oncomplete = () => res(o && o.result !== undefined ? o.result : true); t.onerror = () => res(null); }); } catch { return null; } };
+  const dbAll = async () => (await dbTx('readonly', s => s.getAll())) || [];
+  const dbPut = c => dbTx('readwrite', s => s.put(c));
+  const dbDel = id => dbTx('readwrite', s => s.delete(id));
+  const dbReplace = async list => { await dbTx('readwrite', s => s.clear()); for (const c of list) await dbPut(c); };
+  const persist = () => { cur.messages = messages; cur.ts = Date.now(); store.set('louis.cur', cur.id); store.set('louis.convs', convs.slice(0, 15).map(c => { const x = strip(c); return { ...x, messages: x.messages.slice(-40) }; })); clearTimeout(pT); pT = setTimeout(() => dbPut(strip(cur)), 300); };
   const hello = () => `Bonjour Monsieur ${settings.name || ''}, que puis-je faire pour vous ?`;
   $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || '');
 
@@ -407,6 +512,7 @@
     <g class="hap" fill="none" stroke="#cffafe" stroke-width="5" stroke-linecap="round"><path d="M110 122Q124 106 138 122"/><path d="M162 122Q176 106 190 122"/></g>
     <ellipse cx="102" cy="164" rx="11" ry="6" fill="#22d3ee" opacity=".16"/><ellipse cx="198" cy="164" rx="11" ry="6" fill="#22d3ee" opacity=".16"/>
     <path class="smile" d="M120 165Q150 190 180 165" fill="none" stroke="#22d3ee" stroke-width="4.5" stroke-linecap="round"/>
+    <ellipse class="mouth" cx="150" cy="172" rx="15" ry="7" fill="#031418" stroke="#22d3ee" stroke-width="2.5"/>
   </svg>`;
   $('#robot-big').innerHTML = robot(true);
   $('#avatar-sm').innerHTML = robot(false);
@@ -422,6 +528,7 @@
     if (tab === 'notes') renderNotes();
     if (tab === 'tasks') renderTasks();
     if (tab === 'sys') sysInfo();
+    if (tab === 'hud') startFps();
     if (tab === 'improve') renderImprove();
     if (tab === 'chat') { const log = $('#chat-log'); log.scrollTop = log.scrollHeight; if (focus) setTimeout(() => $('#chat-input').focus(), 50); }
   }
@@ -429,6 +536,7 @@
     const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go, g.hasAttribute('data-focus'));
     const m = e.target.closest('[data-mode]'); if (m) { startFresh(m.dataset.mode); go('chat', true); }
     const v = e.target.closest('[data-vt]'); if (v) toggleVoice();
+    if (e.target.closest('.hands-btn')) toggleHands();
     const mic = e.target.closest('.mic-btn'); if (mic) startMic();
   });
 
@@ -459,17 +567,19 @@
       ['🧠 Explique simplement', 'Explique-moi simplement : ', false],
       ['📝 Préparer un contrôle', 'Prépare-moi à un contrôle sur : ', false]] }
   };
-  function setMode(k) { mode = MODES[k] ? k : 'general'; if (cur) cur.mode = mode; store.set('louis.mode', mode); renderModes(); }
+  function setMode(k) { mode = MODES[k] ? k : 'general'; if (cur) cur.mode = mode; store.set('louis.mode', mode); renderModes(); if (messages.length === 1 && messages[0].greet) renderChat(); }
   function renderModes() {
     $('#modes').innerHTML = Object.entries(MODES).map(([k, m]) => `<button class="chip ${k === mode ? 'on' : ''}" data-setmode="${k}">${m.e} ${m.n}</button>`).join('');
     $('#chips').innerHTML = MODES[mode].chips.map((c, i) => `<button class="chip" data-chip="${i}" style="background:rgba(255,255,255,.04);color:#cbd5e1">${c[0]}</button>`).join('');
+    $('#chips').insertAdjacentHTML('beforeend', '<button class="chip" data-lib style="background:rgba(255,255,255,.04);color:#cbd5e1">📚 Mes fichiers</button>');
     $('#mode-name').textContent = 'Mode · ' + MODES[mode].n;
   }
   $('#modes').addEventListener('click', e => { const b = e.target.closest('[data-setmode]'); if (b) setMode(b.dataset.setmode); });
   $('#chips').addEventListener('click', e => {
+    if (e.target.closest('[data-lib]')) { renderLib(); show('#modal-lib', true); return; }
     const b = e.target.closest('[data-chip]'); if (!b) return;
     const c = MODES[mode].chips[+b.dataset.chip];
-    if (c[2]) send(c[1]); else { const i = $('#chat-input'); i.value = c[1]; i.focus(); }
+    if (c[2]) send(c[1]); else { const i = $('#chat-input'); i.value = c[1]; i.focus(); fit(); }
   });
 
   /* ---------- Intelligence ---------- */
@@ -496,23 +606,28 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     const memo = mem.length ? '\n\nMÉMOIRE (faits durables validés par l\'utilisateur) :\n- ' + mem.slice(0, 30).map(m => m.t).join('\n- ') : '';
     const lessons = rules.length ? '\n\nRÈGLES APPRISES (validées par l\'utilisateur, à appliquer) :\n- ' + rules.map(r => r.t).join('\n- ') : '';
     const tag = "\n\nMÉMORISATION : seulement si l'utilisateur te donne un fait durable le concernant (objectif, niveau, préférence, contrainte) ou te demande de retenir quelque chose, ajoute à la toute fin de ta réponse une ligne [[mem: fait court à retenir]]. N'écris jamais cette ligne autrement. L'utilisateur validera avant tout enregistrement.";
-    return base + who + mine + memo + lessons + tag + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
+    const fo = curFolder(), todo = tasks.filter(t => !t.done).slice(0, 10);
+    const ctx = "\n\nCONTEXTE : date et heure actuelles " + new Date().toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) + (todo.length ? " ; tâches en cours de l'utilisateur : " + todo.map(t => t.text + (t.time ? ' (' + t.time + ')' : '')).join(' ; ') : '') + '.';
+    const dos = fo && fo.instr ? "\n\nDOSSIER « " + fo.name + " » — INSTRUCTIONS : " + fo.instr : '';
+    const sug = "\n\nSUITES : à la fin de chaque réponse, sauf salutation, réponse très courte ou commande, ajoute une dernière ligne [[suite: question 1 | question 2 | question 3]] avec 2 ou 3 suites courtes et utiles que l'utilisateur pourrait demander ensuite. N'écris jamais cette ligne autrement.";
+    return base + who + mine + memo + lessons + tag + ctx + dos + sug + (web ? "\n\nRECHERCHE WEB : tu peux chercher sur le web ; fais-le pour l'actualité, les prix, les cours et toute donnée récente, puis réponds sans inventer." : '') + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
   }
   const genCfg = model => /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
 
   async function ask(history, onDelta, sysText) {
+    if (!settings.key) setTimeout(openSettings, 300);
     if (!settings.key) return { error: true, text: "Clé API manquante. Ouvrez ⚙ Réglages et collez votre clé Gemini (gratuite sur aistudio.google.com)." };
     const models = [...new Set([settings.model, 'gemini-2.5-flash', 'gemini-2.5-flash-lite'])];
     let last = '';
     abortCtl = new AbortController();
     for (const model of models) {
-      let full = '';
+      let full = '', src = [];
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
           signal: abortCtl.signal,
-          body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: sysText || buildSystem() }] }, generationConfig: genCfg(model) })
+          body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: sysText || buildSystem() }] }, generationConfig: genCfg(model), ...(web && !sysText ? { tools: [{ google_search: {} }] } : {}) })
         });
         if (!res.ok) {
           const d = await res.json().catch(() => ({}));
@@ -527,10 +642,10 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
           const lines = buf.split('\n'); buf = lines.pop();
           for (const ln of lines) {
             if (!ln.startsWith('data:')) continue;
-            try { const j = JSON.parse(ln.slice(5)); const t = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''); if (t) { full += t; onDelta(full); } } catch {}
+            try { const j = JSON.parse(ln.slice(5)); (j.candidates?.[0]?.groundingMetadata?.groundingChunks || []).forEach(c => { if (c.web?.uri && !src.some(x => x.u === c.web.uri)) src.push({ t: c.web.title || c.web.uri, u: c.web.uri }); }); const t = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''); if (t) { full += t; onDelta(full); } } catch {}
           }
         }
-        if (full.trim()) return { error: false, text: full };
+        if (full.trim()) return { error: false, text: full, src };
         last = 'Aucune réponse reçue.';
       } catch (err) {
         if (err && err.name === 'AbortError') return { error: !full.trim(), text: full.trim() ? full + '\n\n(Arrêté)' : 'Arrêté.' };
@@ -546,14 +661,21 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   function md(t, mid) {
     const blocks = [];
     t = escH(t).replace(/```([\w+#-]*)[^\n]*\n?([\s\S]*?)(?:```|$)/g, (_, l, c) => { blocks.push({ l: l.toLowerCase(), c: c.replace(/\n$/, '') }); return '@@B' + (blocks.length - 1) + '@@'; });
-    t = t.replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    const codes = [], maths = [];
+    t = t.replace(/`([^`\n]+)`/g, (_, c) => { codes.push(c); return '@@C' + (codes.length - 1) + '@@'; });
+    t = t.replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$([^\s$](?:[^$\n]*?[^\s$])?)\$/g, (_, a, b, c, d) => { maths.push({ d: a !== undefined || b !== undefined, c: unesc(a ?? b ?? c ?? d) }); return '@@M' + (maths.length - 1) + '@@'; });
+    t = t.replace(/^(\|.+\|)[ \t]*\n(\|[ \t:|-]+\|)[ \t]*\n((?:\|.+\|[ \t]*(?:\n|$))*)/gm, (_, h, sep, body) => { const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(x => x.trim()); return '<div class="overflow-x-auto my-2"><table class="text-[12px] border-collapse"><thead><tr>' + cells(h).map(x => '<th class="border border-blue-400/30 px-2 py-1 text-sky-300">' + x + '</th>').join('') + '</tr></thead><tbody>' + body.trim().split('\n').filter(Boolean).map(r => '<tr>' + cells(r).map(x => '<td class="border border-blue-400/20 px-2 py-1">' + x + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>'; });
+    t = t
       .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
       .replace(/^#{1,6}\s*(.+)$/gm, '<div class="md-h">$1</div>')
       .replace(/^\s*[*-]\s+(.+)$/gm, '<div class="md-li">• $1</div>')
       .replace(/^\s*(\d+)[.)]\s+(.+)$/gm, '<div class="md-li">$1. $2</div>')
       .replace(/^---+$/gm, '<hr>')
+      .replace(/(^|[^*\w])\*([^\s*][^*\n]*?)\*/g, '$1<em>$2</em>')
+      .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)"]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
       .replace(/<\/div>\n/g, '</div>').replace(/<hr>\n/g, '<hr>').replace(/\n/g, '<br>')
       .replace(/<br>(@@B\d+@@)/g, '$1').replace(/(@@B\d+@@)<br>/g, '$1');
+    t = t.replace(/@@C(\d+)@@/g, (_, i) => '<code>' + codes[i] + '</code>').replace(/@@M(\d+)@@/g, (_, i) => { const m = maths[i]; try { if (window.katex) return (m.d ? '<div class="overflow-x-auto">' : '') + katex.renderToString(m.c, { displayMode: m.d, throwOnError: false }) + (m.d ? '</div>' : ''); } catch {} return '<code>' + escH(m.c) + '</code>'; });
     return t.replace(/@@B(\d+)@@/g, (_, i) => {
       const b = blocks[i], code = unesc(b.c), key = mid + '_' + i;
       if (b.l === 'chart') { try { return chartSVG(JSON.parse(code)); } catch {} }
@@ -600,24 +722,29 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   }
 
   /* ---------- Chat ---------- */
-  const stripTags = t => String(t || '').replace(/\[\[mem:[\s\S]*?(\]\]|$)/g, '').trimEnd();
+  const stripTags = t => String(t || '').replace(/\[\[(?:mem|suite):[\s\S]*?(\]\]|$)|\[\[[a-z]{0,5}$/g, '').trimEnd();
   const msgEl = m => {
-    const w = document.createElement('div'); w.id = 'm-' + m.id; w.className = 'flex flex-col ' + (m.sender === 'user' ? 'items-end' : 'items-start');
+    const w = document.createElement('div'); w.id = 'm-' + m.id; w.className = 'flex flex-col items-start';
     const b = document.createElement('div'); b.id = 'b-' + m.id; b.className = 'bub ' + (m.sender === 'user' ? 'bub-user' : 'bub-ai');
     fill(b, m); w.appendChild(b);
+    if (m.src && m.src.length) { const s = document.createElement('div'); s.className = 'flex flex-wrap gap-1 mt-1 max-w-[94%]'; m.src.slice(0, 6).forEach(x => { const a = document.createElement('a'); a.href = x.u; a.target = '_blank'; a.rel = 'noopener'; a.className = 'chip !text-[10px] !py-0.5'; a.textContent = '🔗 ' + String(x.t).slice(0, 28); s.appendChild(a); }); w.appendChild(s); }
     if (m.sender === 'jarvis' && !m.pending) {
       const a = document.createElement('div'); a.className = 'flex items-center gap-3 mt-1 px-1 text-[11px] text-zinc-500';
       a.innerHTML = `<span>${m.ts}</span><button data-act="say" data-id="${m.id}" class="hover:text-sky-300">Écouter</button><button data-act="copym" data-id="${m.id}" class="hover:text-sky-300">Copier</button><button data-act="note" data-id="${m.id}" class="hover:text-sky-300">Enregistrer</button>${m.greet ? '' : `<button data-act="up" data-id="${m.id}" class="${m.fb === 1 ? 'text-emerald-400' : 'hover:text-emerald-400'}">👍</button><button data-act="down" data-id="${m.id}" class="${m.fb === -1 ? 'text-rose-400' : 'hover:text-rose-400'}">👎</button><button data-act="regen" data-id="${m.id}" class="hover:text-sky-300">Refaire</button>`}`;
       w.appendChild(a);
     }
+    if (m.sender === 'user' && !m.greet) { const e = document.createElement('div'); e.className = 'self-end mt-1 px-1 text-[11px] text-zinc-500'; e.innerHTML = `<button data-act="edit" data-id="${m.id}" class="hover:text-sky-300">Modifier</button>`; w.appendChild(e); }
+    if (m.next && m.next.length && m === messages[messages.length - 1]) { const e = document.createElement('div'); e.className = 'sug flex flex-wrap gap-2 mt-2'; m.next.forEach(t => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip !whitespace-normal text-left'; b.textContent = '↳ ' + t; b.dataset.sug = t; e.appendChild(b); }); w.appendChild(e); }
     return w;
   };
   function fill(b, m) {
+    b.classList.toggle('streaming', !!m.pending);
     if (m.sender === 'user') b.textContent = m.text;
-    else if (m.pending && !m.text) b.innerHTML = '<span class="text-sky-300/80">Louis réfléchit…</span>';
+    else if (m.pending && !m.text) b.innerHTML = '<span class="dots live"><i></i><i></i><i></i></span>';
     else b.innerHTML = md(stripTags(m.text), m.id);
   }
-  function renderChat() { const log = $('#chat-log'); log.innerHTML = ''; messages.forEach(m => log.appendChild(msgEl(m))); log.scrollTop = log.scrollHeight; }
+  function renderChat() { const log = $('#chat-log'); log.innerHTML = ''; messages.forEach(m => log.appendChild(msgEl(m))); log.scrollTop = log.scrollHeight; if (messages.length === 1 && messages[0].greet) { const e = document.createElement('div'); e.id = 'empty-st'; e.className = 'py-6 text-center'; e.innerHTML = '<div class="text-lg font-bold text-blue-50 neon">Comment puis-je t\'aider ?</div><div class="text-xs text-zinc-400 mt-1 mb-4">Choisis une idée ou écris ton message</div><div class="grid grid-cols-2 gap-2 text-left">' + MODES[mode].chips.map((c, k) => `<button data-card="${k}" class="tile !p-3 text-[12px] text-blue-100">${c[0]}</button>`).join('') + '</div>'; e.querySelectorAll('[data-card]').forEach(b => b.onclick = () => $('#chips').querySelector(`[data-chip="${b.dataset.card}"]`)?.click()); log.appendChild(e); }
+    const i = $('#chat-input'); if (i) { i.value = cur.draft || ''; fit(); } }
   let raf = 0;
   function live(a) {
     if (raf) return;
@@ -631,7 +758,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   let sp = { idx: 0 };
   function feedSpeech(text, final) {
     if (!(autoVoice || sp.on) || !('speechSynthesis' in window)) return;
-    const k = text.indexOf('[[mem:'); if (k >= 0) text = text.slice(0, k);
+    const k = text.search(/\[\[(?:mem|suite):/); if (k >= 0) text = text.slice(0, k);
     const open = (text.match(/```/g) || []).length % 2 === 1;
     const limit = open ? text.lastIndexOf('```') : text.length;
     let seg = text.slice(sp.idx, limit);
@@ -645,27 +772,29 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   }
   async function send(text, viaVoice) {
     text = (text || '').trim(); if (!text && atts.length) text = 'Analyse ce fichier.'; if (!text || busy) return;
+    const lc = atts.length ? null : localCmd(text);
+    if (lc) { const u0 = { id: Date.now(), sender: 'user', raw: text, text, ts: now() }, a0 = { id: u0.id + 1, sender: 'jarvis', text: lc, ts: now() }; messages.push(u0, a0); if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42); renderChat(); persist(); if (viaVoice) enqueueSpeech(lc); resumeHands(); return; }
     const F = atts; atts = []; paintAtt();
-    stopSpeech(); busy = true; $('#chat-send').textContent = 'Stop'; exch++; store.set('louis.exch', exch);
+    stopSpeech(); busy = true; $('#chat-send').dataset.s = 'stop'; exch++; store.set('louis.exch', exch);
     const u = { id: Date.now(), sender: 'user', raw: text, text: text + (F.length ? '\n' + F.map(f => '📎 ' + f.name).join('\n') : ''), files: F, ts: now() };
     const a = { id: u.id + 1, sender: 'jarvis', text: '', ts: now(), pending: true };
-    messages.push(u, a);
-    if (cur.title === 'Nouvelle conversation') cur.title = text.slice(0, 42);
-    const log = $('#chat-log'); log.appendChild(msgEl(u)); log.appendChild(msgEl(a)); log.scrollTop = log.scrollHeight;
+    messages.push(u, a); persist();
+    if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42);
+    const log = $('#chat-log'); $('#empty-st')?.remove(); $$('.sug').forEach(x => x.remove()); log.appendChild(msgEl(u)); log.appendChild(msgEl(a)); log.scrollTop = log.scrollHeight;
     const withF = messages.filter(m => m.files && m.files.length).slice(-2);
-    const hist = messages.filter(m => m !== a && !m.greet && !m.err && m.text).slice(-14).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [...(withF.includes(m) ? m.files.map(f => ({ inlineData: { mimeType: f.mime, data: f.data } })) : []), { text: m.text }] }));
+    const hist = messages.filter(m => m !== a && !m.greet && !m.err && m.text).slice(-30).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [...(withF.includes(m) ? m.files.map(f => ({ inlineData: { mimeType: f.mime, data: f.data } })) : []), { text: m.text }] }));
     while (hist.length && hist[0].role !== 'user') hist.shift();
     sp = { idx: 0, on: !!viaVoice };
     const res = await ask(hist, part => { a.text = part; live(a); feedSpeech(part, false); });
-    a.pending = false; a.err = res.error;
+    a.pending = false; a.err = res.error; a.src = res.src || [];
     const tags = [...res.text.matchAll(/\[\[mem:\s*([^\]]+?)\s*\]\]/g)].map(x => x[1]);
-    a.text = stripTags(res.text);
+    a.text = stripTags(res.text); const nx = (res.text.match(/\[\[suite:\s*([^\]]+?)\s*\]\]/) || [])[1]; a.next = nx && !res.error ? nx.split('|').map(x => x.trim()).filter(Boolean).slice(0, 3) : [];
     cancelAnimationFrame(raf); raf = 0;
     const w = $('#m-' + a.id); if (w) w.replaceWith(msgEl(a));
     if (!res.error) { feedSpeech(a.text, true); tags.forEach(proposeMem); }
-    busy = false; $('#chat-send').textContent = 'Envoyer'; persist(); updateBadge();
+    busy = false; $('#chat-send').dataset.s = ''; persist(); updateBadge(); resumeHands();
   }
-  $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (busy) { if (abortCtl) abortCtl.abort(); return; } const i = $('#chat-input'), t = i.value; i.value = ''; send(t); });
+  $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (busy) { if (abortCtl) abortCtl.abort(); return; } const i = $('#chat-input'), t = i.value; i.value = ''; cur.draft = ''; hIdx = -1; fit(); $('#slash').classList.add('hidden'); send(t); });
 
   /* ---------- Conversations séparées ---------- */
   function startFresh(k) {
@@ -679,17 +808,18 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   $('#conv-close').onclick = () => show('#modal-convs', false);
   $('#conv-q').oninput = renderConvs;
   function renderConvs() {
+    renderFolders();
     const q = $('#conv-q').value.trim().toLowerCase(), box = $('#conv-list');
-    const rows = convs.filter(c => !q || c.title.toLowerCase().includes(q) || c.messages.some(m => String(m.text).toLowerCase().includes(q)));
+    const rows = [...convs].filter(c => fsel === 'all' || c.folder === fsel).sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || b.ts - a.ts).filter(c => !q || c.title.toLowerCase().includes(q) || c.messages.some(m => String(m.text).toLowerCase().includes(q)));
     box.innerHTML = rows.length ? '' : '<div class="text-xs text-zinc-500">Aucune conversation.</div>';
     rows.forEach(c => {
       const r = document.createElement('div'); r.className = 'tile flex items-center gap-2 !p-2' + (c.id === cur.id ? ' !border-sky-400' : '');
       r.innerHTML = '<button class="flex-1 min-w-0 text-left"><div class="text-[13px] text-blue-50 truncate"></div><div class="text-[10px] text-zinc-400"></div></button><button class="text-zinc-500 text-sm" aria-label="Renommer">✎</button><button class="text-zinc-500 hover:text-rose-400 text-sm" aria-label="Supprimer">✕</button>';
-      r.children[0].children[0].textContent = c.title;
-      r.children[0].children[1].textContent = (MODES[c.mode] ? MODES[c.mode].e + ' ' + MODES[c.mode].n : '') + ' · ' + new Date(c.ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + c.messages.filter(m => m.sender === 'user').length + ' msg';
+      r.children[0].children[0].textContent = (c.pin ? '📌 ' : '') + c.title;
+      r.children[0].children[1].textContent = (MODES[c.mode] ? MODES[c.mode].e + ' ' + MODES[c.mode].n : '') + ' · ' + new Date(c.ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + c.messages.filter(m => m.sender === 'user').length + ' msg' + (folders.find(f => f.id === c.folder) ? ' · 📁 ' + folders.find(f => f.id === c.folder).name : '');
       r.children[0].onclick = () => { if (busy) return toast('Réponse en cours'); stopSpeech(); cur = c; messages = c.messages; mode = MODES[c.mode] ? c.mode : 'general'; store.set('louis.mode', mode); renderModes(); persist(); renderChat(); show('#modal-convs', false); go('chat'); };
       r.children[1].onclick = () => { const t = prompt('Nouveau titre ?', c.title); if (t && t.trim()) { c.title = t.trim().slice(0, 60); persist(); renderConvs(); } };
-      r.children[2].onclick = () => { if (busy || !confirm('Supprimer cette conversation ?')) return; convs = convs.filter(x => x !== c); if (c === cur) { cur = convs[0] || newConv(); messages = cur.messages; renderChat(); } persist(); renderConvs(); };
+      r.children[2].onclick = () => { if (busy || !confirm('Supprimer cette conversation ?')) return; convs = convs.filter(x => x !== c); dbDel(c.id); if (c === cur) { cur = convs[0] || newConv(); messages = cur.messages; renderChat(); } persist(); renderConvs(); };
       box.appendChild(r);
     });
   }
@@ -704,6 +834,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     else if (act === 'note' && m) { saveNote('Réponse de Louis', m.text); }
     else if ((act === 'up' || act === 'down') && m) { rate(m, act === 'up' ? 1 : -1); }
     else if (act === 'regen' && m) { regen(m); }
+    else if (act === 'edit' && m) { editMsg(m); }
   });
 
   /* ---------- Images et PDF ---------- */
@@ -713,22 +844,30 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     atts.forEach((f, i) => { const c = document.createElement('button'); c.type = 'button'; c.className = 'chip on'; c.textContent = (f.mime === 'application/pdf' ? '📄 ' : '🖼 ') + f.name.slice(0, 20) + ' ✕'; c.onclick = () => { atts.splice(i, 1); paintAtt(); }; bar.appendChild(c); });
     $('#att-btn').textContent = atts.length ? '📎' + atts.length : '📎';
   }
-  function addFile(f) {
+  const idb = () => new Promise((res, rej) => { const r = indexedDB.open('louis-lib', 1); r.onupgradeneeded = () => r.result.createObjectStore('f', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const lib = {
+    all: async () => { try { const d = await idb(); return await new Promise(res => { const q = d.transaction('f').objectStore('f').getAll(); q.onsuccess = () => res(q.result.sort((a, b) => b.ts - a.ts)); q.onerror = () => res([]); }); } catch { return []; } },
+    put: async f => { try { const d = await idb(); await new Promise(res => { const t = d.transaction('f', 'readwrite'); t.objectStore('f').put(f); t.oncomplete = res; t.onerror = res; }); } catch {} },
+    del: async id => { try { const d = await idb(); await new Promise(res => { const t = d.transaction('f', 'readwrite'); t.objectStore('f').delete(id); t.oncomplete = res; t.onerror = res; }); } catch {} }
+  };
+  const keep = (a, f, libOnly) => { if (!libOnly) { atts.push(a); paintAtt(); } lib.put({ ...a, id: f.name + '_' + f.size, size: f.size, ts: Date.now() }).then(() => { if (libOnly) { toast('Ajouté à la bibliothèque'); renderLib(); } }); };
+  function addFile(f) { readFile(f, false); }
+  function readFile(f, libOnly) {
     if (!f) return;
-    if (atts.length >= 5) return toast('5 fichiers maximum');
+    if (!libOnly && atts.length >= 5) return toast('5 fichiers maximum');
     const isImg = f.type.startsWith('image/'), isPdf = f.type === 'application/pdf';
     if (!isImg && !isPdf) return toast('Images et PDF seulement');
     if (f.size > 15e6) return toast('Fichier trop lourd (15 Mo max)');
     const r = new FileReader();
     r.onload = () => {
       const url = r.result;
-      if (isPdf) { atts.push({ mime: f.type, data: url.split(',')[1], name: f.name }); paintAtt(); return; }
+      if (isPdf) { keep({ mime: f.type, data: url.split(',')[1], name: f.name }, f, libOnly); return; }
       const img = new Image();
       img.onload = () => {
         const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
         c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        atts.push({ mime: 'image/jpeg', data: c.toDataURL('image/jpeg', .85).split(',')[1], name: f.name }); paintAtt();
+        keep({ mime: 'image/jpeg', data: c.toDataURL('image/jpeg', .85).split(',')[1], name: f.name }, f, libOnly);
       };
       img.onerror = () => toast('Image illisible');
       img.src = url;
@@ -752,8 +891,8 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   const hasTTS = 'speechSynthesis' in window;
   if (hasTTS) speechSynthesis.getVoices();
   function setSpeaking(on) {
-    $('#robot-big').classList.toggle('speaking', on); $('#wave').classList.toggle('on', on);
-    $('#voice-state').textContent = on ? 'Louis parle…' : (listening ? "J'écoute…" : 'Prêt');
+    $('#robot-big').classList.toggle('speaking', on); ['#avatar-chat', '#avatar-sm'].forEach(q => $(q).classList.toggle('speaking', on)); $('#wave').classList.toggle('on', on);
+    $('#voice-state').textContent = on ? 'Louis parle…' : (listening ? "J'écoute…" : 'Prêt'); if (!on) resumeHands();
   }
   function stopSpeech() { speakToken++; speakCount = 0; if (hasTTS) speechSynthesis.cancel(); setSpeaking(false); }
   function cleanForSpeech(t) { return t.replace(/```[\s\S]*?(```|$)/g, " Le détail est affiché à l'écran. ").replace(/https?:\/\/\S+/g, '').replace(/[*#`_>~|•]/g, '').replace(/\s+/g, ' ').trim(); }
@@ -800,8 +939,8 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     if (listening) { rec.stop(); return; }
     stopSpeech(); rec = new SR(); rec.lang = mode === 'anglais' ? 'en-US' : 'fr-FR'; rec.interimResults = false;
     rec.onstart = () => { listening = true; $('#wave').classList.add('on'); $('#voice-state').textContent = "J'écoute…"; $$('.mic-btn').forEach(b => b.classList.add('listening')); };
-    rec.onend = () => { listening = false; if (!speakCount) { $('#wave').classList.remove('on'); $('#voice-state').textContent = 'Prêt'; } $$('.mic-btn').forEach(b => b.classList.remove('listening')); };
-    rec.onerror = () => {};
+    rec.onend = () => { listening = false; if (!speakCount) { $('#wave').classList.remove('on'); $('#voice-state').textContent = 'Prêt'; } $$('.mic-btn').forEach(b => b.classList.remove('listening')); resumeHands(); };
+    rec.onerror = e => { if (hands && /not-allowed|service-not-allowed/.test(e.error)) { hands = false; paintHands(); toast('Micro refusé'); } };
     rec.onresult = e => { go('chat'); send(e.results[0][0].transcript, true); };
     rec.start();
   }
@@ -932,345 +1071,4 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     const T = D / 252, sq = sg * Math.sqrt(T), ST = [], pay = [];
     for (let i = 0; i < N; i++) { const z = randn(); ST.push(S0 * Math.exp((mu - sg * sg / 2) * T + sq * z)); pay.push(Math.exp(-r * T) * Math.max(S0 * Math.exp((r - sg * sg / 2) * T + sq * z) - K, 0)); }
     const sorted = [...ST].sort((a, b) => a - b), mean = ST.reduce((a, b) => a + b, 0) / N;
-    const mc = pay.reduce((a, b) => a + b, 0) / N, se = Math.sqrt(pay.reduce((a, b) => a + (b - mc) ** 2, 0) / (N - 1)) / Math.sqrt(N);
-    const d1 = (Math.log(S0 / K) + (r + sg * sg / 2) * T) / sq, bs = S0 * cdf(d1) - K * Math.exp(-r * T) * cdf(d1 - sq);
-    const p5 = quant(sorted, .05), p95 = quant(sorted, .95), med = quant(sorted, .5), pUp = ST.filter(v => v > S0).length / N;
-    const steps = Math.min(D, 60), dt = T / steps, labels = [], paths = [];
-    for (let i = 0; i <= steps; i++) labels.push(Math.round(i * D / steps));
-    for (let p = 0; p < 25; p++) { let s = S0; const a = [s]; for (let i = 0; i < steps; i++) { s *= Math.exp((mu - sg * sg / 2) * dt + sg * Math.sqrt(dt) * randn()); a.push(+s.toFixed(2)); } paths.push({ data: a, color: '#38bdf8' }); }
-    paths.push({ name: 'Espérance', color: '#ffffff', data: labels.map((_, i) => +(S0 * Math.exp(mu * i * dt)).toFixed(2)) });
-    const lo = quant(sorted, .01), hi = quant(sorted, .99), nb = 16, w = (hi - lo) / nb || 1, cnt = new Array(nb).fill(0);
-    ST.forEach(v => { if (v >= lo && v <= hi) cnt[Math.min(nb - 1, Math.floor((v - lo) / w))]++; });
-    const f = v => v.toFixed(2);
-    out.innerHTML = chartSVG({ type: 'line', title: `Trajectoires simulées (25 sur ${N}) · ${D} jours`, labels, series: paths }) +
-      chartSVG({ type: 'bar', title: 'Distribution du prix final (% des simulations)', labels: cnt.map((_, i) => (lo + (i + .5) * w).toFixed(0)), series: [{ name: '% des simulations', data: cnt.map(c => +(c / N * 100).toFixed(1)) }] }) +
-      '<div class="grid grid-cols-2 gap-2">' + card('Prix final moyen', f(mean)) + card('Médiane', f(med)) + card('Percentile 5 %', f(p5), 'text-rose-400') + card('Percentile 95 %', f(p95), 'text-emerald-400') +
-      card('Perte max. à 95 % (VaR)', f(Math.max(0, S0 - p5)), 'text-rose-400') + card('Probabilité de hausse', (pUp * 100).toFixed(1) + ' %', 'text-emerald-400') + card('Call Monte-Carlo', f(mc) + ' ± ' + f(1.96 * se)) + card('Call Black-Scholes', f(bs)) + '</div>' +
-      '<button id="s-ask" class="chip w-full !rounded-xl !py-2.5">Faire analyser ces résultats par Louis</button>';
-    out.classList.remove('hidden');
-    $('#s-ask').onclick = () => { startFresh('maths'); go('chat'); send(`Analyse ces résultats de simulation Monte-Carlo (mouvement brownien géométrique) : S0=${S0}, K=${K}, rendement ${(mu * 100).toFixed(1)} %, taux ${(r * 100).toFixed(1)} %, volatilité ${(sg * 100).toFixed(1)} %, ${D} jours, ${N} simulations. Prix final moyen ${f(mean)}, médiane ${f(med)}, P5 ${f(p5)}, P95 ${f(p95)}, probabilité de hausse ${(pUp * 100).toFixed(1)} %, call Monte-Carlo ${f(mc)} (± ${f(1.96 * se)}) contre Black-Scholes ${f(bs)}. Commente la cohérence, les risques (queues épaisses) et les limites du modèle.`); };
-  };
-
-  /* ---------- Réglages ---------- */
-  const MODELS = [['gemini-2.5-flash', '2.5 Flash · rapide (recommandé)'], ['gemini-2.5-flash-lite', '2.5 Flash-Lite · très rapide'], ['gemini-2.5-pro', '2.5 Pro · plus profond, plus lent'], ['gemini-3-flash-preview', '3 Flash · aperçu']];
-  function fillVoices() {
-    const sel = $('#set-voice'), vs = hasTTS ? speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith('fr')) : [];
-    sel.innerHTML = '<option value="">Automatique (voix masculine)</option>' + vs.map(v => `<option value="${escH(v.voiceURI)}">${escH(v.name)} (${escH(v.lang)})</option>`).join('');
-    sel.value = settings.voice || '';
-  }
-  const show = (id, on) => $(id).classList.toggle('hidden', !on);
-  function openSettings() {
-    const ms = MODELS.slice(); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
-    $('#set-model').innerHTML = ms.map(m => `<option value="${escH(m[0])}">${escH(m[1])}</option>`).join(''); $('#set-model').value = settings.model;
-    $('#set-name').value = settings.name || ''; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
-  }
-  $('#btn-settings').onclick = openSettings; $('#apps-settings').onclick = openSettings;
-  $('#set-cancel').onclick = () => show('#modal-settings', false);
-  $('#set-save').onclick = () => {
-    settings = Object.assign(settings, { name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
-    store.set('jarvis.settings', settings); $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || ''); show('#modal-settings', false); toast('Réglages enregistrés');
-  };
-  $('#set-test').onclick = () => {
-    if (!hasTTS) return; stopSpeech();
-    const u = new SpeechSynthesisUtterance('Bonjour, je suis Louis, votre assistant personnel.'); u.lang = 'fr-FR'; u.pitch = 0.8;
-    const v = voiceByURI($('#set-voice').value) || pickVoice('fr-FR'); if (v) u.voice = v; speechSynthesis.speak(u);
-  };
-  $('#btn-help').onclick = () => show('#modal-help', true);
-  $('#help-close').onclick = () => show('#modal-help', false);
-
-  /* ---------- Installation (PWA) ---------- */
-  let deferred = null;
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('#btn-install').classList.remove('hidden'); });
-  $('#btn-install').onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btn-install').classList.add('hidden'); };
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-
-  /* ---------- Évolution : mémoire, retours, bilan ---------- */
-  function updateBadge() { const e = $('#imp-sub'); if (e) e.textContent = exch - bilanAt >= 10 ? 'Bilan conseillé' : 'Mémoire, règles'; }
-  function proposeMem(t) {
-    t = t.trim().slice(0, 200); if (!t || mem.some(m => m.t === t) || pendingMem.includes(t)) return;
-    pendingMem.push(t); showMem();
-  }
-  function showMem() {
-    const bar = $('#mem-bar'); if (!pendingMem.length) { bar.classList.add('hidden'); return; }
-    $('#mem-txt').textContent = 'Retenir : « ' + pendingMem[0] + ' » ?'; bar.classList.remove('hidden');
-  }
-  $('#mem-yes').onclick = () => { const t = pendingMem.shift(); if (t) { mem.unshift({ id: Date.now(), t }); store.set('louis.mem', mem); } showMem(); };
-  $('#mem-no').onclick = () => { pendingMem.shift(); showMem(); };
-  function rate(m, v) {
-    const i = messages.indexOf(m), u = messages[i - 1];
-    fb = fb.filter(x => x.id !== m.id);
-    if (m.fb === v) m.fb = 0; else { m.fb = v; fb.push({ id: m.id, v, q: u ? String(u.text).slice(0, 300) : '', a: String(m.text).slice(0, 500) }); }
-    fb = fb.slice(-40); store.set('louis.fb', fb); persist();
-    const w = $('#m-' + m.id); if (w) w.replaceWith(msgEl(m));
-    toast(m.fb === 1 ? 'Merci, noté' : m.fb === -1 ? 'Noté, je ferai mieux' : 'Retiré');
-  }
-  function regen(m) {
-    if (busy) return;
-    const i = messages.indexOf(m), u = messages[i - 1];
-    if (i !== messages.length - 1 || !u || u.sender !== 'user') { toast('Seule la dernière réponse peut être refaite'); return; }
-    messages.splice(i - 1, 2); renderChat();
-    atts = u.files && u.files.length ? [...u.files] : []; paintAtt();
-    send(u.raw !== undefined ? u.raw : u.text);
-  }
-  function listRows(el, arr, key, empty) {
-    el.innerHTML = '';
-    if (!arr.length) { el.innerHTML = `<div class="text-xs text-zinc-500">${empty}</div>`; return; }
-    arr.forEach(x => {
-      const r = document.createElement('div'); r.className = 'tile flex items-start gap-2 !p-2';
-      r.innerHTML = '<div class="flex-1 text-[12px] text-blue-100 break-words"></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
-      r.children[0].textContent = x.t;
-      r.children[1].onclick = () => { const k = arr.indexOf(x); arr.splice(k, 1); store.set(key, arr); renderImprove(); };
-      el.appendChild(r);
-    });
-  }
-  function renderImprove() {
-    const up = fb.filter(x => x.v === 1).length, down = fb.filter(x => x.v === -1).length;
-    $('#imp-stats').textContent = `👍 ${up} · 👎 ${down} · ${exch - bilanAt} échanges depuis le dernier bilan`;
-    listRows($('#mem-list'), mem, 'louis.mem', 'Rien en mémoire.');
-    listRows($('#rule-list'), rules, 'louis.rules', 'Aucune règle adoptée.');
-  }
-  $('#mem-form').addEventListener('submit', e => { e.preventDefault(); const i = $('#mem-input'), t = i.value.trim().slice(0, 200); if (!t) return; mem.unshift({ id: Date.now(), t }); store.set('louis.mem', mem); i.value = ''; renderImprove(); });
-  async function bilan() {
-    if (busy) return;
-    const out = $('#bilan-out'), btn = $('#bilan-run');
-    btn.disabled = true; out.innerHTML = '<div class="text-xs text-sky-300/80">Louis analyse…</div>';
-    const recent = messages.filter(m => m.text && !m.greet && !m.err).slice(-16).map(m => (m.sender === 'user' ? 'Utilisateur' : 'Louis') + ' : ' + String(m.text).slice(0, 300)).join('\n');
-    const fbs = fb.slice(-15).map(x => (x.v === 1 ? '👍' : '👎') + ' Q: ' + x.q + ' | R: ' + x.a.slice(0, 200)).join('\n');
-    const prompt = `Voici les derniers échanges et retours (👍/👎) entre un utilisateur et son assistant Louis.\n\nÉCHANGES :\n${recent || '(aucun)'}\n\nRETOURS :\n${fbs || '(aucun)'}\n\nRÈGLES DÉJÀ ADOPTÉES :\n${rules.map(r => r.t).join('\n') || '(aucune)'}\n\nPropose au plus 3 nouvelles règles de comportement courtes, concrètes et différentes des règles existantes, qui amélioreraient les réponses de Louis pour CET utilisateur, et au plus 3 capacités qui manquent à l'application. Réponds uniquement en JSON : {"regles":["..."],"manques":["..."]}. Si les données sont insuffisantes, renvoie des listes vides.`;
-    const res = await ask([{ role: 'user', parts: [{ text: prompt }] }], () => {}, "Tu analyses un assistant personnel pour l'améliorer. Tu réponds uniquement par du JSON valide, en français.");
-    btn.disabled = false;
-    if (res.error) { out.innerHTML = '<div class="text-xs text-rose-400">' + escH(res.text) + '</div>'; return; }
-    let j; try { j = JSON.parse(res.text.replace(/```(?:json)?/g, '').trim().match(/\{[\s\S]*\}/)[0]); } catch { out.innerHTML = '<div class="text-xs text-rose-400">Réponse illisible, réessayez.</div>'; return; }
-    bilanAt = exch; store.set('louis.bilanAt', bilanAt); updateBadge(); renderImprove();
-    lastRegles = (j.regles || []).map(String).slice(0, 3); const man = (j.manques || []).map(String).slice(0, 3);
-    out.innerHTML = (lastRegles.length ? '<div class="lbl">Règles proposées</div>' + lastRegles.map((r, i) => `<div class="tile flex items-start gap-2 !p-2"><div class="flex-1 text-[12px] text-blue-100">${escH(r)}</div><button data-adopt="${i}" class="chip on">Adopter</button></div>`).join('') : '<div class="text-xs text-zinc-400">Aucune règle à proposer pour l\'instant.</div>') +
-      (man.length ? '<div class="lbl mt-2">Ce qui manque</div>' + man.map(x => `<div class="text-[12px] text-zinc-300">• ${escH(x)}</div>`).join('') : '');
-  }
-  $('#bilan-run').onclick = bilan;
-  $('#bilan-out').addEventListener('click', e => {
-    const b = e.target.closest('[data-adopt]'); if (!b) return;
-    const t = lastRegles[+b.dataset.adopt]; if (t && !rules.some(r => r.t === t)) { rules.unshift({ id: Date.now(), t }); store.set('louis.rules', rules); }
-    b.textContent = 'Adoptée'; b.disabled = true; renderImprove();
-  });
-  $('#bk-export').onclick = () => {
-    const d = { v: 2, settings: Object.assign({}, settings, { key: '' }), notes, tasks, mem, rules, fb, links, convs: convs.map(strip) };
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' })); a.download = 'louis-sauvegarde.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-  };
-  $('#bk-import').onchange = e => {
-    const f = e.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = () => {
-      try {
-        const d = JSON.parse(r.result); if (!confirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
-        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key }));
-        [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links], ['louis.convs', d.convs]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
-        location.reload();
-      } catch { toast('Fichier invalide'); }
-    };
-    r.readAsText(f);
-  };
-
-  renderModes(); renderChat(); renderLinks(); renderApps(); renderTasks(); updateBadge(); persist();
-})();
-</script>
-<!-- ============================================================
-  À COLLER JUSTE AVANT le script principal de l’app (celui qui commence par "(() => {")
-  Il remplace l’accueil, agrandit la zone d’écriture du chat, corrige
-  l’affichage du chat et ajoute la salutation vocale + le briefing.
-============================================================= -->
-<style>
-  /* ---------- Général ---------- */
-  .fld, #chat-input { font-size: 16px; } /* évite le zoom automatique sur iPhone */
-  .chip { flex-shrink: 0; }
-  .cut2 { clip-path: polygon(0 12px, 12px 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 12px)); border-radius: 0 !important; }
-  .hud .lbl::before { content: "▸ "; color: #22d3ee; }
-  nav .orb-sm { z-index: 5; }
-  body.typing nav { display: none; }
-
-  /* ---------- Accueil futuriste ---------- */
-  .clk { font: 700 26px ui-monospace, monospace; background: linear-gradient(90deg, #67e8f9, #a78bfa, #67e8f9); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 5s linear infinite; }
-  @keyframes shine { to { background-position: 200% 0; } }
-  .stage2 { position: relative; margin: 4px auto 10px; width: min(76vw, 310px); }
-  .stage2 svg.rings { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .ring { transform-origin: 150px 180px; animation: spin 28s linear infinite; }
-  .ring.r2 { animation-duration: 40s; animation-direction: reverse; }
-  .ring.r3 { animation-duration: 9s; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .stage2::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -8px; height: 18px; border-radius: 50%; background: radial-gradient(closest-side, rgba(34,211,238,.55), transparent); filter: blur(4px); }
-  #gauges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .gg { position: relative; display: flex; flex-direction: column; align-items: center; padding: 10px 2px 8px; background: linear-gradient(160deg, rgba(34,211,238,.10), rgba(2,8,20,.7)); clip-path: polygon(14% 0, 86% 0, 100% 50%, 86% 100%, 14% 100%, 0 50%); }
-  .gg svg { width: 52px; height: 52px; transform: rotate(-90deg); }
-  .gg circle:nth-child(2) { stroke-linecap: round; transition: stroke-dasharray .8s, stroke .8s; filter: drop-shadow(0 0 3px currentColor); }
-  .gg .v { font: 700 11px ui-monospace, monospace; color: #cffafe; margin-top: -2px; }
-  .gg .n { font: 600 8px ui-monospace, monospace; letter-spacing: .16em; color: rgba(125,190,255,.8); }
-  .tk { display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border-left: 2px solid #22d3ee; background: rgba(34,211,238,.06); font-size: 12px; color: #dbeafe; margin-top: 6px; }
-  .tk span { color: #67e8f9; font: 11px ui-monospace, monospace; }
-
-  /* ---------- Écran de démarrage ---------- */
-  #boot2 { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; background: radial-gradient(60% 45% at 50% 40%, rgba(37,99,235,.38), #02040a 70%); transition: opacity .5s; }
-  #boot2 .t { font: 700 13px ui-monospace, monospace; letter-spacing: .35em; color: #bfdbfe; }
-  #boot2 .l { font: 11px ui-monospace, monospace; color: rgba(165,243,252,.85); opacity: 0; animation: fi .5s forwards; }
-  @keyframes fi { to { opacity: 1; } }
-  #boot2 .orb-b { width: 96px; height: 96px; border-radius: 50%; border: 2px solid #22d3ee; box-shadow: 0 0 30px rgba(34,211,238,.6), inset 0 0 20px rgba(34,211,238,.4); animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 50% { box-shadow: 0 0 50px rgba(34,211,238,.9), inset 0 0 30px rgba(34,211,238,.6); } }
-
-  /* ---------- Chat : corrections ---------- */
-  #tab-chat { padding: 10px 12px 8px; }
-  #modes, #chips { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  #modes::-webkit-scrollbar, #chips::-webkit-scrollbar { display: none; }
-  #chips .chip { font-size: 11px; padding: 5px 10px; }
-  #chat-log { padding-bottom: 6px; scroll-behavior: smooth; }
-  #chat-log > div { min-width: 0; }
-  .bub { min-width: 0; max-width: 92%; word-break: break-word; }
-  .bub-ai .cb { max-width: 100%; }
-  .bub-ai .cb pre { max-width: 100%; }
-  #chat-log .flex.items-center.gap-3 { flex-wrap: wrap; row-gap: 2px; }
-  #chat-form { flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; border-radius: 16px 4px 16px 4px; }
-  #chat-input { width: 100%; min-height: 78px; max-height: 38vh; resize: none; line-height: 1.5; padding: 4px 4px 2px; color: #e2e8f0; background: transparent; outline: none; }
-  #chat-form .tb { display: flex; align-items: center; gap: 8px; }
-  #chat-send { margin-left: auto; padding: 9px 20px; }
-</style>
-
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  const jget = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
-  const esc = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  // Ouvert seul (hors de l’app Louis), le bloc n’a rien à modifier : on s’arrête proprement.
-  if (!$('#tab-hud') || !$('#chat-form') || !$('#chat-log') || !$('#chips')) {
-    document.body.insertAdjacentHTML('afterbegin', '<p style="font:16px sans-serif;padding:24px;color:#111">Ce fichier est un bloc à coller dans l’app Louis, juste avant son &lt;script&gt; principal. Il ne s’affiche pas seul.</p>');
-    return;
-  }
-  if ('speechSynthesis' in window) speechSynthesis.getVoices();
-
-  /* ================= ACCUEIL ================= */
-  const MIC = '<svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>';
-  $('#tab-hud').innerHTML = `<div class="max-w-xl mx-auto space-y-3">
-    <div class="hud cut2 flex items-center justify-between !p-3">
-      <div><div class="lbl">Louis // Core · en ligne</div><div id="home-hello" class="text-base font-bold text-blue-50 mt-1">Bonjour Monsieur</div><div class="text-[11px] text-zinc-400">Que puis-je faire pour vous ?</div></div>
-      <div class="text-right"><div id="h-time" class="clk">--:--</div><div id="h-date" class="text-[10px] text-zinc-400">—</div><div class="text-[10px] text-zinc-400">🔋 <span id="sys-bat">—</span></div></div>
-    </div>
-    <div class="stage2">
-      <svg class="rings" viewBox="0 0 300 340" aria-hidden="true">
-        <g class="ring"><circle cx="150" cy="180" r="146" fill="none" stroke="#22d3ee" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="3 9"/></g>
-        <g class="ring r2"><circle cx="150" cy="180" r="130" fill="none" stroke="#a78bfa" stroke-opacity=".6" stroke-width="2" stroke-dasharray="60 40 14 40"/></g>
-        <g class="ring r3"><path d="M150 34A146 146 0 0 1 296 180" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity=".85"/></g>
-      </svg>
-      <div id="robot-big" class="relative"></div>
-    </div>
-    <div class="hud cut2 !p-3">
-      <div class="flex items-center justify-between mb-2"><div class="lbl">Performance de l’appareil</div><div id="health" class="lbl" style="color:#67e8f9">…</div></div>
-      <div class="h-1.5 rounded bg-white/10 overflow-hidden mb-3"><div id="health-bar" class="h-full" style="width:0;background:linear-gradient(90deg,#22d3ee,#a78bfa);box-shadow:0 0 10px #22d3ee;transition:width .8s"></div></div>
-      <div id="gauges"></div>
-    </div>
-    <div class="flex flex-col items-center">
-      <button class="mic-btn orb" aria-label="Parler à Louis">${MIC}</button>
-      <div id="wave" class="wave w-full mt-1"></div>
-      <div id="voice-state" class="text-xs text-blue-200/80">Prêt</div>
-      <div class="flex gap-2 mt-2"><button data-vt class="chip">Voix OFF</button><button id="brief-btn" class="chip" style="border-color:rgba(167,139,250,.6);color:#ddd6fe">📣 Briefing</button></div>
-    </div>
-    <div class="grid grid-cols-3 gap-2 text-center">
-      <button class="mic-btn tile !text-center !p-2"><div class="text-lg">${MIC}</div><div class="text-[11px] text-blue-100">Vocal</div></button>
-      <button data-go="chat" data-focus class="tile !text-center !p-2"><div class="text-lg">💬</div><div class="text-[11px] text-blue-100">Texte</div></button>
-      <button data-go="apps" class="tile !text-center !p-2"><div class="text-lg">⚡</div><div class="text-[11px] text-blue-100">Actions</div></button>
-    </div>
-    <div class="hud !p-3">
-      <div class="flex items-center justify-between"><div class="lbl">Aujourd’hui</div><button data-go="tasks" class="text-[11px] text-blue-300/70">Tout voir</button></div>
-      <div id="home-tasks"></div>
-    </div>
-    <div class="hud !p-3">
-      <div class="flex items-center justify-between mb-2"><div class="lbl">Accès rapide</div><button id="lk-edit" class="text-[11px] text-blue-300/70 hover:text-blue-200">Modifier</button></div>
-      <div id="links" class="grid grid-cols-4 gap-2"></div>
-    </div>
-  </div>`;
-
-  /* --- Jauges de performance (valeurs réelles de l’appareil) --- */
-  const S = { fps: 60, bat: null, sto: null };
-  let fr = 0, t0 = performance.now();
-  (function loop(t) { fr++; if (t - t0 >= 1000) { S.fps = Math.round(fr * 1000 / (t - t0)); fr = 0; t0 = t; } requestAnimationFrame(loop); })(t0);
-  if (navigator.getBattery) navigator.getBattery().then(b => { const u = () => S.bat = { l: Math.round(b.level * 100), c: b.charging }; u(); b.onlevelchange = b.onchargingchange = u; }).catch(() => {});
-  const refSto = () => navigator.storage?.estimate?.().then(e => S.sto = { u: e.usage, q: e.quota }).catch(() => {});
-  refSto(); setInterval(refSto, 15000);
-  const colr = g => g >= 70 ? '#22d3ee' : g >= 40 ? '#fbbf24' : '#fb7185';
-  const gg = (n, good, label) => { const g = Math.max(0, Math.min(100, good)), c = colr(g); return `<div class="gg" style="color:${c}"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="4"/><circle cx="22" cy="22" r="18" fill="none" stroke="${c}" stroke-width="4" stroke-dasharray="${(g * 1.131).toFixed(1)} 113.1"/></svg><div class="v">${label}</div><div class="n">${n}</div></div>`; };
-  function paintPerf() {
-    const box = $('#gauges'); if (!box || !box.offsetParent) return;
-    const m = performance.memory, dm = navigator.deviceMemory, cn = navigator.connection, cores = navigator.hardwareConcurrency || 4;
-    const all = [
-      ['FPS', [S.fps / 60 * 100, S.fps]],
-      ['MÉMOIRE', m ? [100 - m.usedJSHeapSize / m.jsHeapSizeLimit * 100, Math.round(m.usedJSHeapSize / 1e6) + ' Mo'] : [Math.min(100, (dm || 4) / 8 * 100), dm ? '≈' + dm + ' Go' : '—']],
-      ['BATTERIE', S.bat ? [S.bat.l, S.bat.l + '%' + (S.bat.c ? '⚡' : '')] : [80, '—']],
-      ['RÉSEAU', !navigator.onLine ? [0, 'OFF'] : cn?.downlink ? [cn.downlink * 10, cn.downlink + ' Mb/s'] : [80, 'OK']],
-      ['STOCKAGE', S.sto ? [100 - S.sto.u / S.sto.q * 100, (S.sto.u / 1e6).toFixed(0) + ' Mo'] : [80, '—']],
-      ['CŒURS', [cores / 8 * 100, cores]]];
-    box.innerHTML = all.map(([n, [g, l]]) => gg(n, g, l)).join('');
-    const avg = Math.round(all.reduce((a, x) => a + Math.max(0, Math.min(100, x[1][0])), 0) / all.length);
-    $('#health').textContent = (avg >= 75 ? 'OPTIMALE' : avg >= 50 ? 'CORRECTE' : 'FAIBLE') + ' · ' + avg + '%';
-    $('#health-bar').style.width = avg + '%';
-  }
-  paintPerf(); setInterval(paintPerf, 1500);
-
-  /* --- Tâches du jour (lecture seule) --- */
-  function paintTasks() {
-    const box = $('#home-tasks'); if (!box) return;
-    const t = jget('louis.tasks', []).filter(x => !x.done).slice(0, 3);
-    box.innerHTML = t.length ? t.map(x => `<div class="tk"><div>${esc(x.text)}</div>${x.time ? `<span>${esc(x.time)}</span>` : ''}</div>`).join('') : '<div class="text-xs text-zinc-500 mt-2">Aucune tâche en cours.</div>';
-  }
-  paintTasks(); setInterval(paintTasks, 4000);
-
-  /* ================= VOIX : salutation + briefing ================= */
-  function briefing() {
-    const st = jget('jarvis.settings', {}), d = new Date(), h = d.getHours();
-    const hello = h < 5 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir';
-    const todo = jget('louis.tasks', []).filter(t => !t.done).length;
-    let s = `${hello} Monsieur ${st.name || ''}. Il est ${h} heures ${String(d.getMinutes()).padStart(2, '0')}. `;
-    s += todo ? `Vous avez ${todo} tâche${todo > 1 ? 's' : ''} en cours. ` : 'Aucune tâche en cours. ';
-    if (S.bat) s += `Batterie à ${S.bat.l} pour cent. ` + (S.bat.l < 20 && !S.bat.c ? 'Pensez à la recharger. ' : '');
-    return s + 'Tous les systèmes sont opérationnels. Que puis-je faire pour vous ?';
-  }
-  function speak() {
-    if (!('speechSynthesis' in window)) return;
-    const st = jget('jarvis.settings', {}), u = new SpeechSynthesisUtterance(briefing());
-    u.lang = 'fr-FR'; u.pitch = .8; u.rate = 1;
-    const vs = speechSynthesis.getVoices();
-    const v = vs.find(x => x.voiceURI === st.voice) || vs.find(x => /^fr/i.test(x.lang) && /male|thomas|paul|henri|nicolas|antoine|daniel|jean|claude/i.test(x.name)) || vs.find(x => /^fr/i.test(x.lang));
-    if (v) u.voice = v;
-    const on = b => { $('#robot-big')?.classList.toggle('speaking', b); $('#wave')?.classList.toggle('on', b); const s = $('#voice-state'); if (s) s.textContent = b ? 'Louis parle…' : 'Prêt'; };
-    u.onstart = () => on(true); u.onend = u.onerror = () => on(false);
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  }
-  $('#brief-btn').onclick = speak;
-
-  // Écran de démarrage : le toucher autorise la voix (obligation des navigateurs)
-  let booted = false; try { booted = sessionStorage.getItem('louis.booted'); } catch {}
-  if (!booted) {
-    const ov = document.createElement('div'); ov.id = 'boot2';
-    ov.innerHTML = '<div class="orb-b"></div><div class="t">LOUIS // CORE</div><div><div class="l" style="animation-delay:.2s">› noyau ............ OK</div><div class="l" style="animation-delay:.7s">› voix ............. OK</div><div class="l" style="animation-delay:1.2s">› capteurs ......... OK</div></div><button id="boot2-go" class="btn-neon px-8 py-3 text-sm">▶ Réveiller Louis</button><button id="boot2-mute" style="font-size:11px;color:#71717a">Entrer sans voix</button>';
-    document.body.appendChild(ov);
-    const close = withVoice => { try { sessionStorage.setItem('louis.booted', '1'); } catch {} if (withVoice) speak(); ov.style.opacity = 0; setTimeout(() => ov.remove(), 500); };
-    $('#boot2-go').onclick = () => close(true);
-    $('#boot2-mute').onclick = () => close(false);
-  }
-
-  /* ================= CHAT : grande zone d’écriture + corrections ================= */
-  const form = $('#chat-form'), old = $('#chat-input');
-  const ta = document.createElement('textarea');
-  ta.id = 'chat-input'; ta.rows = 3; ta.placeholder = 'Écris ton message…'; ta.setAttribute('enterkeyhint', 'send'); ta.autocomplete = 'off';
-  const bar = document.createElement('div'); bar.className = 'tb';
-  [...form.children].forEach(el => { if (el !== old) bar.appendChild(el); });
-  form.innerHTML = ''; form.append(ta, bar);
-  const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, innerHeight * .38) + 'px'; };
-  ta.addEventListener('input', fit); ta.addEventListener('focus', () => { document.body.classList.add('typing'); fit(); });
-  ta.addEventListener('blur', () => setTimeout(() => document.body.classList.remove('typing'), 250));
-  form.addEventListener('submit', () => setTimeout(fit, 0), true);
-  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer:coarse)').matches) { e.preventDefault(); form.requestSubmit(); } });
-  const sendBtn = $('#chat-send'); if (sendBtn) sendBtn.addEventListener('pointerdown', e => e.preventDefault()); // garde le clavier ouvert
-
-  // Masque les suggestions dès que la conversation a commencé (plus de place pour lire)
-  const log = $('#chat-log'), chips = $('#chips');
-  new MutationObserver(() => { chips.style.display = log.querySelector('.items-end') ? 'none' : ''; }).observe(log, { childList: true });
-})();
-</script>
-
-</body>
-</html>
+    const mc 
