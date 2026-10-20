@@ -1071,4 +1071,229 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     const T = D / 252, sq = sg * Math.sqrt(T), ST = [], pay = [];
     for (let i = 0; i < N; i++) { const z = randn(); ST.push(S0 * Math.exp((mu - sg * sg / 2) * T + sq * z)); pay.push(Math.exp(-r * T) * Math.max(S0 * Math.exp((r - sg * sg / 2) * T + sq * z) - K, 0)); }
     const sorted = [...ST].sort((a, b) => a - b), mean = ST.reduce((a, b) => a + b, 0) / N;
-    const mc 
+    const mc = pay.reduce((a, b) => a + b, 0) / N, med = quant(sorted, .5), q05 = quant(sorted, .05), q95 = quant(sorted, .95), pUp = ST.filter(x => x > S0).length / N;
+    const bins = 20, lo = sorted[0], hi = sorted[N - 1], bw = (hi - lo) / bins || 1, hist = Array(bins).fill(0);
+    ST.forEach(x => hist[Math.min(bins - 1, Math.floor((x - lo) / bw))]++);
+    const M = 8, steps = Math.min(D, 60), dt = D / 252 / steps, paths = [];
+    for (let k = 0; k < M; k++) { let s = S0; const p = [+s.toFixed(2)]; for (let i = 0; i < steps; i++) { s *= Math.exp((mu - sg * sg / 2) * dt + sg * Math.sqrt(dt) * randn()); p.push(+s.toFixed(2)); } paths.push({ name: 'Trajet ' + (k + 1), data: p }); }
+    const labs = Array.from({ length: steps + 1 }, (_, i) => Math.round(i * D / steps));
+    out.innerHTML = '<div class="hud"><div class="lbl mb-2">Résultats</div><div class="grid grid-cols-2 gap-2">' +
+      card('Call (Monte-Carlo)', mc.toFixed(2), 'text-emerald-400') + card('Prix moyen final', mean.toFixed(2)) + card('Médiane', med.toFixed(2)) + card('Hausse (probabilité)', (pUp * 100).toFixed(1) + ' %') +
+      card('Pire cas à 5 %', q05.toFixed(2), 'text-rose-400') + card('Meilleur cas à 95 %', q95.toFixed(2), 'text-emerald-400') + '</div></div>' +
+      '<div class="hud">' + chartSVG({ type: 'line', title: 'Trajectoires simulées (jours)', labels: labs, series: paths }) + chartSVG({ type: 'bar', title: 'Distribution du prix final', labels: hist.map((_, i) => Math.round(lo + i * bw)), series: [{ name: 'Fréquence', data: hist }] }) + '</div>';
+    out.classList.remove('hidden');
+  };
+
+  /* ---------- Utilitaires d'interface ---------- */
+  const show = (sel, on) => $(sel).classList.toggle('hidden', !on);
+  const dl = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+  const input = $('#chat-input');
+  function fit() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, big ? innerHeight * .5 : 160) + 'px'; }
+  input.addEventListener('input', () => {
+    fit(); cur.draft = input.value; persist();
+    const v = input.value, sl = $('#slash');
+    if (v.startsWith('/') && !/\s/.test(v)) {
+      const m = Object.keys(CMDS).filter(c => c.startsWith(v.slice(1)));
+      sl.innerHTML = m.map(c => `<button type="button" data-cmd="${c}" class="block w-full text-left px-3 py-2 text-xs text-blue-100 hover:bg-blue-500/20">/${c} <span class="text-zinc-500">${CMDS[c]}</span></button>`).join('');
+      sl.classList.toggle('hidden', !m.length);
+    } else sl.classList.add('hidden');
+  });
+  $('#slash').addEventListener('click', e => { const b = e.target.closest('[data-cmd]'); if (!b) return; input.value = '/' + b.dataset.cmd + ' '; $('#slash').classList.add('hidden'); input.focus(); fit(); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer:coarse)').matches) { e.preventDefault(); $('#chat-form').requestSubmit(); return; }
+    if (e.key === 'ArrowUp' && !input.value.trim()) {
+      const us = messages.filter(m => m.sender === 'user' && !m.greet); if (!us.length) return;
+      hIdx = Math.min(us.length - 1, hIdx + 1); input.value = us[us.length - 1 - hIdx].raw || us[us.length - 1 - hIdx].text; fit(); e.preventDefault();
+    }
+  });
+  $('#tbar-exp').onclick = () => { big = !big; fit(); };
+  $('#chat-log').addEventListener('click', e => { const b = e.target.closest('[data-sug]'); if (b) send(b.dataset.sug); });
+  const paintWeb = () => { $('#web-btn').classList.toggle('on', web); };
+  $('#web-btn').onclick = () => { web = !web; store.set('louis.web', web); paintWeb(); toast(web ? 'Recherche web activée' : 'Recherche web coupée'); };
+  paintWeb();
+
+  /* ---------- Commandes locales ---------- */
+  const CMDS = { aide: 'liste des commandes', heure: 'date et heure', note: 'enregistrer une note', tache: 'ajouter une tâche', web: 'activer / couper le web' };
+  function localCmd(t) {
+    const s = t.trim(); if (!s.startsWith('/')) return null;
+    const [c, ...r] = s.slice(1).split(/\s+/), a = r.join(' ');
+    if (c === 'aide') return '**Commandes**\n' + Object.entries(CMDS).map(([k, v]) => `- /${k} : ${v}`).join('\n');
+    if (c === 'heure') return new Date().toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' });
+    if (c === 'note' && a) { saveNote('Note', a); return 'Note enregistrée.'; }
+    if (c === 'tache' && a) { tasks.unshift({ id: Date.now(), text: a.slice(0, 200), time: '', done: false }); store.set('louis.tasks', tasks); return 'Tâche ajoutée.'; }
+    if (c === 'web') { web = !web; store.set('louis.web', web); paintWeb(); return web ? 'Recherche web activée.' : 'Recherche web coupée.'; }
+    return 'Commande inconnue. Tapez /aide.';
+  }
+
+  /* ---------- Dossiers ---------- */
+  const curFolder = () => folders.find(f => f.id === cur.folder);
+  function renderFolders() {
+    const bar = $('#fold-bar');
+    bar.innerHTML = `<button class="chip ${fsel === 'all' ? 'on' : ''}" data-f="all">Tous</button>` + folders.map(f => `<button class="chip ${fsel === f.id ? 'on' : ''}" data-f="${f.id}">📁 ${escH(f.name)}</button>`).join('') +
+      '<button class="chip" data-f="+">＋ Dossier</button>' + (fsel !== 'all' ? '<button class="chip" data-f="edit">✎</button><button class="chip" data-f="del">✕</button>' : '');
+  }
+  $('#fold-bar').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return; const k = b.dataset.f, f = folders.find(x => x.id === fsel);
+    if (k === '+') { const n = prompt('Nom du dossier ?'); if (!n) return; const ins = prompt('Instructions pour Louis dans ce dossier (facultatif) ?') || ''; const o = { id: 'f' + Date.now(), name: n.trim().slice(0, 20), instr: ins.trim() }; folders.push(o); fsel = o.id; }
+    else if (k === 'edit' && f) { const n = prompt('Nom ?', f.name); if (n) f.name = n.trim().slice(0, 20); const ins = prompt('Instructions ?', f.instr || ''); if (ins !== null) f.instr = ins.trim(); }
+    else if (k === 'del' && f) { if (!confirm('Supprimer ce dossier ? Les conversations sont conservées.')) return; convs.forEach(c => { if (c.folder === f.id) c.folder = undefined; }); folders = folders.filter(x => x !== f); fsel = 'all'; }
+    else fsel = k;
+    store.set('louis.folders', folders); persist(); renderConvs();
+  });
+  $('#conv-exp').onclick = () => dl((cur.title || 'conversation').replace(/[^\w-]+/g, '_') + '.md', '# ' + cur.title + '\n\n' + messages.filter(m => m.text).map(m => (m.sender === 'user' ? '**Vous**' : '**Louis**') + ' (' + m.ts + ')\n\n' + m.text).join('\n\n---\n\n'), 'text/markdown');
+  $('#conv-exp-all').onclick = async () => { const all = await dbAll(); dl('louis-conversations.json', JSON.stringify(all.length ? all : convs.map(strip), null, 1), 'application/json'); };
+
+  /* ---------- Bibliothèque ---------- */
+  async function renderLib() {
+    const box = $('#lib-list'), items = await lib.all();
+    box.innerHTML = items.length ? '' : '<div class="text-xs text-zinc-500">Aucun fichier.</div>';
+    items.forEach(f => {
+      const r = document.createElement('div'); r.className = 'tile flex items-center gap-2 !p-2';
+      r.innerHTML = '<span class="flex-1 min-w-0 truncate text-[12px] text-blue-50"></span><button class="chip on">Joindre</button><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      r.children[0].textContent = (f.mime === 'application/pdf' ? '📄 ' : '🖼 ') + f.name;
+      r.children[1].onclick = () => { if (atts.length >= 5) return toast('5 fichiers maximum'); atts.push({ mime: f.mime, data: f.data, name: f.name }); paintAtt(); show('#modal-lib', false); go('chat'); };
+      r.children[2].onclick = async () => { await lib.del(f.id); renderLib(); };
+      box.appendChild(r);
+    });
+  }
+  $('#lib-close').onclick = () => show('#modal-lib', false);
+  $('#lib-add').onchange = e => { [...e.target.files].forEach(f => readFile(f, true)); e.target.value = ''; };
+
+  /* ---------- Réglages ---------- */
+  const THEMES = [{ n: 'Bleu', h: 0, c: '#38bdf8' }, { n: 'Violet', h: 55, c: '#a78bfa' }, { n: 'Vert', h: -110, c: '#34d399' }, { n: 'Rose', h: 110, c: '#f472b6' }];
+  const applyTheme = () => { const t = THEMES.find(x => x.n === settings.theme) || THEMES[0]; document.documentElement.style.filter = t.h ? `hue-rotate(${t.h}deg)` : ''; };
+  let pickTheme = '';
+  function paintThemes() { $('#theme-row').innerHTML = THEMES.map(t => `<button type="button" data-th="${t.n}" aria-label="${t.n}" class="w-8 h-8 rounded-full" style="background:${t.c};outline:${(pickTheme || 'Bleu') === t.n ? '2px solid #fff' : 'none'};outline-offset:2px"></button>`).join(''); }
+  $('#theme-row').addEventListener('click', e => { const b = e.target.closest('[data-th]'); if (b) { pickTheme = b.dataset.th; paintThemes(); } });
+  function openSettings() {
+    $('#set-name').value = settings.name || ''; $('#set-key').value = settings.key || ''; $('#set-notes').value = settings.notes || ''; $('#set-greet').checked = !!settings.greet;
+    $('#set-model').innerHTML = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'].map(m => `<option ${m === settings.model ? 'selected' : ''}>${m}</option>`).join('');
+    const vs = hasTTS ? speechSynthesis.getVoices().filter(v => /^fr/i.test(v.lang)) : [];
+    $('#set-voice').innerHTML = '<option value="">Automatique</option>' + vs.map(v => `<option value="${escH(v.voiceURI)}" ${v.voiceURI === settings.voice ? 'selected' : ''}>${escH(v.name)}</option>`).join('');
+    pickTheme = settings.theme || 'Bleu'; paintThemes(); show('#modal-settings', true);
+  }
+  if (hasTTS) speechSynthesis.onvoiceschanged = () => { if (!$('#modal-settings').classList.contains('hidden')) { const v = $('#set-voice').value; openSettings(); $('#set-voice').value = v; } };
+  $('#btn-settings').onclick = $('#apps-settings').onclick = openSettings;
+  $('#set-cancel').onclick = () => show('#modal-settings', false);
+  $('#set-save').onclick = () => {
+    Object.assign(settings, { name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), notes: $('#set-notes').value.trim(), greet: $('#set-greet').checked, model: $('#set-model').value, voice: $('#set-voice').value, theme: pickTheme });
+    store.set('jarvis.settings', settings); applyTheme(); $('#home-hello').textContent = 'Bonjour Monsieur ' + (settings.name || ''); show('#modal-settings', false); toast('Réglages enregistrés');
+  };
+  $('#set-test').onclick = () => { const v = $('#set-voice').value; const keep = settings.voice; settings.voice = v; stopSpeech(); enqueueSpeech('Bonjour, je suis Louis. Voici ma voix.'); settings.voice = keep; };
+  $('#btn-help').onclick = () => show('#modal-help', true);
+  $('#help-close').onclick = () => show('#modal-help', false);
+
+  /* ---------- Retours, mémoire, évolution ---------- */
+  function rate(m, v) {
+    m.fb = m.fb === v ? 0 : v; const i = messages.indexOf(m), u = messages.slice(0, i).reverse().find(x => x.sender === 'user');
+    fb = fb.filter(x => x.id !== m.id); if (m.fb) fb.push({ id: m.id, v: m.fb, q: u ? String(u.raw || u.text).slice(0, 160) : '', a: String(m.text).slice(0, 240) });
+    fb = fb.slice(-40); store.set('louis.fb', fb); const w = $('#m-' + m.id); if (w) w.replaceWith(msgEl(m)); persist();
+  }
+  function regen(m) {
+    if (busy) return; const i = messages.indexOf(m); let j = i - 1; while (j >= 0 && messages[j].sender !== 'user') j--; if (j < 0) return;
+    const raw = messages[j].raw || messages[j].text; messages.splice(j); renderChat(); send(raw);
+  }
+  function editMsg(m) {
+    if (busy) return; const j = messages.indexOf(m); const raw = m.raw || m.text; messages.splice(j); renderChat(); input.value = raw; fit(); input.focus(); persist();
+  }
+  function proposeMem(t) {
+    if (!t || mem.some(x => x.t === t) || pendingMem.includes(t)) return; pendingMem.push(t); showMem();
+  }
+  function showMem() { if (!pendingMem.length) return show('#mem-bar', false); $('#mem-txt').textContent = 'Retenir : ' + pendingMem[0]; show('#mem-bar', true); }
+  $('#mem-yes').onclick = () => { const t = pendingMem.shift(); if (t) { mem.unshift({ t, ts: Date.now() }); store.set('louis.mem', mem); toast('Mémorisé'); } showMem(); };
+  $('#mem-no').onclick = () => { pendingMem.shift(); showMem(); };
+  function updateBadge() { $('#imp-sub').textContent = exch - bilanAt >= 20 ? 'Bilan conseillé' : 'Mémoire, règles'; }
+  function renderImprove() {
+    $('#imp-stats').textContent = `${exch} échanges · ${fb.filter(x => x.v > 0).length} 👍 · ${fb.filter(x => x.v < 0).length} 👎 · ${rules.length} règles · ${mem.length} faits`;
+    const rl = $('#rule-list'); rl.innerHTML = rules.length ? '' : '<div class="text-xs text-zinc-500">Aucune règle.</div>';
+    rules.forEach((r, i) => { const d = document.createElement('div'); d.className = 'tile flex gap-2 items-start !p-2'; d.innerHTML = '<span class="flex-1 text-[12px] text-blue-50"></span><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>'; d.children[0].textContent = r.t; d.children[1].onclick = () => { rules.splice(i, 1); store.set('louis.rules', rules); renderImprove(); }; rl.appendChild(d); });
+    const ml = $('#mem-list'); ml.innerHTML = mem.length ? '' : '<div class="text-xs text-zinc-500">Rien en mémoire.</div>';
+    mem.forEach((r, i) => { const d = document.createElement('div'); d.className = 'tile flex gap-2 items-start !p-2'; d.innerHTML = '<span class="flex-1 text-[12px] text-blue-50"></span><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>'; d.children[0].textContent = r.t; d.children[1].onclick = () => { mem.splice(i, 1); store.set('louis.mem', mem); renderImprove(); }; ml.appendChild(d); });
+  }
+  $('#mem-form').addEventListener('submit', e => { e.preventDefault(); const i = $('#mem-input'), t = i.value.trim(); if (!t) return; mem.unshift({ t: t.slice(0, 200), ts: Date.now() }); store.set('louis.mem', mem); i.value = ''; renderImprove(); });
+  $('#bilan-run').onclick = async () => {
+    if (busy) return; const out = $('#bilan-out'); const us = convs.flatMap(c => c.messages).filter(m => m.sender === 'user' && !m.greet).slice(-15).map(m => '- ' + String(m.raw || m.text).slice(0, 140));
+    if (!us.length) { out.textContent = 'Pas encore assez d\'échanges.'; return; }
+    out.innerHTML = '<span class="dots live"><i></i><i></i><i></i></span>'; busy = true;
+    const txt = 'Derniers messages de l\'utilisateur :\n' + us.join('\n') + '\n\nRetours :\n' + (fb.map(x => (x.v > 0 ? '👍 ' : '👎 ') + x.q).join('\n') || 'aucun') + '\n\nRègles déjà en place :\n' + (rules.map(r => r.t).join('\n') || 'aucune');
+    const res = await ask([{ role: 'user', parts: [{ text: txt }] }], () => {}, 'Tu analyses les échanges d\'un assistant avec son utilisateur. Réponds UNIQUEMENT par un JSON {"regles":["règle courte et actionnable"],"manques":["capacité ou info qui manque à l\'assistant"]} : 3 règles maximum, nouvelles, utiles, et 3 manques maximum.');
+    busy = false; lastRegles = [];
+    try { const j = JSON.parse((res.text.match(/\{[\s\S]*\}/) || ['{}'])[0]); lastRegles = (j.regles || []).slice(0, 3);
+      out.innerHTML = ''; lastRegles.forEach(t => { const d = document.createElement('div'); d.className = 'tile flex gap-2 items-start !p-2'; d.innerHTML = '<span class="flex-1 text-[12px] text-blue-50"></span><button class="chip on">Adopter</button>'; d.children[0].textContent = t; d.children[1].onclick = () => { rules.push({ t, ts: Date.now() }); store.set('louis.rules', rules); d.remove(); renderImprove(); }; out.appendChild(d); });
+      (j.manques || []).slice(0, 3).forEach(t => { const d = document.createElement('div'); d.className = 'text-[11px] text-zinc-400'; d.textContent = '⚠ Manque : ' + t; out.appendChild(d); });
+      if (!out.children.length) out.textContent = 'Rien à signaler.';
+    } catch { out.textContent = res.error ? res.text : 'Analyse illisible, réessayez.'; }
+    bilanAt = exch; store.set('louis.bilanAt', bilanAt); updateBadge();
+  };
+  $('#bk-export').onclick = async () => { const { key, ...s } = settings; dl('louis-sauvegarde.json', JSON.stringify({ settings: s, notes, mem, rules, fb, tasks, links, folders, convs: await dbAll() }), 'application/json'); };
+  $('#bk-import').onchange = e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return; const r = new FileReader();
+    r.onload = async () => { try {
+      const d = JSON.parse(r.result); if (!confirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
+      if (d.settings) store.set('jarvis.settings', { ...settings, ...d.settings, key: settings.key });
+      [['jarvis.notes', 'notes'], ['louis.mem', 'mem'], ['louis.rules', 'rules'], ['louis.fb', 'fb'], ['louis.tasks', 'tasks'], ['louis.links', 'links'], ['louis.folders', 'folders']].forEach(([k, n]) => { if (Array.isArray(d[n])) store.set(k, d[n]); });
+      if (Array.isArray(d.convs) && d.convs.length) { await dbReplace(d.convs); store.set('louis.convs', d.convs.slice(0, 15)); store.set('louis.cur', d.convs[0].id); }
+      location.reload();
+    } catch { toast('Fichier invalide'); } };
+    r.readAsText(f);
+  };
+
+  /* ---------- Mode conversation mains libres ---------- */
+  function paintHands() { $$('.hands-btn').forEach(b => { b.classList.toggle('on', hands); b.textContent = hands ? (b.dataset.l.includes('Conv') ? '🎧 Actif' : '🎧') : b.dataset.l; }); }
+  async function toggleHands() {
+    hands = !hands; paintHands();
+    if (hands) { autoVoice = true; paintVT(); try { wl = await navigator.wakeLock?.request('screen'); } catch {} go('chat'); resumeHands(); toast('Mode conversation actif'); }
+    else { try { wl && wl.release(); } catch {} wl = null; clearTimeout(hT); if (listening && rec) rec.stop(); toast('Mode conversation coupé'); }
+  }
+  function resumeHands() {
+    clearTimeout(hT); if (!hands) return;
+    hT = setTimeout(() => { if (hands && !busy && !listening && !speakCount) startMic(); }, 800);
+  }
+
+  /* ---------- Jauges de l'accueil ---------- */
+  const gauge = (l, p, v) => `<div class="gauge"><svg width="54" height="54" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="3"/><circle cx="20" cy="20" r="16" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="${Math.max(1, Math.round(p))} 100" transform="rotate(-90 20 20)"/></svg><div class="lbl" style="font-size:9px">${l}</div><div class="text-[11px] text-blue-50">${v}</div></div>`;
+  let fpsOn = false;
+  function startFps() {
+    if (fpsOn) return; fpsOn = true; let f = 0, t0 = performance.now();
+    const loop = t => {
+      if (!$('#tab-hud').classList.contains('active')) { fpsOn = false; return; }
+      f++;
+      if (t - t0 >= 1000) {
+        const fps = Math.round(f * 1000 / (t - t0)); f = 0; t0 = t;
+        const pm = performance.memory, mp = pm ? pm.usedJSHeapSize / pm.jsHeapSizeLimit * 100 : 0, bat = parseInt($('#sys-bat').textContent) || 0;
+        const fp = Math.min(100, fps / 60 * 100), score = Math.round(pm ? (fp + (100 - mp) + (bat || 100)) / 3 : (fp + (bat || 100)) / 2);
+        $('#gauges').innerHTML = gauge('FPS', fp, fps) + gauge('Mémoire JS', mp, pm ? Math.round(mp) + ' %' : '—') + gauge('Batterie', bat, bat ? bat + ' %' : '—');
+        $('#health').textContent = score >= 75 ? 'Excellent' : score >= 50 ? 'Bon' : 'Moyen'; $('#health-bar').style.width = score + '%';
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- Démarrage, installation ---------- */
+  $('#boot-robot').innerHTML = robot(true);
+  const bootOut = speak => { const b = $('#boot'); if (speak && settings.greet) enqueueSpeech(hello()); b.style.opacity = 0; setTimeout(() => b.classList.add('hidden'), 500); };
+  $('#boot-go').onclick = () => bootOut(true);
+  $('#boot-mute').onclick = () => bootOut(false);
+  let dip;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); dip = e; $('#btn-install').classList.remove('hidden'); });
+  $('#btn-install').onclick = async () => { if (!dip) return; dip.prompt(); try { await dip.userChoice; } catch {} dip = null; $('#btn-install').classList.add('hidden'); };
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  addEventListener('keydown', e => { if (e.key === 'Escape') { ['#modal-settings', '#modal-convs', '#modal-lib', '#modal-help'].forEach(s => show(s, false)); $('#prev-close').click(); } });
+  addEventListener('beforeunload', () => { cur.messages = messages; dbPut(strip(cur)); });
+
+  /* ---------- Initialisation ---------- */
+  applyTheme(); renderModes(); renderChat(); renderApps(); renderLinks(); renderTasks(); paintHands(); updateBadge(); startFps();
+  dbAll().then(list => {
+    if (busy) return; let ch = false;
+    list.forEach(d => {
+      const c = convs.find(x => x.id === d.id);
+      if (!c) { convs.push(d); ch = true; }
+      else if (d.messages.length > c.messages.length && d.ts >= c.ts) { c.messages = d.messages; ch = true; if (c === cur) messages = cur.messages; }
+    });
+    if (ch) renderChat();
+  });
+})();
+</script>
+</body>
+</html>
