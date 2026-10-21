@@ -408,14 +408,15 @@
     <!-- TÂCHES -->
     <section id="tab-tasks" class="tab">
       <div class="max-w-xl mx-auto space-y-3">
-        <div><div class="text-lg font-bold text-blue-50">Tâches</div><div class="text-xs text-zinc-400">Organise ta journée</div></div>
+        <div class="flex items-center justify-between"><div><div class="text-lg font-bold text-blue-50">Tâches</div><div id="t-net" class="text-xs text-zinc-400">Suivi local</div></div><div id="t-streak" class="chip on">🔥 0</div></div>
+        <div id="t-stats" class="hud !p-3"></div>
+        <div id="t-prop" class="hud !p-3"></div>
         <div class="flex gap-2" id="task-filters">
           <button class="chip on" data-tf="all">Toutes</button><button class="chip" data-tf="todo">En cours</button><button class="chip" data-tf="done">Terminées</button>
         </div>
-        <form id="task-form" class="hud flex gap-2 !p-2">
-          <input id="task-input" type="text" autocomplete="off" placeholder="Nouvelle tâche…" class="flex-1 min-w-0 bg-transparent text-sm px-2 py-2 outline-none placeholder-zinc-500">
-          <input id="task-time" type="time" class="bg-transparent text-xs text-blue-200 outline-none">
-          <button class="btn-neon px-4 py-2 text-sm" type="submit">＋</button>
+        <form id="task-form" class="hud !p-2 space-y-2">
+          <div class="flex gap-2"><input id="task-input" type="text" autocomplete="off" placeholder="Nouvelle tâche…" class="flex-1 min-w-0 bg-transparent text-sm px-2 py-2 outline-none placeholder-zinc-500"><button class="btn-neon px-4 py-2 text-sm" type="submit">＋</button></div>
+          <div class="flex gap-2 px-1"><input id="task-date" type="date" class="bg-transparent text-xs text-blue-200 outline-none"><input id="task-time" type="time" class="bg-transparent text-xs text-blue-200 outline-none"><select id="task-pr" class="bg-transparent text-xs text-blue-200 outline-none ml-auto"><option value="" class="bg-black">Normale</option><option value="h" class="bg-black">★ Haute</option></select></div>
         </form>
         <div id="task-list" class="space-y-2"></div>
       </div>
@@ -436,7 +437,8 @@
           <button data-go="improve" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#ec4899,#be185d)">🧠</div><div class="text-xs font-bold text-blue-50">Évolution</div><div id="imp-sub" class="text-[10px] text-zinc-400">Mémoire, règles</div></button>
           <button id="apps-settings" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#64748b,#334155)">⚙</div><div class="text-xs font-bold text-blue-50">Réglages</div><div class="text-[10px] text-zinc-400">Clé, voix</div></button>
         </div>
-        <div class="lbl pt-1">Applications suggérées</div>
+        <button id="apps-tools" class="btn-neon w-full py-2.5 text-sm">🧮 Boîte à outils financière</button>
+        <div class="lbl pt-1">Outils d'analyse</div>
         <div id="apps-ext" class="grid grid-cols-3 gap-2"></div>
       </div>
     </section>
@@ -1312,18 +1314,18 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   sysInfo(); addEventListener('online', sysInfo); addEventListener('offline', sysInfo);
   if (navigator.getBattery) navigator.getBattery().then(b => { const u = () => { const t = Math.round(b.level * 100) + ' %' + (b.charging ? ' ⚡' : ''); $('#sys-bat').textContent = t; $('#sys-bat2').textContent = t; }; u(); b.onlevelchange = b.onchargingchange = u; }).catch(() => {});
   let links = store.get('louis.links', [
-    { n: 'Gmail', u: 'https://mail.google.com', i: '✉' }, { n: 'YouTube', u: 'https://www.youtube.com', i: '▶' },
-    { n: 'GitHub', u: 'https://github.com', i: '⌘' }, { n: 'Drive', u: 'https://drive.google.com', i: '☁' }]);
+    { n: 'TradingView', u: 'https://www.tradingview.com', i: '📈' }, { n: 'Colab', u: 'https://colab.research.google.com', i: '🐍' },
+    { n: 'GitHub', u: 'https://github.com', i: '⌘' }, { n: 'Kaggle', u: 'https://www.kaggle.com', i: '◈' }]);
   const APPS = [
-    { n: 'Google', u: 'https://www.google.com', i: 'G', c: 'linear-gradient(135deg,#4285f4,#34a853)' },
-    { n: 'YouTube', u: 'https://www.youtube.com', i: '▶', c: '#ff0033' },
-    { n: 'Gmail', u: 'https://mail.google.com', i: '✉', c: 'linear-gradient(135deg,#ea4335,#fbbc04)' },
-    { n: 'Spotify', u: 'https://open.spotify.com', i: '♫', c: '#1db954' },
+    { n: 'TradingView', u: 'https://www.tradingview.com', i: '📈', c: 'linear-gradient(135deg,#2962ff,#1e40af)' },
+    { n: 'Yahoo Finance', u: 'https://finance.yahoo.com', i: '$', c: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
+    { n: 'Investopedia', u: 'https://www.investopedia.com', i: '📖', c: 'linear-gradient(135deg,#0ea5e9,#0369a1)' },
+    { n: 'Kaggle', u: 'https://www.kaggle.com', i: '◈', c: 'linear-gradient(135deg,#20beff,#0b6fa4)' },
+    { n: 'Colab', u: 'https://colab.research.google.com', i: '🐍', c: 'linear-gradient(135deg,#f9ab00,#e37400)' },
+    { n: 'GitHub', u: 'https://github.com', i: '⌘', c: '#2b3137' },
+    { n: 'DeepL', u: 'https://www.deepl.com/translator', i: '文', c: 'linear-gradient(135deg,#0f2b46,#1e5a8e)' },
     { n: 'Drive', u: 'https://drive.google.com', i: '△', c: 'linear-gradient(135deg,#fbbc04,#0f9d58,#4285f4)' },
-    { n: 'Traduction', u: 'https://translate.google.com', i: '文', c: 'linear-gradient(135deg,#4285f4,#1a73e8)' },
-    { n: 'Maps', u: 'https://maps.google.com', i: '⌖', c: 'linear-gradient(135deg,#34a853,#ea4335)' },
-    { n: 'Agenda', u: 'https://calendar.google.com', i: '▦', c: 'linear-gradient(135deg,#4285f4,#1967d2)' },
-    { n: 'GitHub', u: 'https://github.com', i: '⌘', c: '#2b3137' }];
+    { n: 'Agenda', u: 'https://calendar.google.com', i: '▦', c: 'linear-gradient(135deg,#4285f4,#1967d2)' }];
   const brand = l => {
     const a = APPS.find(x => x.n.toLowerCase() === String(l.n).toLowerCase());
     if (a) return { c: a.c, i: a.i };
@@ -1349,32 +1351,11 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   $('#lk-edit').onclick = () => { linkEdit = !linkEdit; $('#lk-edit').textContent = linkEdit ? 'Terminer' : 'Modifier'; renderLinks(); };
 
   /* ---------- Tâches (créées uniquement par vous) + rappels ---------- */
-  function renderTasks() {
-    $$('#task-filters [data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === tfilter));
-    const list = $('#task-list'); list.innerHTML = '';
-    const shown = tasks.filter(t => tfilter === 'all' || (tfilter === 'done' ? t.done : !t.done));
-    if (!shown.length) { list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Aucune tâche.</div>'; return; }
-    shown.forEach(t => {
-      const r = document.createElement('div'); r.className = 'hud !p-3 flex items-center gap-3';
-      r.innerHTML = '<button class="chk"></button><div class="flex-1 min-w-0"><div class="text-sm text-blue-50 break-words"></div><div class="text-[10px] text-zinc-400"></div></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
-      const chk = r.children[0]; chk.classList.toggle('done', t.done); chk.textContent = t.done ? '✓' : '';
-      r.children[1].children[0].textContent = t.text; if (t.done) r.children[1].children[0].style.textDecoration = 'line-through';
-      r.children[1].children[1].textContent = (t.done ? 'Terminée' : 'En cours') + (t.time ? ' · ' + t.time : '');
-      chk.onclick = () => { t.done = !t.done; store.set('louis.tasks', tasks); renderTasks(); };
-      r.children[2].onclick = () => { tasks = tasks.filter(x => x.id !== t.id); store.set('louis.tasks', tasks); renderTasks(); };
-      list.appendChild(r);
-    });
-  }
-  $('#task-form').addEventListener('submit', e => {
-    e.preventDefault(); const i = $('#task-input'), tm = $('#task-time'), text = i.value.trim(); if (!text) return;
-    if (tm.value && window.Notification && Notification.permission === 'default') Notification.requestPermission();
-    tasks.unshift({ id: Date.now(), text: text.slice(0, 200), time: tm.value, done: false }); store.set('louis.tasks', tasks); i.value = ''; tm.value = ''; renderTasks();
-  });
   $('#task-filters').addEventListener('click', e => { const b = e.target.closest('[data-tf]'); if (b) { tfilter = b.dataset.tf; renderTasks(); } });
   setInterval(() => {
     const d = new Date(), hm = d.toTimeString().slice(0, 5), day = d.toDateString();
     tasks.forEach(t => {
-      if (!t.done && t.time === hm && t.nd !== day) {
+      if (!t.done && t.time === hm && t.nd !== day && (!t.date || t.date === ymd())) {
         t.nd = day; store.set('louis.tasks', tasks); toast('⏰ ' + t.text); navigator.vibrate?.(300);
         if (window.Notification && Notification.permission === 'granted') new Notification('Lisa · Tâche', { body: t.text, icon: 'icon-192.png' });
       }
@@ -1634,7 +1615,7 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     if (todo.length) { const nx = todo.filter(x => x.time && x.time >= hm).sort((a, b) => a.time.localeCompare(b.time))[0]; t += ' Vous avez ' + todo.length + ' tâche' + (todo.length > 1 ? 's' : '') + ' en cours' + (nx ? ', la prochaine à ' + nx.time.replace(':', ' heures ') + '.' : '.'); }
     return t + ' Que puis-je faire pour vous ?';
   }
-  function wake(speak) { const b = $('#boot'); if (!b || b.dataset.done) return; b.dataset.done = 1; if (speak && hasTTS) enqueueSpeech(briefText()); b.style.opacity = 0; b.style.pointerEvents = 'none'; setTimeout(() => b.remove(), 600); }
+  function wake(speak) { const b = $('#boot'); if (!b || b.dataset.done) return; b.dataset.done = 1; if (speak && hasTTS) enqueueSpeech(briefText()); if (PB) phoneReport(false).then(t => { if (t) { lisaSay(t); if (speak && hasTTS) enqueueSpeech(t); } }); b.style.opacity = 0; b.style.pointerEvents = 'none'; setTimeout(() => b.remove(), 600); }
   if (settings.greet === false) $('#boot').remove();
   else { $('#boot-robot').innerHTML = robot(true); $('#boot-go').onclick = () => wake(true); $('#boot-mute').onclick = () => wake(false); }
   $('#boot')?.addEventListener('click', e => { if (!e.target.closest('#boot-mute')) wake(true); });
@@ -1647,12 +1628,13 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   }
   function localCmd(t) {
     if (t.startsWith('/')) return slash(t);
+    if (/compte[- ]rendu|qui m'a (appel|écrit|contact)|appels? manqu|messages? manqu|mes notifications/i.test(t)) return phoneCmd();
     const q = t.toLowerCase().replace(/[.!?]+$/, '').trim(); let m;
     if (/^(ouvre|affiche|montre|va)\b.*\bt[âa]ches?\b/.test(q)) { go('tasks'); return 'Voici vos tâches.'; }
     if (/^(ouvre|affiche|montre|va)\b.*\b(accueil|tableau de bord)\b/.test(q)) { go('hud'); return "Voici l'accueil."; }
     if (/^(ouvre|affiche|montre|va)\b.*\bfichiers?\b/.test(q)) { renderLib(); show('#modal-lib', true); return 'Voici vos fichiers.'; }
     if (/^(nouvelle conversation|nouveau chat)$/.test(q)) { startFresh(); return 'Nouvelle conversation prête.'; }
-    if ((m = q.match(/^(?:ajoute|crée|cree|note)(?: une)? t[âa]che(?: pour| :|:)?\s+(.+)$/))) { tasks.unshift({ id: Date.now(), text: m[1].slice(0, 200), time: '', done: false }); store.set('louis.tasks', tasks); return 'Tâche ajoutée : ' + m[1] + '.'; }
+    if ((m = q.match(/^(?:ajoute|crée|cree|note)(?: une)? t[âa]che(?: pour| :|:)?\s+(.+)$/))) { addTask(m[1], '', ymd()); return 'Tâche ajoutée : ' + m[1] + '.'; }
     if (/\b(désactive|desactive|coupe)\b.*\brecherche/.test(q)) { web = false; store.set('louis.web', false); paintWeb(); return 'Recherche web désactivée.'; }
     if (/\b(active|allume)\b.*\brecherche/.test(q)) { web = true; store.set('louis.web', true); paintWeb(); return 'Recherche web activée.'; }
     if (/^(quelle heure|il est quelle heure|l'heure)/.test(q)) return 'Il est ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', ' h ') + '.';
@@ -1660,11 +1642,11 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     if (/\bbatterie\b/.test(q) && /^(quel|combien|niveau|état|etat|la batterie)/.test(q)) return P.bat != null ? 'Batterie à ' + P.bat + ' %' + (P.chg ? ', en charge.' : '.') : 'Je ne peux pas lire la batterie sur cet appareil.';
     if ((m = q.match(/^(?:minuteur|chrono|timer|rappelle[- ]moi)(?: de| dans| pour)?\s+(\d+)\s*(secondes?|sec|s|minutes?|min|heures?|h)\b/))) { const n = +m[1], u = m[2][0], sec = u === 'h' ? n * 3600 : u === 'm' ? n * 60 : n; if (sec < 1 || sec > 86400) return 'Durée invalide.'; startTimer(sec, m[1] + ' ' + m[2]); return 'Minuteur lancé : ' + m[1] + ' ' + m[2] + '. Gardez cette page ouverte.'; }
     if ((m = q.match(/^(?:calcule|calcul|combien font|combien fait)\s+([\d\s+\-*/().,x×÷^]+)$/))) { try { const ex = m[1].replace(/[x×]/g, '*').replace(/÷/g, '/').replace(/\^/g, '**').replace(/,/g, '.'); const v = Function('"use strict";return (' + ex + ')')(); if (Number.isFinite(v)) return m[1].trim() + ' = ' + (+v.toFixed(10)); } catch {} return 'Je ne peux pas calculer cette expression.'; }
-    if ((m = q.match(/^ouvre\s+(youtube|gmail|google|drive|github|spotify|maps|agenda|traduction)$/))) { const ap = APPS.find(x => x.n.toLowerCase() === m[1]); if (ap) { window.open(ap.u, '_blank', 'noopener'); return 'J\'ouvre ' + ap.n + '.'; } }
+    if ((m = q.match(/^ouvre\s+([\w .]+)$/))) { const ap = APPS.find(x => x.n.toLowerCase() === m[1]); if (ap) { window.open(ap.u, '_blank', 'noopener'); return 'J\'ouvre ' + ap.n + '.'; } }
     if (/(état|etat|santé|performance).*(système|systeme|appareil|téléphone)|comment va (le|mon) (système|systeme|appareil)/.test(q)) return perfSummary();
     return null;
   }
-  const CMDS = [['/new', 'Nouvelle conversation'], ['/clear', 'Vider cette conversation'], ['/export', 'Exporter en Markdown'], ['/pin', 'Épingler / désépingler'], ['/web', 'Recherche web on/off'], ['/voix', 'Voix on/off'], ['/mode ', 'Changer de mode (general, code, anglais, maths, devoirs)'], ['/dossier ', 'Ranger dans un dossier (ex. /dossier Anglais)'], ['/model ', 'Modèle : flash, lite ou pro'], ['/fichiers', 'Bibliothèque de fichiers'], ['/stats', 'Historique et stockage'], ['/aide', 'Liste des commandes']];
+  const CMDS = [['/phone', 'Compte rendu : appels, SMS, WhatsApp'], ['/tache ', 'Ajouter une tâche (ex. /tache Réviser 18:30)'], ['/taches', 'Lister les tâches en cours'], ['/fait ', 'Valider une tâche (/fait 2)'], ['/plan', 'Propositions du jour'], ['/note ', 'Enregistrer une note'], ['/calc ', 'Calculer (ex. /calc 1500*1.07^10)'], ['/minuteur ', 'Minuteur (ex. /minuteur 25 min)'], ['/copie', 'Copier la dernière réponse'], ['/outils', 'Boîte à outils financière'], ['/new', 'Nouvelle conversation'], ['/clear', 'Vider cette conversation'], ['/export', 'Exporter en Markdown'], ['/pin', 'Épingler / désépingler'], ['/web', 'Recherche web on/off'], ['/voix', 'Voix on/off'], ['/mode ', 'Changer de mode (general, code, anglais, maths, devoirs)'], ['/dossier ', 'Ranger dans un dossier (ex. /dossier Anglais)'], ['/model ', 'Modèle : flash, lite ou pro'], ['/fichiers', 'Bibliothèque de fichiers'], ['/stats', 'Historique et stockage'], ['/aide', 'Liste des commandes']];
   const tin = $('#chat-input'), coarse = matchMedia('(pointer:coarse)').matches;
   function fit() { const mx = Math.round(innerHeight * (big ? .55 : .3)); tin.style.height = 'auto'; tin.style.height = (big ? mx : Math.min(tin.scrollHeight, mx)) + 'px'; }
   function showSlash() {
@@ -1674,6 +1656,8 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   }
   tin.addEventListener('input', () => { fit(); cur.draft = tin.value; clearTimeout(dT); dT = setTimeout(persist, 700); showSlash(); });
   tin.addEventListener('keydown', e => {
+    if (e.key === 'Tab' && !$('#slash').classList.contains('hidden')) { e.preventDefault(); const b = $('#slash [data-cmd]'); if (b) { tin.value = b.dataset.cmd; fit(); showSlash(); } return; }
+    if (e.key === 'Escape') { $('#slash').classList.add('hidden'); return; }
     if (e.key === 'Enter' && !e.shiftKey && !coarse && !e.isComposing) { e.preventDefault(); $('#chat-form').requestSubmit(); return; }
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
     const us = messages.filter(m => m.sender === 'user').map(m => m.raw ?? m.text);
@@ -1703,6 +1687,16 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
       case '/fichiers': renderLib(); show('#modal-lib', true); return 'Voici vos fichiers.';
       case '/mode': if (MODES[arg]) { setMode(arg); return 'Mode : ' + MODES[arg].n + '.'; } return 'Modes : ' + Object.keys(MODES).join(', ') + '.';
       case '/stats': return `${convs.length} conversations · ${convs.reduce((n, x) => n + x.messages.length, 0)} messages · historique ≈ ${convs.reduce((n, x) => n + kb(x), 0)} Ko, enregistré sur l'appareil (IndexedDB), sans limite de longueur.`;
+      case '/tache': { const m = t.match(/^\/tache\s+(.+?)(?:\s+(\d{1,2}[:h]\d{2}))?$/i); if (!m) return 'Usage : /tache Texte [hh:mm]'; const tm = m[2] ? m[2].replace('h', ':').padStart(5, '0') : ''; addTask(m[1], tm, ymd()); return 'Tâche ajoutée : ' + m[1] + (tm ? ' à ' + tm : '') + '.'; }
+      case '/taches': { const o = tasks.filter(x => !x.done); return o.length ? o.map((x, i) => `${i + 1}. ${x.text}${x.time ? ' · ' + x.time : ''}${isLate(x) ? ' ⚠ en retard' : ''}`).join('\n') + '\n\n/fait N pour valider.' : 'Aucune tâche en cours.'; }
+      case '/fait': { const x = tasks.filter(y => !y.done)[(+arg) - 1]; if (!x) return 'Numéro invalide, voir /taches.'; toggleTask(x); return 'Terminée : ' + x.text + ' ✅'; }
+      case '/plan': { PROPS = proposals(); renderProps(); return PROPS.length ? PROPS.map(x => '- ' + x.m).join('\n') + '\n\nAjoutez-les depuis l\'onglet Tâches.' : 'Rien à proposer pour le moment.'; }
+      case '/note': if (!r.length) return 'Usage : /note Texte'; saveNote(r.join(' ').slice(0, 40), r.join(' ')); return 'Note enregistrée.';
+      case '/calc': return localCmd('calcule ' + r.join(' ')) || 'Expression invalide.';
+      case '/minuteur': return localCmd('minuteur ' + r.join(' ')) || 'Usage : /minuteur 10 min';
+      case '/copie': { const l = [...messages].reverse().find(m => m.sender !== 'user' && m.text); if (!l) return 'Rien à copier.'; navigator.clipboard?.writeText(l.text); return 'Dernière réponse copiée.'; }
+      case '/phone': return phoneCmd();
+      case '/outils': openTools(); return 'Boîte à outils ouverte.';
       case '/aide': return 'Commandes :\n' + CMDS.map(x => '- ' + x[0].trim() + ' : ' + x[1]).join('\n');
     }
     return 'Commande inconnue. Tape /aide.';
@@ -1758,6 +1752,118 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     const t = r.text.replace(/["«»*#\n]/g, ' ').replace(/\s+/g, ' ').trim().replace(/[.!?:]$/, '').slice(0, 48);
     if (t.length > 2) { c.title = t; dbPut(strip(c)); persist(); }
   }
+
+
+  /* ---------- Compte rendu du téléphone (Android, application Capacitor) ---------- */
+  const PB = window.Capacitor?.Plugins?.LisaBridge;
+  function lisaSay(t) { messages.push({ id: Date.now(), sender: 'jarvis', text: t, ts: now() }); renderChat(); persist(); }
+  async function phoneReport(ask) {
+    if (!PB) return null;
+    try {
+      let st = await PB.status();
+      if (ask && (!st.calls || !st.sms)) st = await PB.ask();
+      if (ask && !st.notif) { PB.openNotifSettings(); return "Activez l'accès aux notifications pour Lisa, puis redemandez le compte rendu."; }
+      const since = store.get('lisa.seen', Date.now() - 864e5), r = await PB.report({ since });
+      store.set('lisa.seen', Date.now());
+      const grp = (a, k) => { const m = {}; a.forEach(x => { const n = (x[k] || 'Inconnu'); m[n] = (m[n] || 0) + 1; }); return Object.entries(m).map(([n, c]) => n + (c > 1 ? ' (' + c + ')' : '')).join(', '); };
+      const out = [], miss = r.calls.filter(c => c.type !== 'in');
+      if (miss.length) out.push('Appels manqués : ' + grp(miss, 'name') + '.');
+      if (r.sms.length) out.push('SMS de ' + grp(r.sms, 'from') + '.');
+      if (r.wa.length) out.push('WhatsApp : ' + grp(r.wa, 'from') + '.');
+      return out.length ? 'Depuis votre dernière visite : ' + out.join(' ') : 'Rien de nouveau : aucun appel manqué ni message.';
+    } catch (e) { return 'Je ne peux pas lire le téléphone pour le moment.'; }
+  }
+  const phoneCmd = () => { if (!PB) return "Cette fonction demande l'application Android de Lisa."; phoneReport(true).then(t => t && lisaSay(t)); return 'Je consulte votre téléphone…'; };
+  /* ---------- Tâches v2 : suivi hors ligne + propositions ---------- */
+  const ymd = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const norm = x => String(x).toLowerCase().replace(/[^\p{L}\d ]/gu, '').trim();
+  let tlog = store.get('louis.tlog', []), PROPS = [];
+  const saveT = () => { store.set('louis.tasks', tasks); store.set('louis.tlog', tlog.slice(-400)); };
+  const isLate = t => !t.done && t.date && (t.date < ymd() || (t.date === ymd() && t.time && t.time < new Date().toTimeString().slice(0, 5)));
+  function addTask(text, time, date, pr) { text = String(text).trim().slice(0, 200); if (!text) return; const t = { id: Date.now(), text, time: time || '', date: date || '', pr: pr || '', done: false, created: Date.now() }; tasks.unshift(t); saveT(); renderTasks(); return t; }
+  function toggleTask(t) { t.done = !t.done; if (t.done) { t.doneAt = Date.now(); tlog.push({ k: norm(t.text), t: t.text, d: ymd(), h: new Date().getHours() }); } else { delete t.doneAt; tlog = tlog.filter(x => !(x.k === norm(t.text) && x.d === ymd())); } saveT(); renderTasks(); }
+  function streak() { const ds = new Set(tlog.map(x => x.d)); let n = 0, d = new Date(); if (!ds.has(ymd(d))) d = new Date(Date.now() - 864e5); while (ds.has(ymd(d))) { n++; d = new Date(d - 864e5); } return n; }
+  const POOL = [["Réviser 30 min d'anglais financier", '08:00'], ['Pratiquer 30 min de Python (pandas)', '18:00'], ['Résoudre 3 exercices de probabilités ou statistiques', '17:00'], ['Lire une actualité financière et noter 3 idées', '12:30'], ['Construire ou mettre à jour un modèle Excel / DCF', '19:00'], ['Faire le point : 3 priorités pour demain', '21:00']];
+  function proposals() {
+    const out = [], today = ymd(), hr = new Date().getHours();
+    const has = x => tasks.some(t => norm(t.text) === norm(x) && (!t.done || (t.doneAt && ymd(new Date(t.doneAt)) === today)));
+    tasks.filter(isLate).slice(0, 2).forEach(t => out.push({ m: 'En retard : ' + t.text, a: "Reporter à aujourd'hui", f: () => { t.date = today; t.time = ''; saveT(); renderTasks(); } }));
+    const cnt = {}; tlog.forEach(x => { (cnt[x.k] = cnt[x.k] || { n: 0, t: x.t }).n++; });
+    Object.values(cnt).filter(c => c.n >= 2 && !has(c.t)).sort((a, b) => b.n - a.n).slice(0, 2).forEach(c => out.push({ m: 'Habitude (' + c.n + ' fois) : ' + c.t, a: '＋ Ajouter', f: () => addTask(c.t, '', today) }));
+    const day = Math.floor(Date.now() / 864e5);
+    for (let i = 0; out.length < 4 && i < POOL.length; i++) { const p = POOL[(day + i) % POOL.length]; if (!has(p[0])) out.push({ m: p[0], a: '＋ Ajouter', f: () => addTask(p[0], hr < +p[1].slice(0, 2) ? p[1] : '', today) }); }
+    return out;
+  }
+  function renderProps() {
+    PROPS = proposals(); const on = navigator.onLine;
+    $('#t-prop').innerHTML = '<div class="lbl mb-2">Propositions pour vous' + (on ? '' : ' · calculées sur l\'appareil') + '</div>' +
+      (PROPS.length ? PROPS.map((p, i) => `<div class="flex items-center gap-2 py-1"><div class="flex-1 text-[12px] text-blue-50">${escH(p.m)}</div><button type="button" data-p="${i}" class="chip">${escH(p.a)}</button></div>`).join('') : '<div class="text-xs text-zinc-400">Tout est à jour 👌</div>') +
+      (on ? '<button type="button" data-p="ai" class="chip w-full !rounded-xl !py-2 mt-2">✨ Demander un plan à Lisa</button>' : '');
+  }
+  function renderTasks() {
+    $$('#task-filters [data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === tfilter));
+    $('#t-net').textContent = navigator.onLine ? "En ligne · enregistré sur l'appareil" : 'Hors ligne · suivi local actif';
+    $('#t-streak').textContent = '🔥 ' + streak() + ' j';
+    const today = ymd(), days = [...Array(7)].map((_, i) => ymd(new Date(Date.now() - (6 - i) * 864e5))), n = days.map(d => tlog.filter(x => x.d === d).length), mx = Math.max(1, ...n);
+    const late = tasks.filter(isLate).length, open = tasks.filter(t => !t.done).length;
+    $('#t-stats').innerHTML = `<div class="flex items-end gap-3"><div class="flex items-end gap-1 h-10 w-28">${n.map(v => `<i style="flex:1;height:${Math.max(10, v / mx * 100)}%;background:#22d3ee;opacity:${v ? 1 : .2};border-radius:3px"></i>`).join('')}</div><div class="text-[11px] text-zinc-300 leading-4"><b class="text-blue-50">${n[6]}</b> faite${n[6] > 1 ? 's' : ''} aujourd'hui<br>${open} en cours${late ? ' · <span class="text-rose-400">' + late + ' en retard</span>' : ''}</div></div>`;
+    renderProps();
+    const list = $('#task-list'); list.innerHTML = '';
+    const rank = t => (t.done ? 9 : isLate(t) ? 0 : t.pr ? 1 : 2);
+    const shown = tasks.filter(t => tfilter === 'all' || (tfilter === 'done' ? t.done : !t.done)).sort((a, b) => rank(a) - rank(b) || (a.date || '9').localeCompare(b.date || '9') || (a.time || '99').localeCompare(b.time || '99'));
+    if (!shown.length) { list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Aucune tâche.</div>'; return; }
+    shown.forEach(t => {
+      const r = document.createElement('div'); r.className = 'hud !p-3 flex items-center gap-3';
+      r.innerHTML = '<button class="chk"></button><div class="flex-1 min-w-0"><div class="text-sm text-blue-50 break-words"></div><div class="text-[10px] text-zinc-400"></div></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      const chk = r.children[0], tt = r.children[1].children[0], mt = r.children[1].children[1];
+      chk.classList.toggle('done', t.done); chk.textContent = t.done ? '✓' : '';
+      tt.textContent = (t.pr ? '★ ' : '') + t.text; if (t.done) tt.style.textDecoration = 'line-through';
+      mt.textContent = (t.done ? 'Terminée' : isLate(t) ? 'En retard' : 'En cours') + (t.date && t.date !== today ? ' · ' + t.date.slice(8) + '/' + t.date.slice(5, 7) : '') + (t.time ? ' · ' + t.time : '');
+      if (isLate(t)) mt.style.color = '#fb7185';
+      chk.onclick = () => toggleTask(t);
+      r.children[2].onclick = () => { tasks = tasks.filter(x => x.id !== t.id); saveT(); renderTasks(); };
+      list.appendChild(r);
+    });
+  }
+  $('#task-form').addEventListener('submit', e => {
+    e.preventDefault(); const i = $('#task-input'), tm = $('#task-time'), dt = $('#task-date'); if (!i.value.trim()) return;
+    if (tm.value && window.Notification && Notification.permission === 'default') Notification.requestPermission();
+    addTask(i.value, tm.value, dt.value || ymd(), $('#task-pr').value); i.value = ''; tm.value = ''; dt.value = '';
+  });
+  $('#t-prop').addEventListener('click', e => {
+    const b = e.target.closest('[data-p]'); if (!b) return;
+    if (b.dataset.p === 'ai') { const o = tasks.filter(t => !t.done).map(t => '- ' + t.text + (t.time ? ' (' + t.time + ')' : '')).join('\n') || '(aucune)'; go('chat'); send("Voici mes tâches en cours :\n" + o + "\n\nPropose-moi un plan réaliste et priorisé pour aujourd'hui, avec des horaires, orienté analyse financière et data."); }
+    else PROPS[+b.dataset.p]?.f();
+  });
+  addEventListener('online', renderTasks); addEventListener('offline', renderTasks);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && $('#tab-tasks').classList.contains('active')) renderTasks(); });
+  { const l = tasks.filter(isLate).length; if (l) setTimeout(() => toast('⚠ ' + l + ' tâche' + (l > 1 ? 's' : '') + ' en retard'), 1500); }
+
+  /* ---------- Boîte à outils financière ---------- */
+  const fm = v => Number.isFinite(v) ? v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) : '—';
+  const TOOLS = [
+    { n: 'Intérêts composés', f: [['Capital initial', 1000], ['Apport mensuel', 100], ['Taux annuel (%)', 7], ['Années', 10]], run: ([c, a, t, y]) => { const i = t / 1200, n = y * 12, v = c * Math.pow(1 + i, n) + (i ? a * (Math.pow(1 + i, n) - 1) / i : a * n); return 'Valeur finale : ' + fm(v) + '\nVersé : ' + fm(c + a * n) + ' · Gains : ' + fm(v - c - a * n); } },
+    { n: 'Prêt', f: [['Montant', 10000], ['Taux annuel (%)', 5], ['Années', 5]], run: ([p, t, y]) => { const i = t / 1200, n = y * 12, m = i ? p * i / (1 - Math.pow(1 + i, -n)) : p / n; return 'Mensualité : ' + fm(m) + '\nCoût total : ' + fm(m * n) + ' · Intérêts : ' + fm(m * n - p); } },
+    { n: 'VAN / TRI', f: [['Flux (séparés par des virgules)', '-1000,300,400,500'], ["Taux d'actualisation (%)", 8]], run: ([fl, r]) => { const c = String(fl).split(',').map(Number); if (c.length < 2 || c.some(isNaN)) return 'Flux invalides.'; const npv = q => c.reduce((s, x, k) => s + x / Math.pow(1 + q, k), 0); let lo = -.99, hi = 10, irr = NaN; if (npv(lo) * npv(hi) < 0) { for (let k = 0; k < 200; k++) { const mid = (lo + hi) / 2; if (npv(lo) * npv(mid) <= 0) hi = mid; else lo = mid; } irr = (lo + hi) / 2; } return 'VAN : ' + fm(npv(r / 100)) + '\nTRI : ' + (Number.isFinite(irr) ? fm(irr * 100) + ' %' : 'non défini'); } },
+    { n: 'CAGR', f: [['Valeur initiale', 100], ['Valeur finale', 180], ['Années', 5]], run: ([a, b, y]) => 'Rendement total : ' + fm((b / a - 1) * 100) + ' %\nCAGR : ' + fm((Math.pow(b / a, 1 / y) - 1) * 100) + ' %' },
+    { n: 'Focus 25 min', f: [], run: () => { startTimer(1500, 'focus de 25 minutes'); return 'Session de 25 minutes lancée. Gardez cette page ouverte.'; } }];
+  let toolI = 0;
+  const tm = document.createElement('div'); tm.id = 'modal-tools'; tm.className = 'hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50';
+  tm.innerHTML = '<div class="hud w-full max-w-sm max-h-[85vh] overflow-y-auto flex flex-col gap-2" style="background:#050a16"><div class="flex items-center justify-between"><div class="lbl">Boîte à outils</div><button id="tl-close" class="chip on">Fermer</button></div><div id="tl-tabs" class="flex gap-1 overflow-x-auto pb-1"></div><div id="tl-body" class="space-y-2"></div><pre id="tl-out" class="text-xs text-cyan-200 whitespace-pre-wrap"></pre></div>';
+  document.body.appendChild(tm);
+  function renderTool() {
+    const T = TOOLS[toolI]; $('#tl-out').textContent = '';
+    $('#tl-tabs').innerHTML = TOOLS.map((x, i) => `<button type="button" data-t="${i}" class="chip ${i === toolI ? 'on' : ''} whitespace-nowrap">${x.n}</button>`).join('');
+    $('#tl-body').innerHTML = T.f.map(([l, v]) => `<label class="lbl block" style="font-size:9px">${escH(l)}<input value="${escH(v)}" ${typeof v === 'number' ? 'type="number" step="any"' : 'type="text"'} class="fld"></label>`).join('') + `<button type="button" id="tl-run" class="btn-neon w-full py-2.5 text-sm">${T.f.length ? 'Calculer' : 'Lancer'}</button>`;
+  }
+  function openTools() { renderTool(); show('#modal-tools', true); }
+  tm.addEventListener('click', e => {
+    if (e.target === tm || e.target.id === 'tl-close') return show('#modal-tools', false);
+    const b = e.target.closest('[data-t]'); if (b) { toolI = +b.dataset.t; return renderTool(); }
+    if (e.target.id === 'tl-run') { const T = TOOLS[toolI], v = [...$$('#tl-body input')].map((el, i) => typeof T.f[i][1] === 'number' ? +el.value : el.value); $('#tl-out').textContent = T.run(v); }
+  });
+  $('#apps-tools').onclick = openTools;
+
   renderModes(); renderChat(); renderLinks(); renderApps(); renderTasks(); updateBadge(); updateBar();
   dbAll().then(list => {
     if (!list.length) { convs.forEach(c => dbPut(strip(c))); return; }
