@@ -499,9 +499,10 @@
     <label class="lbl block" style="font-size:9px">Votre prénom<input id="set-name" type="text" class="fld"></label>
     <div class="lbl" style="font-size:9px">Thème de couleur</div><div id="theme-row" class="flex gap-3"></div>
     <label class="flex items-center gap-2 text-[12px] text-blue-100"><input id="set-greet" type="checkbox" class="accent-cyan-400"> Salutation vocale au démarrage</label>
-    <label class="lbl block" style="font-size:9px">Clé API Gemini<input id="set-key" type="password" autocomplete="off" placeholder="Collez votre clé ici" class="fld"></label>
+    <label class="lbl block" style="font-size:9px">Code d'accès<input id="set-code" type="password" autocomplete="off" placeholder="Code fourni par Léonard" class="fld"></label>
+    <label class="lbl block" style="font-size:9px">Clé API Gemini (facultatif)<input id="set-key" type="password" autocomplete="off" placeholder="Laissez vide pour utiliser le code d'accès" class="fld"></label>
     <button id="adm-open" type="button" class="chip w-full !rounded-xl">🛡 Espace admin</button>
-    <button id="set-keytest" type="button" class="chip w-full !rounded-xl">Tester la clé</button>
+    <button id="set-keytest" type="button" class="chip w-full !rounded-xl">Tester l'accès</button>
     <label class="lbl block" style="font-size:9px">Modèle<select id="set-model" class="fld"></select></label>
     <label class="lbl block" style="font-size:9px">Voix de Lisa<select id="set-voice" class="fld"></select></label>
     <button id="set-test" type="button" class="chip w-full !rounded-xl">Écouter cette voix</button>
@@ -588,7 +589,7 @@
       <button id="adm-cprev" class="chip w-full !rounded-xl">Copier la liste de révocation</button>
       <div class="lbl pt-1">Sécurité</div>
       <div class="flex gap-2"><button id="adm-chpw" class="chip flex-1">Changer le code</button><button id="adm-lockn" class="chip flex-1">Verrouiller</button></div>
-      <p class="text-[10px] text-zinc-500 leading-relaxed">Chaque testeur utilise sa propre clé Gemini (⚙ Réglages) et ses données restent sur son appareil. Votre clé n'est jamais partagée. La liste de révocation se colle dans la constante ACCESS.revoked du fichier index.html.</p>
+      <p class="text-[10px] text-zinc-500 leading-relaxed">Chaque testeur saisit son code d'accès (⚙ Réglages) ; la clé Gemini reste cachée dans le Worker. Ses données restent sur son appareil. Votre clé n'est jamais partagée. La liste de révocation se colle dans la constante ACCESS.revoked du fichier index.html.</p>
     </div>
   </div>
 </div>
@@ -641,7 +642,8 @@
   const uiConfirm = m => uiDialog(m, { ok: 'Confirmer' }), uiPrompt = (m, d) => uiDialog(m, { input: true, def: d || '' }), uiAlert = m => uiDialog(m, { cancel: false });
 
   /* ---------- Données ---------- */
-  let settings = Object.assign({ key: '', model: 'gemini-3.8-flash', voice: '', notes: '', name: 'Leonard', v: 0 }, store.get('jarvis.settings', {}));
+  const PROXY_URL = 'https://lisa-proxy-2728.leonardouamouno3.workers.dev';
+  let settings = Object.assign({ key: '', code: '', model: 'gemini-3.8-flash', voice: '', notes: '', name: 'Leonard', v: 0 }, store.get('jarvis.settings', {}));
   if (settings.v < 4) { if (!settings.model || /^gemini-(2\.5-flash|3-flash)/.test(settings.model)) settings.model = 'gemini-3.8-flash'; settings.v = 4; store.set('jarvis.settings', settings); }
   let notes = store.get('jarvis.notes', []);
   let mem = store.get('louis.mem', []), rules = store.get('louis.rules', []), fb = store.get('louis.fb', []), pendingMem = [], lastRegles = [];
@@ -804,24 +806,25 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   const genCfg = model => /gemini-3\.8-flash/.test(model) ? { thinkingConfig: { thinkingLevel: (mode === 'maths' || mode === 'devoirs') ? 'medium' : 'low' } } : /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
 
   async function ask(history, onDelta, sysText) {
-    if (!settings.key) setTimeout(openSettings, 300);
-    if (!settings.key) return { error: true, text: "Clé API manquante. Ouvrez ⚙ Réglages et collez votre clé Gemini (gratuite sur aistudio.google.com)." };
+    const viaProxy = !settings.key;
+    if (viaProxy && !settings.code) setTimeout(openSettings, 300);
+    if (viaProxy && !settings.code) return { error: true, text: "Code d'accès manquant. Ouvrez ⚙ Réglages et saisissez le code que vous avez reçu." };
       const models = [...new Set([settings.model, 'gemini-3.5-flash-lite'])];
     let last = '';
     abortCtl = new AbortController();
     for (const model of models) {
       let full = '', src = [];
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
+        const res = await fetch(`${viaProxy ? PROXY_URL : 'https://generativelanguage.googleapis.com'}/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
+          headers: viaProxy ? { 'Content-Type': 'application/json', 'x-access-code': settings.code } : { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
           signal: abortCtl.signal,
           body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: sysText || buildSystem() }] }, generationConfig: genCfg(model), ...(web && !sysText ? { tools: [{ google_search: {} }] } : {}) })
         });
         if (!res.ok) {
           const d = await res.json().catch(() => ({}));
           last = `Erreur (${res.status}) : ${d?.error?.message || 'requête refusée'}`;
-          if (res.status === 403 || /API key/i.test(last)) return { error: true, text: last + '\n\nVérifiez votre clé dans ⚙ Réglages.' };
+          if (res.status === 401 || res.status === 403 || /API key/i.test(last)) return { error: true, text: last + (viaProxy ? '\n\nVérifiez votre code d\'accès dans ⚙ Réglages.' : '\n\nVérifiez votre clé dans ⚙ Réglages.') };
           continue;
         }
         const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '';
@@ -1409,12 +1412,12 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   function openSettings() {
     const ms = MODELS.slice(); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
     $('#set-model').innerHTML = ms.map(m => `<option value="${escH(m[0])}">${escH(m[1])}</option>`).join(''); $('#set-model').value = settings.model;
-    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
+    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-code').value = settings.code || ''; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
   }
   $('#btn-settings').onclick = openSettings; $('#apps-settings').onclick = openSettings;
   $('#set-cancel').onclick = () => show('#modal-settings', false);
   $('#set-save').onclick = () => {
-    settings = Object.assign(settings, { greet: $('#set-greet').checked, name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
+    settings = Object.assign(settings, { greet: $('#set-greet').checked, name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), code: $('#set-code').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
     store.set('jarvis.settings', settings); $('#home-hello').textContent = 'Bonjour ' + (settings.name || '') + ' !'; show('#modal-settings', false); toast('Réglages enregistrés');
   };
   $('#set-test').onclick = () => {
@@ -1510,7 +1513,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     r.onload = async () => {
       try {
         const d = JSON.parse(r.result); if (!await uiConfirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
-        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key }));
+        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key, code: settings.code }));
         [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links], ['louis.folders', d.folders], ['louis.convs', d.convs]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
         if (Array.isArray(d.convs)) { dbReplace(d.convs).then(() => location.reload()); return; }
         location.reload();
@@ -1694,8 +1697,8 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   $('#theme-row').addEventListener('click', e => { const b = e.target.closest('[data-th]'); if (!b) return; settings.theme = +b.dataset.th; store.set('jarvis.settings', settings); paintTheme(); });
   paintTheme();
   $('#set-keytest').onclick = async () => {
-    const k = $('#set-key').value.trim(); if (!k) return uiAlert("Colle d'abord ta clé.");
-    try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${$('#set-model').value}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': k }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) }); const d = await r.json().catch(() => ({})); uiAlert(r.ok ? '✅ Clé valide, le modèle répond.' : '❌ ' + String(d?.error?.message || r.status).slice(0, 120)); } catch { uiAlert('❌ Connexion impossible.'); }
+    const k = $('#set-key').value.trim(), c = $('#set-code').value.trim(); if (!k && !c) return uiAlert("Saisis d'abord ton code d'accès (ou ta clé).");
+    try { const r = await fetch(`${k ? 'https://generativelanguage.googleapis.com' : PROXY_URL}/v1beta/models/${$('#set-model').value}:generateContent`, { method: 'POST', headers: k ? { 'Content-Type': 'application/json', 'x-goog-api-key': k } : { 'Content-Type': 'application/json', 'x-access-code': c }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) }); const d = await r.json().catch(() => ({})); uiAlert(r.ok ? '✅ Accès valide, le modèle répond.' : '❌ ' + String(d?.error?.message || d?.error || r.status).slice(0, 120)); } catch { uiAlert('❌ Connexion impossible.'); }
   };
   { const lg = $('#chat-log'), tb = $('#to-bottom');
     const place = () => { const far = lg.scrollHeight - lg.scrollTop - lg.clientHeight > 160; tb.classList.toggle('hidden', !far); if (far) tb.style.top = (lg.getBoundingClientRect().bottom - $('#tab-chat').getBoundingClientRect().top - 46) + 'px'; };
