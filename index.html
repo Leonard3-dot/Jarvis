@@ -42,6 +42,25 @@
   .av-stage.sm { position: absolute; -webkit-mask-image: none; mask-image: none; }
   .av-stage > .av-img { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-select: none; pointer-events: none; }
   #avatar-sm, #avatar-chat { position: relative; }
+
+  /* ===== Yeux de Lisa : iris lumineux, anneau holographique, clignement ===== */
+  .av-eye { position: absolute; top: 35.2%; width: 3.7%; aspect-ratio: 1; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(207,250,254,.75) 0 14%, rgba(34,211,238,.55) 38%, rgba(56,189,248,.18) 62%, transparent 74%); animation: eyepulse 3.4s ease-in-out infinite, eyeblink 5.6s infinite; }
+  .av-eye.l { left: 40.5%; } .av-eye.r { left: 57.1%; }
+  .av-eye::before { content: ""; position: absolute; inset: -110%; border-radius: 50%; background: radial-gradient(circle, rgba(34,211,238,.32), rgba(99,102,241,.12) 45%, transparent 68%); }
+  .av-eye::after { content: ""; position: absolute; inset: -22%; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 52%, rgba(207,250,254,.95) 74%, transparent 92%); -webkit-mask-image: radial-gradient(circle, transparent 60%, #000 65%, #000 77%, transparent 82%); mask-image: radial-gradient(circle, transparent 60%, #000 65%, #000 77%, transparent 82%); animation: eyering 4.2s linear infinite; }
+  .av-eye.r::after { animation-direction: reverse; }
+  .av-lid { position: absolute; top: 35.4%; width: 8.2%; height: 3%; pointer-events: none; transform: translate(-50%, -50%) scaleY(0); background: radial-gradient(ellipse 50% 50% at 50% 50%, rgb(60,60,118) 55%, rgba(60,60,118,0) 100%); animation: lidblink 5.6s infinite; }
+  .av-lid.l { left: 40.4%; } .av-lid.r { left: 57%; }
+  @keyframes eyepulse { 0%, 100% { transform: translate(-50%, -50%) scale(.9); } 50% { transform: translate(-50%, -50%) scale(1.15); } }
+  @keyframes eyering { to { transform: rotate(360deg); } }
+  @keyframes eyeblink { 0%, 93%, 100% { opacity: 1; } 95.5% { opacity: 0; } }
+  @keyframes lidblink { 0%, 92.5%, 100% { transform: translate(-50%, -50%) scaleY(0); } 95% { transform: translate(-50%, -50%) scaleY(1); } }
+  .speaking .av-eye { animation-duration: 1.1s, 5.6s; filter: brightness(1.35) saturate(1.2); }
+  .speaking .av-eye::after { animation-duration: 1.6s; }
+  body.busy .av-eye { filter: brightness(1.5) hue-rotate(35deg); animation-duration: .9s, 5.6s; }
+  body.busy .av-eye::after { animation-duration: .8s; }
+  .still:not(.speaking) .av-eye::after { animation: eyering 4.2s linear infinite !important; }
+  @media (prefers-reduced-motion: reduce) { .av-eye, .av-eye::after, .av-lid { animation: none !important; } }
   .av-op { position: absolute; left: 43.036%; top: 49.524%; width: 11.25%; height: 1.587%; transform-origin: 50% 0; transform: scale(var(--ow), var(--o)); border-radius: 0 0 50% 50% / 0 0 100% 100%; background: linear-gradient(to bottom, #2a1033 0, #1a0823 55%, #5c2352 100%); filter: blur(.25px); pointer-events: none; will-change: transform; }
   .av-op::before { content: ""; position: absolute; left: 14%; right: 14%; top: 0; height: 24%; background: rgba(214,212,250,.85); border-radius: 0 0 45% 45%; opacity: clamp(0, calc(var(--o) * 2.2 - .55), .8); }
   .av-jaw { position: absolute; left: 42.946%; top: 49.524%; width: 11.429%; height: 6.349%; pointer-events: none; transform-origin: 50% 0; transform: scaleX(var(--wl)); opacity: clamp(0, calc(var(--o) * 40), 1); -webkit-mask-image: radial-gradient(ellipse 58% 100% at 50% 0%, #000 68%, transparent 100%); mask-image: radial-gradient(ellipse 58% 100% at 50% 0%, #000 68%, transparent 100%); }
@@ -235,6 +254,21 @@
   .composer { border-radius: 30px; border-color: rgba(56,140,255,.55); background: rgba(8,20,46,.78); box-shadow: 0 0 24px rgba(37,99,235,.3), 0 8px 30px rgba(0,0,0,.45); }
   .send { width: 42px; height: 42px; box-shadow: 0 0 20px rgba(56,189,248,.6); }
   .chip { background: rgba(8,22,52,.6); border-color: rgba(56,140,255,.4); }
+
+  /* ===== Chat moderne (v2) ===== */
+  .tb { width: 36px; height: 36px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #9db8e0; background: rgba(56,140,255,.07); border: 1px solid transparent; flex-shrink: 0; transition: background .15s, color .15s, border-color .15s; }
+  .tb:hover { background: rgba(56,140,255,.18); color: #e0f2fe; } .tb.on { color: #22d3ee; background: rgba(34,211,238,.14); border-color: rgba(34,211,238,.45); } .tb.acc { color: #fff; background: linear-gradient(135deg,#2563eb,#0891b2); box-shadow: 0 0 14px rgba(34,211,238,.35); }
+  .tb:focus-visible { outline: 2px solid #67e8f9; outline-offset: 2px; }
+  .term { border: 0; background: none; box-shadow: none; padding: 0 2px; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; }
+  .chat-head { display: flex; align-items: center; gap: 10px; padding: 2px 0 6px; border-bottom: 1px solid rgba(96,165,250,.14); }
+  .chat-title { font-weight: 800; letter-spacing: .14em; font-size: 15px; color: #f1f7ff; line-height: 1.1; } .chat-sub { font-size: 11px; color: #7fa3d6; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #modes .chip { background: transparent; border-color: transparent; color: #8fa6c9; padding: 6px 12px; } #modes .chip:hover { color: #e0f2fe; } #modes .chip.on { background: rgba(56,140,255,.2); border-color: rgba(96,165,250,.45); color: #fff; }
+  #chat-log .bub-ai { background: none; border: 0; box-shadow: none; border-radius: 0; padding: 2px; }
+  #chat-log .bub-user { background: rgba(37,99,235,.3); border: 1px solid rgba(125,190,255,.28); box-shadow: none; border-radius: 20px 20px 6px 20px; }
+  .composer { border-radius: 28px; background: rgba(8,16,34,.92); border: 1px solid rgba(96,165,250,.32); box-shadow: 0 10px 30px rgba(0,0,0,.45); padding: 10px 10px 8px 14px; }
+  .cbtn { width: 36px; height: 36px; } .cbtn svg { width: 19px; height: 19px; } .cbtn.on { color: #22d3ee; }
+  [data-vt] .v-on { display: none; } [data-vt].on .v-on { display: block; } [data-vt].on .v-off { display: none; }
+  #att-btn { position: relative; } #att-btn[data-n]:not([data-n=""])::after { content: attr(data-n); position: absolute; top: -2px; right: -2px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px; background: #22d3ee; color: #04101f; font-size: 10px; font-weight: 700; line-height: 15px; text-align: center; }
 </style>
 </head>
 <body>
@@ -260,8 +294,8 @@
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <button id="btn-install" class="chip hidden">Installer</button>
-      <button id="btn-help" class="chip" aria-label="Aide">?</button>
-      <button id="btn-settings" class="chip" aria-label="Réglages">⚙</button>
+      <button id="btn-help" class="tb" aria-label="Aide"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg></button>
+      <button id="btn-settings" class="tb" aria-label="Réglages"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
       <div class="online-pill"><i></i><span id="status">Prêt</span></div>
     </div>
   </header>
@@ -339,25 +373,32 @@
     <!-- CHAT -->
     <section id="tab-chat" class="tab" style="overflow:hidden">
       <div class="term max-w-3xl mx-auto h-full flex flex-col gap-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2"><div id="avatar-chat" class="live w-12 h-12 rounded-full border border-blue-400/40 bg-black overflow-hidden transition-shadow"></div><div><div class="text-sm font-bold text-blue-50">Terminal IA</div><div id="mode-name" class="lbl" style="font-size:9px"></div></div></div>
-          <div class="flex gap-2"><button id="web-btn" class="chip" aria-label="Recherche web">🌐</button><button class="chip hands-btn" data-l="🎧" aria-label="Mode conversation">🎧</button><button id="lib-open" class="chip" aria-label="Mes fichiers">📚</button><button id="conv-open" class="chip" aria-label="Conversations">🗂</button><button id="new-chat" class="chip">＋ Nouvelle</button></div>
+        <div class="chat-head">
+          <div id="avatar-chat" class="live w-11 h-11 rounded-full border border-blue-400/40 bg-black overflow-hidden transition-shadow shrink-0"></div>
+          <div class="min-w-0 flex-1"><div class="chat-title">LISA</div><div id="mode-name" class="chat-sub"></div></div>
+          <div class="flex items-center gap-1">
+            <button id="web-btn" class="tb" aria-label="Recherche web"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg></button>
+            <button class="tb hands-btn" data-ic data-l="" aria-label="Mode conversation"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></button>
+            <button id="lib-open" class="tb" aria-label="Mes fichiers"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+            <button id="conv-open" class="tb" aria-label="Conversations"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+            <button id="new-chat" class="tb acc" aria-label="Nouvelle conversation"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
         </div>
-        <div id="modes" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
-        <div id="chips" class="flex gap-2 overflow-x-auto pb-1 shrink-0"></div>
-        <div id="chat-log" class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1" style="overscroll-behavior:contain"></div>
+        <div id="modes" class="flex gap-1 overflow-x-auto pb-1 shrink-0"></div>
+        <div id="chips" class="hidden"></div>
+        <div id="chat-log" class="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1" style="overscroll-behavior:contain"></div>
         <div id="mem-bar" class="hud hidden !p-2 text-xs flex items-center gap-2 shrink-0"><span id="mem-txt" class="flex-1 text-blue-100"></span><button id="mem-yes" type="button" class="chip on">Retenir</button><button id="mem-no" type="button" class="chip">Non</button></div>
-        <button id="to-bottom" type="button" class="hidden absolute right-4 z-20 w-9 h-9 rounded-full bg-black/80 border border-cyan-300/50 text-cyan-200 text-lg" style="top:0" aria-label="Aller en bas">↓</button>
+        <button id="to-bottom" type="button" class="hidden absolute right-4 z-20 tb" style="top:0;background:rgba(5,12,28,.9);border:1px solid rgba(34,211,238,.5)" aria-label="Aller en bas"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
         <div id="att-bar" class="hidden flex gap-2 overflow-x-auto shrink-0"></div>
         <div id="slash" class="hidden shrink-0 max-h-40 overflow-y-auto rounded-2xl border border-blue-400/30 bg-black/85"></div>
         <form id="chat-form" class="composer shrink-0">
-          <textarea id="chat-input" rows="1" autocomplete="off" enterkeyhint="enter" placeholder="Posez votre question à Lisa…"></textarea>
+          <textarea id="chat-input" rows="1" autocomplete="off" enterkeyhint="enter" placeholder="Écrivez à LISA…"></textarea>
           <div class="flex items-center gap-1">
-            <button type="button" id="att-btn" class="cbtn" aria-label="Joindre une image ou un PDF">📎</button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
+            <button type="button" id="att-btn" class="cbtn" aria-label="Joindre une image ou un PDF"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M20 11.5l-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17.5a2 2 0 0 1-3-3L14.5 7"/></svg></button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
             <button type="button" class="mic-btn cbtn" aria-label="Parler"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
-            <button type="button" data-vt class="cbtn" aria-label="Voix">🔇</button>
+            <button type="button" data-vt class="cbtn" aria-label="Voix"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="v-on"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="v-off"><path d="M11 5 6 9H3v6h3l5 4zM16 9l5 6M21 9l-5 6"/></svg></button>
             <span id="tbar-txt" class="flex-1 min-w-0 truncate text-right px-2 text-[10px] text-zinc-500"></span>
-            <button type="button" id="tbar-exp" class="cbtn" aria-label="Agrandir la zone de saisie">⤢</button>
+            <button type="button" id="tbar-exp" class="cbtn" aria-label="Agrandir la zone de saisie"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
             <button id="chat-send" type="submit" class="send" aria-label="Envoyer"><svg class="i-send" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><svg class="i-stop" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></button>
           </div>
         </form>
@@ -499,7 +540,6 @@
     <label class="lbl block" style="font-size:9px">Votre prénom<input id="set-name" type="text" class="fld"></label>
     <div class="lbl" style="font-size:9px">Thème de couleur</div><div id="theme-row" class="flex gap-3"></div>
     <label class="flex items-center gap-2 text-[12px] text-blue-100"><input id="set-greet" type="checkbox" class="accent-cyan-400"> Salutation vocale au démarrage</label>
-    <label class="lbl block" style="font-size:9px">Code d'accès<input id="set-code" type="password" autocomplete="off" placeholder="Code fourni par Léonard" class="fld"></label>
     <label class="lbl block" style="font-size:9px">Clé API Gemini (facultatif)<input id="set-key" type="password" autocomplete="off" placeholder="Laissez vide pour utiliser le code d'accès" class="fld"></label>
     <button id="adm-open" type="button" class="chip w-full !rounded-xl">🛡 Espace admin</button>
     <button id="set-keytest" type="button" class="chip w-full !rounded-xl">Tester l'accès</button>
@@ -704,7 +744,7 @@
   { const tst = new Image(); tst.onerror = () => { AV_URL = AV_BIG; document.querySelectorAll('.av-stage img').forEach(i => { i.src = AV_BIG; }); }; tst.src = AV_URL; }
   /* Mâchoire en lamelles (profil elliptique) : les coins de la bouche restent en place, le centre s'ouvre. */
   const JAW_N = 21, JAW = Array.from({ length: JAW_N }, (_, k) => { const x = ((k + .5) / JAW_N) * 2 - 1, pr = Math.sqrt(Math.max(0, 1 - x * x)); return `<div class="jw" style="left:${(k * 100 / JAW_N).toFixed(3)}%;--p:${pr.toFixed(3)}"><img src="${AV_URL}" alt="" draggable="false" style="width:${875 * JAW_N}%;left:${(-(240.5 * JAW_N / 64 + k) * 100).toFixed(1)}%"></div>`; }).join('');
-  const robot = full => `<div class="av-stage ${full ? 'full' : 'sm'}"${full ? '' : ' style="width:160%;left:-28.57%;top:0"'}><img class="av-img" src="${AV_URL}" alt="Avatar de l'assistant" draggable="false"><div class="av-op"></div><div class="av-jaw">${JAW}</div></div>`;
+  const robot = full => `<div class="av-stage ${full ? 'full' : 'sm'}"${full ? '' : ' style="width:160%;left:-28.57%;top:0"'}><img class="av-img" src="${AV_URL}" alt="Avatar de l'assistant" draggable="false"><div class="av-eye l"></div><div class="av-eye r"></div><div class="av-lid l"></div><div class="av-lid r"></div><div class="av-op"></div><div class="av-jaw">${JAW}</div></div>`;
   $('#robot-big').innerHTML = robot(true);
   $('#avatar-sm').innerHTML = robot(false);
   $('#avatar-chat').innerHTML = robot(false);
@@ -787,11 +827,11 @@ ADAPTATION : repère le niveau et les objectifs de l'utilisateur d'après ses me
 
 RIGUEUR : annonce tes hypothèses ; signale les limites des modèles ; dans une démonstration, détaille chaque étape ; fournis un code propre, commenté et testé mentalement ; tiens compte des contraintes réelles (frais, spread, liquidité). N'invente jamais de chiffres : si une donnée manque, dis-le.
 
-VITESSE : réponds directement, sans préambule ni répétition de la demande ; longueur proportionnée (courte pour une question simple, détaillée pour un projet ou une démonstration).
+QUALITÉ DES RÉPONSES : commence par la réponse ou la conclusion en une ou deux phrases, puis développe seulement ce qui est utile. Va droit au but, sans préambule ni répétition de la demande, sans phrases creuses (« bien sûr », « excellente question »). Sois précis et concret : chiffres, exemples réels, étapes numérotées pour une marche à suivre, tableau pour comparer. Explique d'abord simplement, puis ajoute le détail technique si le sujet l'exige. Quand plusieurs options existent, recommande-en une et dis pourquoi. Relis mentalement ta réponse : corrige toute erreur ou approximation avant d'envoyer, et dis clairement ce dont tu n'es pas sûr. Longueur proportionnée : 2 à 4 lignes pour une question simple, détaillée pour un projet ou une démonstration.
 
 GRAPHIQUES : si (et seulement si) un graphique, une simulation ou une visualisation est demandé, calcule réellement les valeurs et affiche-les avec un bloc de code de langage chart contenant un JSON valide : {"type":"line|area|bar","title":"...","labels":["..."],"series":[{"name":"...","data":[nombres]}]}, au plus 60 points par série, nombres arrondis, puis une courte interprétation.
 
-STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses structurées et précises ; Markdown (titres, listes, gras, blocs de code).`;
+STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et attentionnée ; tutoie ou vouvoie comme l'utilisateur le fait ; un 🙂 de temps en temps sans en abuser. Mise en forme Markdown sobre : gras pour l'essentiel, listes courtes, titres seulement pour les longues réponses, blocs de code pour le code. Phrases courtes et claires, jamais de mur de texte.`;
     const who = settings.name ? `\n\nL'utilisateur s'appelle ${settings.name} ; tu l'appelles « Monsieur ${settings.name} », uniquement pour saluer, pas à chaque phrase.` : '';
     const mine = settings.notes ? `\n\nINSTRUCTIONS PERSONNELLES DE L'UTILISATEUR : ${settings.notes}` : '';
     const memo = mem.length ? '\n\nMÉMOIRE (faits durables validés par l\'utilisateur) :\n- ' + mem.slice(0, 30).map(m => m.t).join('\n- ') : '';
@@ -803,28 +843,29 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     const sug = "\n\nSUITES : à la fin de chaque réponse, sauf salutation, réponse très courte ou commande, ajoute une dernière ligne [[suite: question 1 | question 2 | question 3]] avec 2 ou 3 suites courtes et utiles que l'utilisateur pourrait demander ensuite (elles seront lues à voix haute : formule-les comme de courtes propositions). N'écris jamais cette ligne autrement.";
     return base + adaptTxt() + who + mine + memo + lessons + tag + ctx + dos + sug + (web ? "\n\nRECHERCHE WEB : tu peux chercher sur le web ; fais-le pour l'actualité, les prix, les cours et toute donnée récente, puis réponds sans inventer." : '') + (MODES[mode].x ? '\n\n' + MODES[mode].x : '');
   }
-  const genCfg = model => /gemini-3\.8-flash/.test(model) ? { thinkingConfig: { thinkingLevel: (mode === 'maths' || mode === 'devoirs') ? 'medium' : 'low' } } : /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
+  const genCfg = model => /gemini-3\.8-flash/.test(model) ? { thinkingConfig: { thinkingLevel: (mode === 'maths' || mode === 'devoirs' || mode === 'code') ? 'medium' : 'low' } } : /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
 
   async function ask(history, onDelta, sysText) {
-    const viaProxy = !settings.key;
-    if (viaProxy && !settings.code) setTimeout(openSettings, 300);
-    if (viaProxy && !settings.code) return { error: true, text: "Code d'accès manquant. Ouvrez ⚙ Réglages et saisissez le code que vous avez reçu." };
+    const pass = store.get('louis.pass', '');
+    const viaProxy = !settings.key && !!pass;
+    if (!settings.key && !pass) setTimeout(openSettings, 300);
+    if (!settings.key && !pass) return { error: true, text: "Accès manquant. Ouvrez le lien d'invitation reçu, ou collez votre clé Gemini dans ⚙ Réglages." };
       const models = [...new Set([settings.model, 'gemini-3.5-flash-lite'])];
     let last = '';
     abortCtl = new AbortController();
     for (const model of models) {
       let full = '', src = [];
       try {
-        const res = await fetch(`${viaProxy ? PROXY_URL : 'https://generativelanguage.googleapis.com'}/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
+        const res = await fetch(viaProxy ? `${PROXY_URL}/chat/${encodeURIComponent(model)}` : `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
           method: 'POST',
-          headers: viaProxy ? { 'Content-Type': 'application/json', 'x-access-code': settings.code } : { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
+          headers: viaProxy ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pass } : { 'Content-Type': 'application/json', 'x-goog-api-key': settings.key },
           signal: abortCtl.signal,
           body: JSON.stringify({ contents: history, systemInstruction: { parts: [{ text: sysText || buildSystem() }] }, generationConfig: genCfg(model), ...(web && !sysText ? { tools: [{ google_search: {} }] } : {}) })
         });
         if (!res.ok) {
           const d = await res.json().catch(() => ({}));
           last = `Erreur (${res.status}) : ${d?.error?.message || 'requête refusée'}`;
-          if (res.status === 401 || res.status === 403 || /API key/i.test(last)) return { error: true, text: last + (viaProxy ? '\n\nVérifiez votre code d\'accès dans ⚙ Réglages.' : '\n\nVérifiez votre clé dans ⚙ Réglages.') };
+          if (res.status === 401 || res.status === 403 || /API key/i.test(last)) return { error: true, text: last + (viaProxy ? '\n\nVotre pass est refusé ou expiré : demandez-en un nouveau.' : '\n\nVérifiez votre clé dans ⚙ Réglages.') };
           continue;
         }
         const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '';
@@ -997,7 +1038,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     const lc = atts.length ? null : localCmd(text);
     if (lc) { const u0 = { id: Date.now(), sender: 'user', raw: text, text, ts: now() }, a0 = { id: u0.id + 1, sender: 'jarvis', text: lc, ts: now() }; messages.push(u0, a0); if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42); renderChat(); persist(); if (viaVoice) enqueueSpeech(lc); resumeHands(); return; }
     const F = atts; atts = []; paintAtt();
-    stopSpeech(); busy = true; $('#chat-send').dataset.s = 'stop'; exch++; store.set('louis.exch', exch);
+    stopSpeech(); busy = true; document.body.classList.add('busy'); $('#chat-send').dataset.s = 'stop'; exch++; store.set('louis.exch', exch);
     const u = { id: Date.now(), sender: 'user', raw: text, text: text + (F.length ? '\n' + F.map(f => '📎 ' + f.name).join('\n') : ''), files: F, ts: now() };
     const a = { id: u.id + 1, sender: 'jarvis', text: '', ts: now(), pending: true };
     messages.push(u, a); syncChips(); persist();
@@ -1014,7 +1055,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     clearTimeout(raf); raf = 0;
     const w = $('#m-' + a.id); if (w) w.replaceWith(msgEl(a));
     if (!res.error) { feedSpeech(a.text, true); tags.forEach(proposeMem); if (a.next.length && (autoVoice || viaVoice)) enqueueSpeech('Si vous voulez, je peux aussi : ' + a.next.join(' ; ou ') + '.'); }
-    busy = false; $('#chat-send').dataset.s = ''; persist(); updateBadge(); resumeHands();
+    busy = false; document.body.classList.remove('busy'); $('#chat-send').dataset.s = ''; persist(); updateBadge(); resumeHands();
     if (!res.error && !cur.titleAI && messages.filter(m => m.sender === 'user').length === 1) autoTitle(cur, text, a.text);
   }
   $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (busy) { if (abortCtl) abortCtl.abort(); return; } const i = $('#chat-input'), t = i.value; i.value = ''; cur.draft = ''; hIdx = -1; fit(); $('#slash').classList.add('hidden'); send(t); });
@@ -1065,7 +1106,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   function paintAtt() {
     const bar = $('#att-bar'); bar.classList.toggle('hidden', !atts.length); bar.innerHTML = '';
     atts.forEach((f, i) => { const c = document.createElement('button'); c.type = 'button'; c.className = 'chip on'; c.textContent = (f.mime === 'application/pdf' ? '📄 ' : '🖼 ') + f.name.slice(0, 20) + ' ✕'; c.onclick = () => { atts.splice(i, 1); paintAtt(); }; bar.appendChild(c); });
-    $('#att-btn').textContent = atts.length ? '📎' + atts.length : '📎';
+    $('#att-btn').dataset.n = atts.length || '';
   }
   const idb = () => new Promise((res, rej) => { const r = indexedDB.open('louis-lib', 1); r.onupgradeneeded = () => r.result.createObjectStore('f', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
   const lib = {
@@ -1237,7 +1278,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
       LIP.queue(c, u); if (speechSynthesis.paused) speechSynthesis.resume(); speechSynthesis.speak(u);
     });
   }
-  function paintVT() { $$('[data-vt]').forEach(b => { b.textContent = b.closest('#tab-chat') ? (autoVoice ? '🔊' : '🔇') : (autoVoice ? 'Voix ON' : 'Voix OFF'); b.classList.toggle('on', autoVoice); }); }
+  function paintVT() { $$('[data-vt]').forEach(b => { if (!b.closest('#tab-chat')) b.textContent = autoVoice ? 'Voix ON' : 'Voix OFF'; b.classList.toggle('on', autoVoice); }); }
   function toggleVoice() { autoVoice = !autoVoice; store.set('louis.voice2', autoVoice); if (!autoVoice) stopSpeech(); paintVT(); }
   paintVT();
 
@@ -1412,12 +1453,12 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   function openSettings() {
     const ms = MODELS.slice(); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
     $('#set-model').innerHTML = ms.map(m => `<option value="${escH(m[0])}">${escH(m[1])}</option>`).join(''); $('#set-model').value = settings.model;
-    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-code').value = settings.code || ''; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
+    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
   }
   $('#btn-settings').onclick = openSettings; $('#apps-settings').onclick = openSettings;
   $('#set-cancel').onclick = () => show('#modal-settings', false);
   $('#set-save').onclick = () => {
-    settings = Object.assign(settings, { greet: $('#set-greet').checked, name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), code: $('#set-code').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
+    settings = Object.assign(settings, { greet: $('#set-greet').checked, name: $('#set-name').value.trim(), key: $('#set-key').value.trim(), model: $('#set-model').value, voice: $('#set-voice').value, notes: $('#set-notes').value.trim().slice(0, 1500) });
     store.set('jarvis.settings', settings); $('#home-hello').textContent = 'Bonjour ' + (settings.name || '') + ' !'; show('#modal-settings', false); toast('Réglages enregistrés');
   };
   $('#set-test').onclick = () => {
@@ -1513,7 +1554,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     r.onload = async () => {
       try {
         const d = JSON.parse(r.result); if (!await uiConfirm('Remplacer les données actuelles par cette sauvegarde ?')) return;
-        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key, code: settings.code }));
+        if (d.settings) store.set('jarvis.settings', Object.assign({}, d.settings, { key: settings.key }));
         [['jarvis.notes', d.notes], ['louis.tasks', d.tasks], ['louis.mem', d.mem], ['louis.rules', d.rules], ['louis.fb', d.fb], ['louis.links', d.links], ['louis.folders', d.folders], ['louis.convs', d.convs]].forEach(([k, v]) => { if (Array.isArray(v)) store.set(k, v); });
         if (Array.isArray(d.convs)) { dbReplace(d.convs).then(() => location.reload()); return; }
         location.reload();
@@ -1523,7 +1564,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   };
 
   function resumeHands() { if (!hands) return; clearTimeout(hT); hT = setTimeout(() => { if (hands && !busy && !listening && !speakCount) startMic(); }, 700); }
-  function paintHands() { $$('.hands-btn').forEach(b => { b.classList.toggle('on', hands); b.textContent = hands ? '🎧 ON' : b.dataset.l; }); }
+  function paintHands() { $$('.hands-btn').forEach(b => { b.classList.toggle('on', hands); if (!b.hasAttribute('data-ic')) b.textContent = hands ? '🎧 ON' : b.dataset.l; }); }
   async function toggleHands() {
     if (!hands && !SR) return toast('Micro non pris en charge : utilisez Chrome');
     hands = !hands; paintHands();
@@ -1640,7 +1681,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
     else if (e.key === 'ArrowDown' && hIdx >= 0) { e.preventDefault(); hIdx--; tin.value = hIdx >= 0 ? us[us.length - 1 - hIdx] : ''; fit(); }
   });
   $('#slash').addEventListener('click', e => { const b = e.target.closest('[data-cmd]'); if (!b) return; tin.value = b.dataset.cmd; $('#slash').classList.add('hidden'); fit(); tin.focus(); });
-  $('#tbar-exp').onclick = () => { big = !big; $('#tbar-exp').textContent = big ? '⤡' : '⤢'; fit(); tin.focus(); };
+  $('#tbar-exp').onclick = () => { big = !big; $('#tbar-exp').classList.toggle('on', big); fit(); tin.focus(); };
   const kb = c => Math.max(1, Math.round(JSON.stringify(strip(c)).length / 1024));
   function exportConv(c) {
     const txt = `# ${c.title}\n\n` + c.messages.filter(m => !m.greet && m.text).map(m => `**${m.sender === 'user' ? 'Vous' : 'Lisa'}** · ${m.ts || ''}\n\n${m.text}\n`).join('\n---\n\n');
@@ -1697,8 +1738,14 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   $('#theme-row').addEventListener('click', e => { const b = e.target.closest('[data-th]'); if (!b) return; settings.theme = +b.dataset.th; store.set('jarvis.settings', settings); paintTheme(); });
   paintTheme();
   $('#set-keytest').onclick = async () => {
-    const k = $('#set-key').value.trim(), c = $('#set-code').value.trim(); if (!k && !c) return uiAlert("Saisis d'abord ton code d'accès (ou ta clé).");
-    try { const r = await fetch(`${k ? 'https://generativelanguage.googleapis.com' : PROXY_URL}/v1beta/models/${$('#set-model').value}:generateContent`, { method: 'POST', headers: k ? { 'Content-Type': 'application/json', 'x-goog-api-key': k } : { 'Content-Type': 'application/json', 'x-access-code': c }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) }); const d = await r.json().catch(() => ({})); uiAlert(r.ok ? '✅ Accès valide, le modèle répond.' : '❌ ' + String(d?.error?.message || d?.error || r.status).slice(0, 120)); } catch { uiAlert('❌ Connexion impossible.'); }
+    const k = $('#set-key').value.trim(), pass = store.get('louis.pass', ''), m = $('#set-model').value;
+    if (!k && !pass) return uiAlert("Colle d'abord ta clé, ou ouvre ton lien d'invitation.");
+    try {
+      const r = k ? await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': k }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) })
+        : await fetch(`${PROXY_URL}/chat/${encodeURIComponent(m)}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pass }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) });
+      const d = r.ok ? {} : await r.json().catch(() => ({}));
+      uiAlert(r.ok ? '✅ Accès valide, le modèle répond.' : '❌ ' + String(d?.error?.message || r.status).slice(0, 120));
+    } catch { uiAlert('❌ Connexion impossible.'); }
   };
   { const lg = $('#chat-log'), tb = $('#to-bottom');
     const place = () => { const far = lg.scrollHeight - lg.scrollTop - lg.clientHeight > 160; tb.classList.toggle('hidden', !far); if (far) tb.style.top = (lg.getBoundingClientRect().bottom - $('#tab-chat').getBoundingClientRect().top - 46) + 'px'; };
