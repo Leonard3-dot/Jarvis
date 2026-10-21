@@ -806,7 +806,7 @@ STYLE : ton chaleureux, un 🙂 de temps en temps sans en abuser ; réponses str
   async function ask(history, onDelta, sysText) {
     if (!settings.key) setTimeout(openSettings, 300);
     if (!settings.key) return { error: true, text: "Clé API manquante. Ouvrez ⚙ Réglages et collez votre clé Gemini (gratuite sur aistudio.google.com)." };
-    const models = [...new Set([settings.model, 'gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'])];
+      const models = [...new Set([settings.model, 'gemini-3.8-flash', 'gemini-3.5-flash-lite'])];
     let last = '';
     abortCtl = new AbortController();
     for (const model of models) {
