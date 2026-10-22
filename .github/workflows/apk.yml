@@ -328,6 +328,31 @@ jobs:
                   } catch (Exception e) { c.reject(e.getMessage()); return; }
                   c.reject("introuvable");
               }
+
+              private android.speech.tts.TextToSpeech tts;
+
+              @PluginMethod public void speak(final PluginCall c) {
+                  final String text = c.getString("text", ""), lang = c.getString("lang", "fr-FR");
+                  final float rate = c.getFloat("rate", 1.0f);
+                  final Runnable say = () -> {
+                      tts.setLanguage(java.util.Locale.forLanguageTag(lang));
+                      tts.setSpeechRate(rate);
+                      tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
+                          @Override public void onStart(String u) {}
+                          @Override public void onDone(String u) { c.resolve(); }
+                          @Override public void onError(String u) { c.reject("tts"); }
+                          @Override public void onStop(String u, boolean interrupted) { c.resolve(); }
+                      });
+                      tts.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, String.valueOf(System.nanoTime()));
+                  };
+                  if (tts == null) {
+                      tts = new android.speech.tts.TextToSpeech(ctx(), status -> {
+                          if (status == android.speech.tts.TextToSpeech.SUCCESS) say.run(); else { tts = null; c.reject("tts"); }
+                      });
+                  } else say.run();
+              }
+
+              @PluginMethod public void stopSpeak(PluginCall c) { if (tts != null) tts.stop(); c.resolve(); }
           }
           EOF_PHONE
           mkdir -p $(dirname android/app/src/main/java/com/leonard/lisa/MainActivity.java)
@@ -349,7 +374,7 @@ jobs:
           cat > /tmp/patch_manifest.py <<'EOF_PATCH'
           p = "android/app/src/main/AndroidManifest.xml"
           s = open(p, encoding="utf-8").read()
-          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>\n    '
+          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>\n    '
           svc = '<service android:name=".LisaNotifService" android:exported="false" android:label="Lisa" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"><intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter></service>\n    '
           s = s.replace("<application", perms + "<application", 1)
           s = s.replace("</application>", svc + "</application>", 1)
