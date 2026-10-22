@@ -23,7 +23,7 @@ jobs:
           cp icon-*.png www/ 2>/dev/null || true
           if [ -f manifest.json ]; then cp manifest.json www/; else echo '{"name":"Lisa","short_name":"Lisa","start_url":".","display":"standalone","background_color":"#030610","theme_color":"#030610"}' > www/manifest.json; fi
           npm init -y
-          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/speech-recognition@6
           npx cap init Lisa com.leonard.lisa --web-dir www
           npx cap add android
       - name: Ajouter le plugin Lisa (appels, SMS, WhatsApp)
@@ -71,6 +71,12 @@ jobs:
               @PluginMethod public void ask(PluginCall c) { requestAllPermissions(c, "done"); }
               @PermissionCallback private void done(PluginCall c) { c.resolve(state()); }
 
+              @PluginMethod public void reply(PluginCall c) {
+                  String to = c.getString("to", ""), text = c.getString("text", "");
+                  if (to.isEmpty() || text.isEmpty()) { c.reject("vide"); return; }
+                  if (LisaNotifService.reply(getContext(), to, text)) c.resolve(); else c.reject("introuvable");
+              }
+
               @PluginMethod public void openNotifSettings(PluginCall c) {
                   Intent i = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
                   i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -80,7 +86,7 @@ jobs:
 
               @PluginMethod public void report(PluginCall c) {
                   long since = c.getData().optLong("since", System.currentTimeMillis() - 86400000L);
-                  JSArray calls = new JSArray(), sms = new JSArray(), wa = new JSArray();
+                  JSArray calls = new JSArray(), sms = new JSArray(), wa = new JSArray(), gm = new JSArray();
                   try {
                       if (has(Manifest.permission.READ_CALL_LOG)) {
                           try (Cursor q = getContext().getContentResolver().query(CallLog.Calls.CONTENT_URI,
@@ -114,11 +120,11 @@ jobs:
                       JSONArray a = new JSONArray(sp.getString("notifs", "[]"));
                       for (int i = 0; i < a.length(); i++) {
                           JSONObject n = a.getJSONObject(i);
-                          if (n.getLong("t") > since) wa.put(new JSObject(n.toString()));
+                          if (n.getLong("t") > since) { if ("gm".equals(n.optString("app", "wa"))) gm.put(new JSObject(n.toString())); else wa.put(new JSObject(n.toString())); }
                       }
                   } catch (Exception e) { c.reject(e.getMessage()); return; }
                   JSObject r = new JSObject();
-                  r.put("calls", calls); r.put("sms", sms); r.put("wa", wa);
+                  r.put("calls", calls); r.put("sms", sms); r.put("wa", wa); r.put("gm", gm);
                   c.resolve(r);
               }
           }
@@ -128,28 +134,70 @@ jobs:
           package com.leonard.lisa;
 
           import android.app.Notification;
+          import android.app.RemoteInput;
           import android.content.Context;
+          import android.content.Intent;
           import android.content.SharedPreferences;
+          import android.os.Bundle;
           import android.service.notification.NotificationListenerService;
           import android.service.notification.StatusBarNotification;
+          import java.util.Iterator;
+          import java.util.LinkedHashMap;
+          import java.util.Map;
           import org.json.JSONArray;
           import org.json.JSONObject;
 
-          /** Mémorise uniquement qui a écrit sur WhatsApp (expéditeur et heure), sur l'appareil. */
+          /** Mémorise sur l'appareil qui a écrit (WhatsApp : expéditeur ; Gmail : expéditeur et objet)
+           *  et garde en mémoire vive la réponse rapide WhatsApp pour répondre sur ordre de l'utilisateur. */
           public class LisaNotifService extends NotificationListenerService {
+              static final Map<String, Notification.Action> REPLY = new LinkedHashMap<>();
+
+              static boolean reply(Context ctx, String to, String text) {
+                  String key = null;
+                  for (String k : REPLY.keySet()) if (k.toLowerCase().contains(to.toLowerCase())) key = k;
+                  if (key == null) return false;
+                  Notification.Action ac = REPLY.get(key);
+                  try {
+                      RemoteInput[] ri = ac.getRemoteInputs();
+                      Bundle b = new Bundle();
+                      for (RemoteInput r : ri) b.putCharSequence(r.getResultKey(), text);
+                      Intent i = new Intent();
+                      RemoteInput.addResultsToIntent(ri, i, b);
+                      ac.actionIntent.send(ctx, 0, i);
+                      REPLY.remove(key);
+                      return true;
+                  } catch (Exception e) { return false; }
+              }
+
               @Override public void onNotificationPosted(StatusBarNotification sbn) {
-                  String pkg = sbn.getPackageName();
-                  if (!"com.whatsapp".equals(pkg) && !"com.whatsapp.w4b".equals(pkg)) return;
+                  String pkg = sbn.getPackageName(), app;
+                  if ("com.whatsapp".equals(pkg) || "com.whatsapp.w4b".equals(pkg)) app = "wa";
+                  else if ("com.google.android.gm".equals(pkg)) app = "gm";
+                  else return;
                   Notification n = sbn.getNotification();
                   if ((n.flags & Notification.FLAG_GROUP_SUMMARY) != 0) return;
                   CharSequence title = n.extras.getCharSequence(Notification.EXTRA_TITLE);
                   if (title == null) return;
+                  if ("wa".equals(app) && n.actions != null) {
+                      for (Notification.Action ac : n.actions) {
+                          if (ac.getRemoteInputs() != null && ac.getRemoteInputs().length > 0) {
+                              REPLY.put(title.toString(), ac);
+                              if (REPLY.size() > 30) { Iterator<String> it = REPLY.keySet().iterator(); it.next(); it.remove(); }
+                              break;
+                          }
+                      }
+                  }
                   try {
                       SharedPreferences sp = getSharedPreferences("lisa", Context.MODE_PRIVATE);
                       JSONArray a = new JSONArray(sp.getString("notifs", "[]")), b = new JSONArray();
                       JSONObject o = new JSONObject();
+                      o.put("app", app);
                       o.put("from", title.toString());
                       o.put("t", sbn.getPostTime());
+                      if ("gm".equals(app)) {
+                          CharSequence tx = n.extras.getCharSequence(Notification.EXTRA_TEXT);
+                          if (tx != null) o.put("s", tx.toString().substring(0, Math.min(80, tx.length())));
+                      }
                       for (int i = Math.max(0, a.length() - 199); i < a.length(); i++) b.put(a.get(i));
                       b.put(o);
                       sp.edit().putString("notifs", b.toString()).apply();
@@ -157,6 +205,88 @@ jobs:
               }
           }
           EOF_NOTIF
+          mkdir -p $(dirname android/app/src/main/java/com/leonard/lisa/LisaPhone.java)
+          cat > android/app/src/main/java/com/leonard/lisa/LisaPhone.java <<'EOF_PHONE'
+          package com.leonard.lisa;
+
+          import android.app.NotificationManager;
+          import android.content.ContentResolver;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.hardware.camera2.CameraCharacteristics;
+          import android.hardware.camera2.CameraManager;
+          import android.media.AudioManager;
+          import android.net.Uri;
+          import android.provider.Settings;
+          import com.getcapacitor.Plugin;
+          import com.getcapacitor.PluginCall;
+          import com.getcapacitor.PluginMethod;
+          import com.getcapacitor.annotation.CapacitorPlugin;
+
+          /** Contrôles du téléphone, déclenchés uniquement par une commande de l'utilisateur. */
+          @CapacitorPlugin(name = "LisaPhone")
+          public class LisaPhone extends Plugin {
+              private Context ctx() { return getContext(); }
+              private void launch(Intent i) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); ctx().startActivity(i); }
+              private int pct(PluginCall c) { return Math.max(0, Math.min(100, c.getInt("level", 50))); }
+
+              @PluginMethod public void volume(PluginCall c) {
+                  AudioManager am = (AudioManager) ctx().getSystemService(Context.AUDIO_SERVICE);
+                  int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                  am.setStreamVolume(AudioManager.STREAM_MUSIC, Math.round(max * pct(c) / 100f), AudioManager.FLAG_SHOW_UI);
+                  c.resolve();
+              }
+
+              @PluginMethod public void brightness(PluginCall c) {
+                  if (!Settings.System.canWrite(ctx())) {
+                      launch(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + ctx().getPackageName())));
+                      c.reject("permission"); return;
+                  }
+                  ContentResolver cr = ctx().getContentResolver();
+                  Settings.System.putInt(cr, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                  Settings.System.putInt(cr, Settings.System.SCREEN_BRIGHTNESS, Math.round(255 * pct(c) / 100f));
+                  c.resolve();
+              }
+
+              @PluginMethod public void torch(PluginCall c) {
+                  try {
+                      CameraManager cm = (CameraManager) ctx().getSystemService(Context.CAMERA_SERVICE);
+                      for (String id : cm.getCameraIdList()) {
+                          CameraCharacteristics ch = cm.getCameraCharacteristics(id);
+                          Boolean flash = ch.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+                          Integer face = ch.get(CameraCharacteristics.LENS_FACING);
+                          if (Boolean.TRUE.equals(flash) && face != null && face == CameraCharacteristics.LENS_FACING_BACK) {
+                              cm.setTorchMode(id, c.getBoolean("on", true)); c.resolve(); return;
+                          }
+                      }
+                      c.reject("no flash");
+                  } catch (Exception e) { c.reject(e.getMessage()); }
+              }
+
+              @PluginMethod public void dnd(PluginCall c) {
+                  NotificationManager nm = (NotificationManager) ctx().getSystemService(Context.NOTIFICATION_SERVICE);
+                  if (!nm.isNotificationPolicyAccessGranted()) {
+                      launch(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS));
+                      c.reject("permission"); return;
+                  }
+                  nm.setInterruptionFilter(c.getBoolean("on", true) ? NotificationManager.INTERRUPTION_FILTER_NONE : NotificationManager.INTERRUPTION_FILTER_ALL);
+                  c.resolve();
+              }
+
+              @PluginMethod public void open(PluginCall c) {
+                  String a;
+                  switch (c.getString("page", "main")) {
+                      case "wifi": a = Settings.ACTION_WIFI_SETTINGS; break;
+                      case "bluetooth": a = Settings.ACTION_BLUETOOTH_SETTINGS; break;
+                      case "display": a = Settings.ACTION_DISPLAY_SETTINGS; break;
+                      case "sound": a = Settings.ACTION_SOUND_SETTINGS; break;
+                      case "battery": a = Settings.ACTION_BATTERY_SAVER_SETTINGS; break;
+                      default: a = Settings.ACTION_SETTINGS;
+                  }
+                  launch(new Intent(a)); c.resolve();
+              }
+          }
+          EOF_PHONE
           mkdir -p $(dirname android/app/src/main/java/com/leonard/lisa/MainActivity.java)
           cat > android/app/src/main/java/com/leonard/lisa/MainActivity.java <<'EOF_MAIN'
           package com.leonard.lisa;
@@ -167,6 +297,7 @@ jobs:
           public class MainActivity extends BridgeActivity {
               @Override public void onCreate(Bundle savedInstanceState) {
                   registerPlugin(LisaBridge.class);
+                  registerPlugin(LisaPhone.class);
                   super.onCreate(savedInstanceState);
               }
           }
@@ -175,7 +306,7 @@ jobs:
           cat > /tmp/patch_manifest.py <<'EOF_PATCH'
           p = "android/app/src/main/AndroidManifest.xml"
           s = open(p, encoding="utf-8").read()
-          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    '
+          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>\n    '
           svc = '<service android:name=".LisaNotifService" android:exported="false" android:label="Lisa" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"><intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter></service>\n    '
           s = s.replace("<application", perms + "<application", 1)
           s = s.replace("</application>", svc + "</application>", 1)
