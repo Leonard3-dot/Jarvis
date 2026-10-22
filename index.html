@@ -1286,8 +1286,21 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
 
   /* ---------- Micro : écoute seulement quand on appuie ---------- */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const NSR = window.Capacitor?.Plugins?.SpeechRecognition;
+  async function nativeMic() {
+    if (listening) { try { await NSR.stop(); } catch (e) {} return; }
+    const ui = on => { listening = on; $('#wave').classList.toggle('on', on || !!speakCount); $('#voice-state').textContent = on ? "J'écoute…" : 'Prêt'; $$('.mic-btn').forEach(b => b.classList.toggle('listening', on)); };
+    try {
+      const p = await NSR.requestPermissions(); if (p.speechRecognition !== 'granted') { toast('Micro refusé'); return; }
+      stopSpeech(); ui(true);
+      const r = await NSR.start({ language: mode === 'anglais' ? 'en-US' : 'fr-FR', maxResults: 1, partialResults: false, popup: false });
+      const t = r && r.matches && r.matches[0]; if (t) { go('chat'); send(t, true); }
+    } catch (e) { toast('Micro indisponible'); }
+    ui(false); resumeHands();
+  }
   let rec = null;
   function startMic() {
+    if (!SR && NSR) return nativeMic();
     if (!SR) { toast('Micro non pris en charge : utilisez Chrome'); return; }
     if (listening) { rec.stop(); return; }
     stopSpeech(); rec = new SR(); rec.lang = mode === 'anglais' ? 'en-US' : 'fr-FR'; rec.interimResults = false;
@@ -1628,7 +1641,9 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   }
   function localCmd(t) {
     if (t.startsWith('/')) return slash(t);
-    if (/compte[- ]rendu|qui m'a (appel|écrit|contact)|appels? manqu|messages? manqu|mes notifications/i.test(t)) return phoneCmd();
+    const rp = replyCmd(t); if (rp) return rp;
+    const pc = phoneCtl(t); if (pc) return pc;
+    if (/mes (e-?)?mails|compte[- ]rendu|qui m'a (appel|écrit|contact)|appels? manqu|messages? manqu|mes notifications/i.test(t)) return phoneCmd();
     const q = t.toLowerCase().replace(/[.!?]+$/, '').trim(); let m;
     if (/^(ouvre|affiche|montre|va)\b.*\bt[âa]ches?\b/.test(q)) { go('tasks'); return 'Voici vos tâches.'; }
     if (/^(ouvre|affiche|montre|va)\b.*\b(accueil|tableau de bord)\b/.test(q)) { go('hud'); return "Voici l'accueil."; }
@@ -1770,8 +1785,33 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
       if (miss.length) out.push('Appels manqués : ' + grp(miss, 'name') + '.');
       if (r.sms.length) out.push('SMS de ' + grp(r.sms, 'from') + '.');
       if (r.wa.length) out.push('WhatsApp : ' + grp(r.wa, 'from') + '.');
+      if (r.gm && r.gm.length) out.push('Gmail : ' + grp(r.gm, 'from') + '.');
       return out.length ? 'Depuis votre dernière visite : ' + out.join(' ') : 'Rien de nouveau : aucun appel manqué ni message.';
     } catch (e) { return 'Je ne peux pas lire le téléphone pour le moment.'; }
+  }
+  let pendingReply = null;
+  function replyCmd(t) {
+    if (pendingReply && Date.now() - pendingReply.t > 120000) pendingReply = null;
+    if (pendingReply) {
+      if (/^(oui|ok|envoie|envoyer|confirme|vas-y|go)\b/i.test(t)) { const p = pendingReply; pendingReply = null; PB.reply({ to: p.to, text: p.text }).then(() => lisaSay('Envoyé à ' + p.to + ' sur WhatsApp.')).catch(() => lisaSay("Impossible : la conversation n'est plus disponible. Répondez directement dans WhatsApp.")); return 'Envoi…'; }
+      if (/^(non|annule|stop)\b/i.test(t)) { pendingReply = null; return 'Annulé.'; }
+    }
+    const m = t.match(/^(?:dis|réponds|reponds|envoie)\s+(?:à|a)\s+(.+?)\s*(?:\bque\b|:)\s*(.+)$/i);
+    if (!m) return null;
+    if (!PB) return "L'envoi demande l'application Android de Lisa.";
+    let text = m[2].trim(); text = text.charAt(0).toUpperCase() + text.slice(1); if (!/[.!?]$/.test(text)) text += '.';
+    pendingReply = { to: m[1].trim(), text, t: Date.now() };
+    return 'Message pour ' + pendingReply.to + ' sur WhatsApp : « ' + text + ' »\nConfirmez-vous l\'envoi ? (oui / non)';
+  }
+  const PH = window.Capacitor?.Plugins?.LisaPhone;
+  function phoneCtl(t) {
+    const q = t.toLowerCase().trim().replace(/[.!?]+$/, ''); let m;
+    const run = (fn, arg, ok) => { if (!PH) return "Le contrôle du téléphone demande l'application Android de Lisa."; PH[fn](arg).then(() => lisaSay(ok)).catch(() => lisaSay("Autorisation nécessaire : accordez-la dans l'écran qui vient de s'ouvrir, puis redemandez.")); return "D'accord…"; };
+    if (m = q.match(/^(?:mets?|règle|regle|passe|monte|baisse)?\s*(?:le |la )?(volume|luminosité|luminosite)\s*(?:à|a|au|sur)?\s*(\d{1,3})\s*%?$/)) { const v = Math.min(100, +m[2]), vol = m[1] === 'volume'; return run(vol ? 'volume' : 'brightness', { level: v }, (vol ? 'Volume' : 'Luminosité') + ' à ' + v + ' %.'); }
+    if (m = q.match(/^(allume|éteins|eteins|coupe|active|désactive|desactive)\s+(?:la |ma )?(lampe|torche)/)) { const on = /^(allume|active)$/.test(m[1]); return run('torch', { on }, on ? 'Lampe allumée.' : 'Lampe éteinte.'); }
+    if (m = q.match(/^(active|désactive|desactive|mets?|coupe|enlève|enleve)\s+(?:le )?(?:mode )?ne pas déranger/)) { const on = /^(active|mets?)$/.test(m[1]); return run('dnd', { on }, on ? 'Ne pas déranger activé.' : 'Ne pas déranger désactivé.'); }
+    if (m = q.match(/^ouvre\s+(?:les |le |la )?(paramètres|parametres|wifi|bluetooth|batterie|son|affichage)$/)) return run('open', { page: { wifi: 'wifi', bluetooth: 'bluetooth', batterie: 'battery', son: 'sound', affichage: 'display' }[m[1]] || 'main' }, 'Paramètres ouverts.');
+    return null;
   }
   const phoneCmd = () => { if (!PB) return "Cette fonction demande l'application Android de Lisa."; phoneReport(true).then(t => t && lisaSay(t)); return 'Je consulte votre téléphone…'; };
   /* ---------- Tâches v2 : suivi hors ligne + propositions ---------- */
