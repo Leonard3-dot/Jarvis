@@ -437,6 +437,8 @@
           <button data-go="improve" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#ec4899,#be185d)">🧠</div><div class="text-xs font-bold text-blue-50">Évolution</div><div id="imp-sub" class="text-[10px] text-zinc-400">Mémoire, règles</div></button>
           <button id="apps-settings" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#64748b,#334155)">⚙</div><div class="text-xs font-bold text-blue-50">Réglages</div><div class="text-[10px] text-zinc-400">Clé, voix</div></button>
         </div>
+        <div class="lbl pt-1">Actions rapides · hors ligne</div>
+        <div id="quick" class="flex flex-wrap gap-2"></div>
         <button id="apps-tools" class="btn-neon w-full py-2.5 text-sm">🧮 Boîte à outils financière</button>
         <div class="lbl pt-1">Outils d'analyse</div>
         <div id="apps-ext" class="grid grid-cols-3 gap-2"></div>
@@ -658,6 +660,27 @@
   <iframe id="prev-frame" class="flex-1 w-full bg-white" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
 </div>
 
+<script>
+(function () {
+  const PHn = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LisaPhone;
+  if (!PHn || !PHn.speak) return;
+  function U(t) { this.text = t || ''; this.lang = 'fr-FR'; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null; }
+  window.SpeechSynthesisUtterance = U;
+  let q = [], busy = false, gen = 0;
+  async function next() {
+    if (busy || !q.length) return; busy = true; const g = gen, u = q.shift();
+    try { if (u.onstart) u.onstart({}); await PHn.speak({ text: u.text, lang: u.lang || 'fr-FR', rate: u.rate || 1 }); } catch (e) { if (g === gen && u.onerror) u.onerror({ error: 'synthesis-failed' }); }
+    if (g !== gen) return; busy = false; if (u.onend) u.onend({}); next();
+  }
+  const S = { paused: false, pending: false, onvoiceschanged: null,
+    speak(u) { if (u.volume === 0) { setTimeout(() => { if (u.onstart) u.onstart({}); if (u.onend) u.onend({}); }, 0); return; } q.push(u); next(); },
+    cancel() { q = []; busy = false; gen++; try { PHn.stopSpeak(); } catch (e) {} },
+    pause() {}, resume() {}, getVoices() { return [{ voiceURI: 'android-fr', name: 'Voix Android', lang: 'fr-FR', default: true, localService: true }]; },
+    addEventListener() {}, removeEventListener() {} };
+  Object.defineProperty(S, 'speaking', { get() { return busy || q.length > 0; } });
+  try { Object.defineProperty(window, 'speechSynthesis', { value: S, configurable: true }); } catch (e) { window.speechSynthesis = S; }
+})();
+</script>
 <script>
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
@@ -1660,6 +1683,7 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     if ((m = q.match(/^(?:calcule|calcul|combien font|combien fait)\s+([\d\s+\-*/().,x×÷^]+)$/))) { try { const ex = m[1].replace(/[x×]/g, '*').replace(/÷/g, '/').replace(/\^/g, '**').replace(/,/g, '.'); const v = Function('"use strict";return (' + ex + ')')(); if (Number.isFinite(v)) return m[1].trim() + ' = ' + (+v.toFixed(10)); } catch {} return 'Je ne peux pas calculer cette expression.'; }
     if ((m = q.match(/^ouvre\s+([\w .]+)$/))) { const ap = APPS.find(x => x.n.toLowerCase() === m[1]); if (ap) { window.open(ap.u, '_blank', 'noopener'); return 'J\'ouvre ' + ap.n + '.'; } }
     if (/(état|etat|santé|performance).*(système|systeme|appareil|téléphone)|comment va (le|mon) (système|systeme|appareil)/.test(q)) return perfSummary();
+    if (!navigator.onLine) return cachedAnswer(q) || OFFLINE_MISS;
     return null;
   }
   const CMDS = [['/messages', 'Lire mes messages WhatsApp et Gmail'], ['/offline', 'Ce qui marche sans Internet'], ['/phone', 'Compte rendu : appels, SMS, WhatsApp'], ['/tache ', 'Ajouter une tâche (ex. /tache Réviser 18:30)'], ['/taches', 'Lister les tâches en cours'], ['/fait ', 'Valider une tâche (/fait 2)'], ['/plan', 'Propositions du jour'], ['/note ', 'Enregistrer une note'], ['/calc ', 'Calculer (ex. /calc 1500*1.07^10)'], ['/minuteur ', 'Minuteur (ex. /minuteur 25 min)'], ['/copie', 'Copier la dernière réponse'], ['/outils', 'Boîte à outils financière'], ['/new', 'Nouvelle conversation'], ['/clear', 'Vider cette conversation'], ['/export', 'Exporter en Markdown'], ['/pin', 'Épingler / désépingler'], ['/web', 'Recherche web on/off'], ['/voix', 'Voix on/off'], ['/mode ', 'Changer de mode (general, code, anglais, maths, devoirs)'], ['/dossier ', 'Ranger dans un dossier (ex. /dossier Anglais)'], ['/model ', 'Modèle : flash, lite ou pro'], ['/fichiers', 'Bibliothèque de fichiers'], ['/stats', 'Historique et stockage'], ['/aide', 'Liste des commandes']];
@@ -1816,8 +1840,19 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     if (m = q.match(/^ouvre\s+(?:les |le |la )?(paramètres|parametres|wifi|bluetooth|batterie|son|affichage)$/)) return run('open', { page: { wifi: 'wifi', bluetooth: 'bluetooth', batterie: 'battery', son: 'sound', affichage: 'display' }[m[1]] || 'main' }, 'Paramètres ouverts.');
     return null;
   }
-  const GLOSS = { van: "VAN (valeur actuelle nette) : somme des flux futurs actualisés moins l'investissement initial. Positive = projet créateur de valeur.", tri: "TRI (taux de rendement interne) : taux d'actualisation qui annule la VAN. À comparer au coût du capital.", cagr: "CAGR : taux de croissance annuel moyen = (valeur finale / valeur initiale)^(1/années) − 1.", wacc: "WACC : coût moyen pondéré du capital, mélange du coût des fonds propres et de la dette après impôt.", ebitda: "EBITDA : résultat avant intérêts, impôts, dépréciations et amortissements. Mesure la rentabilité opérationnelle.", bfr: "BFR : besoin en fonds de roulement = stocks + créances clients − dettes fournisseurs.", roe: "ROE : rentabilité des capitaux propres = résultat net / capitaux propres.", roi: "ROI : retour sur investissement = (gain − coût) / coût.", per: "PER : cours de l'action / bénéfice par action. Indique combien le marché paie 1 € de bénéfice.", beta: "Bêta : sensibilité d'un actif au marché. Bêta > 1 = plus volatil que le marché.", sharpe: "Ratio de Sharpe : (rendement − taux sans risque) / volatilité. Mesure le rendement par unité de risque.", dcf: "DCF : valorisation par actualisation des flux de trésorerie futurs, plus une valeur terminale." };
-  const OFFLINE = "Sans Internet, Lisa sait faire :\n- tâches, suivi et propositions (/tache, /taches, /fait, /plan)\n- notes, calculs, boîte à outils financière (/note, /calc, /outils)\n- minuteur et alarme (« minuteur 10 min », « réveille-moi à 7h30 »)\n- compte rendu appels, SMS, WhatsApp, Gmail (/phone, /messages)\n- lampe, volume, luminosité, ne pas déranger, paramètres\n- appeler un contact (« appelle Karim »)\n- définitions de finance (« définition VAN »)\nLes réponses de l'IA demandent Internet.";
+  const GLOSS = { van: "VAN (valeur actuelle nette) : somme des flux futurs actualisés moins l'investissement initial. Positive = projet créateur de valeur.", tri: "TRI (taux de rendement interne) : taux d'actualisation qui annule la VAN. À comparer au coût du capital.", cagr: "CAGR : taux de croissance annuel moyen = (valeur finale / valeur initiale)^(1/années) − 1.", wacc: "WACC : coût moyen pondéré du capital, mélange du coût des fonds propres et de la dette après impôt.", ebitda: "EBITDA : résultat avant intérêts, impôts, dépréciations et amortissements. Mesure la rentabilité opérationnelle.", bfr: "BFR : besoin en fonds de roulement = stocks + créances clients − dettes fournisseurs.", roe: "ROE : rentabilité des capitaux propres = résultat net / capitaux propres.", roi: "ROI : retour sur investissement = (gain − coût) / coût.", per: "PER : cours de l'action / bénéfice par action. Indique combien le marché paie 1 € de bénéfice.", beta: "Bêta : sensibilité d'un actif au marché. Bêta > 1 = plus volatil que le marché.", sharpe: "Ratio de Sharpe : (rendement − taux sans risque) / volatilité. Mesure le rendement par unité de risque.", liquidite: "Liquidité : facilité à convertir un actif en argent rapidement sans perdre de valeur.", levier: "Effet de levier : usage de la dette pour amplifier le rendement des fonds propres, mais aussi le risque.", dividende: "Dividende : part du bénéfice distribuée aux actionnaires.", bilan: "Bilan : photographie du patrimoine d'une entreprise (actif = passif + capitaux propres).", inflation: "Inflation : hausse générale et durable des prix, qui réduit le pouvoir d'achat.", obligation: "Obligation : titre de dette qui verse des intérêts (coupons) et rembourse le capital à l'échéance.", action: "Action : part de capital d'une entreprise, donnant droit aux dividendes et au vote.", etf: "ETF : fonds coté en bourse qui réplique un indice, à faibles frais.", volatilite: "Volatilité : ampleur des variations du prix d'un actif, mesurée par l'écart-type des rendements.", correlation: "Corrélation : mesure (de −1 à 1) du lien entre les variations de deux actifs.", marge: "Marge nette : résultat net / chiffre d'affaires.", endettement: "Ratio d'endettement : dette nette / capitaux propres (ou / EBITDA).", fcf: "Free cash flow : flux de trésorerie disponible après investissements, = flux d'exploitation − capex.", capex: "Capex : dépenses d'investissement en équipements et immobilisations.", capitalisation: "Capitalisation boursière : cours de l'action × nombre d'actions.", spread: "Spread : écart de taux ou de prix, par exemple entre une obligation risquée et un emprunt d'État.", dcf: "DCF : valorisation par actualisation des flux de trésorerie futurs, plus une valeur terminale." };
+  const OFFLINE = "Sans Internet, Lisa sait faire :\n- tâches, suivi et propositions (/tache, /taches, /fait, /plan)\n- notes, calculs, boîte à outils financière (/note, /calc, /outils)\n- minuteur et alarme (« minuteur 10 min », « réveille-moi à 7h30 »)\n- compte rendu appels, SMS, WhatsApp, Gmail (/phone, /messages)\n- lampe, volume, luminosité, ne pas déranger, paramètres\n- appeler un contact (« appelle Karim »)\n- définitions de finance (« définition VAN ») et quiz (« quiz »)\n- réponses déjà données, retrouvées quand une question ressemble à une ancienne\n- boutons « Actions rapides » dans l'onglet Apps\nLes réponses de l'IA demandent Internet.";
+  let quizK = null;
+  const QUICK = [['💡 Lampe', 'allume la lampe'], ['🌑 Éteindre', 'éteins la lampe'], ['🔊 Volume 30', 'mets le volume à 30'], ['🔊 Volume 70', 'mets le volume à 70'], ['☀️ Luminosité 50', 'luminosité 50'], ['🔕 Ne pas déranger', 'active ne pas déranger'], ['🔔 Sonnerie', 'désactive ne pas déranger'], ['⏲ 10 min', 'minuteur 10 min'], ['⏰ Réveil 7h', 'réveille-moi à 7h'], ['📞 Compte rendu', 'compte rendu'], ['💬 Mes messages', 'lis mes messages'], ['📋 Mes tâches', '/taches'], ['✨ Plan du jour', '/plan'], ['🧮 Outils', '/outils'], ['📶 Wi-Fi', 'ouvre wifi'], ['🔵 Bluetooth', 'ouvre bluetooth'], ['🎯 Quiz finance', 'quiz'], ['❓ Hors ligne', '/offline']];
+  $('#quick').innerHTML = QUICK.map((x, i) => `<button type="button" data-q="${i}" class="chip">${x[0]}</button>`).join('');
+  $('#quick').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) { go('chat'); send(QUICK[+b.dataset.q][1]); } });
+  const OFFLINE_MISS = "Hors ligne : je n'ai pas de réponse mémorisée pour cela. Sans Internet, je réponds aux commandes, au glossaire, au quiz et aux outils (tape /offline).";
+  function cachedAnswer(q) {
+    const tk = s => new Set(norm(s).split(' ').filter(w => w.length > 2)), A = tk(q); if (A.size < 2) return null;
+    let best = 0, ans = null;
+    messages.forEach((m, i) => { const a = messages[i + 1]; if (m.sender !== 'user' || !a || a.sender === 'user' || !a.text || a.pending || /^Erreur/.test(a.text)) return; const B = tk(m.raw || m.text); let n = 0; A.forEach(w => B.has(w) && n++); const sc = n / (A.size + B.size - n || 1); if (sc > best) { best = sc; ans = a.text; } });
+    return best >= 0.5 ? '(Réponse mémorisée, hors ligne)\n' + ans : null;
+  }
   function readMsgs() {
     if (!PB) return "Cette fonction demande l'application Android de Lisa.";
     PB.report({ since: Date.now() - 864e5 }).then(r => {
@@ -1831,8 +1866,10 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   }
   function offlineCmd(t) {
     const q = t.toLowerCase().trim().replace(/[.!?]+$/, ''); let m;
+    if (/^quiz( finance)?$/.test(q)) { const ks = Object.keys(GLOSS); quizK = ks[Math.floor(Math.random() * ks.length)]; return 'Quiz : que signifie « ' + quizK.toUpperCase() + ' » ? Dites « réponse » pour voir la solution.'; }
+    if (quizK && /^(réponse|reponse|solution)$/.test(q)) { const r = GLOSS[quizK]; quizK = null; return r; }
     if (/^(lis|lire|montre)\s+(moi\s+)?(mes|les)\s+(messages|mails|e-?mails)/.test(q)) return readMsgs();
-    if (m = q.match(/^(?:définition|definition|c'est quoi|qu'est-ce que|que veut dire)\s+(?:de |du |des |d')?(?:le |la |l'|les |un |une )?(.+)$/)) { const k = Object.keys(GLOSS).find(x => norm(m[1]).split(' ').includes(x)); if (k) return GLOSS[k]; }
+    if (m = q.match(/^(?:définition|definition|c'est quoi|qu'est-ce que|que veut dire)\s+(?:de |du |des |d')?(?:le |la |l'|les |un |une )?(.+)$/)) { const k = Object.keys(GLOSS).find(x => norm(m[1]).normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(' ').includes(x)); if (k) return GLOSS[k]; }
     if (m = q.match(/^(?:réveille-moi|reveille-moi|mets? (?:un )?(?:réveil|reveil)|alarme)(?:\s+(?:à|a|pour))?\s*(\d{1,2})\s*(?:h|:)\s*(\d{2})?$/)) { if (!PH) return "Le réveil demande l'application Android de Lisa."; const h = Math.min(23, +m[1]), mi = Math.min(59, +(m[2] || 0)); PH.alarm({ h, m: mi }).then(() => lisaSay('Réveil réglé à ' + h + 'h' + String(mi).padStart(2, '0') + '.')).catch(() => lisaSay('Impossible de régler le réveil.')); return "D'accord…"; }
     if (PH && (m = q.match(/^(?:minuteur|timer|compte à rebours)\s+(?:de\s+)?(\d+)\s*(h|heures?|min|minutes?|s|secondes?)/))) { const n = +m[1], u = m[2][0], sec = u === 'h' ? n * 3600 : u === 's' ? n : n * 60; PH.timer({ seconds: sec }).then(() => lisaSay('Minuteur lancé.')).catch(() => lisaSay('Impossible de lancer le minuteur.')); return "D'accord…"; }
     if (m = q.match(/^(?:appelle|appeler|téléphone à|telephone a)\s+(.+)$/)) { if (!PH) return "L'appel demande l'application Android de Lisa."; PH.call({ name: m[1].trim() }).then(r => lisaSay('Je prépare l\'appel vers ' + r.name + '. Touchez le bouton d\'appel.')).catch(() => lisaSay("Contact introuvable ou autorisation refusée.")); return "D'accord…"; }
