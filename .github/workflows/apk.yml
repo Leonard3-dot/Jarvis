@@ -24,6 +24,13 @@ jobs:
           if [ -f manifest.json ]; then cp manifest.json www/; else echo '{"name":"Lisa","short_name":"Lisa","start_url":".","display":"standalone","background_color":"#030610","theme_color":"#030610"}' > www/manifest.json; fi
           npm init -y
           npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/speech-recognition@6
+          npm i -D tailwindcss@3.4.17
+          echo '@tailwind base;' > tw-in.css
+          echo '@tailwind components;' >> tw-in.css
+          echo '@tailwind utilities;' >> tw-in.css
+          npx tailwindcss -i tw-in.css -o www/tw.css --content www/index.html --minify
+          sed -i 's#<script src="https://cdn.tailwindcss.com/3.4.17"></script>#<link rel="stylesheet" href="tw.css">#' www/index.html
+          grep -c 'href="tw.css"' www/index.html
           npx cap init Lisa com.leonard.lisa --web-dir www
           npx cap add android
       - name: Ajouter le plugin Lisa (appels, SMS, WhatsApp)
@@ -194,10 +201,8 @@ jobs:
                       o.put("app", app);
                       o.put("from", title.toString());
                       o.put("t", sbn.getPostTime());
-                      if ("gm".equals(app)) {
-                          CharSequence tx = n.extras.getCharSequence(Notification.EXTRA_TEXT);
-                          if (tx != null) o.put("s", tx.toString().substring(0, Math.min(80, tx.length())));
-                      }
+                      CharSequence tx = n.extras.getCharSequence(Notification.EXTRA_TEXT);
+                      if (tx != null) o.put("s", tx.toString().substring(0, Math.min(120, tx.length())));
                       for (int i = Math.max(0, a.length() - 199); i < a.length(); i++) b.put(a.get(i));
                       b.put(o);
                       sp.edit().putString("notifs", b.toString()).apply();
@@ -209,7 +214,15 @@ jobs:
           cat > android/app/src/main/java/com/leonard/lisa/LisaPhone.java <<'EOF_PHONE'
           package com.leonard.lisa;
 
+          import android.Manifest;
           import android.app.NotificationManager;
+          import android.database.Cursor;
+          import android.provider.AlarmClock;
+          import android.provider.ContactsContract;
+          import com.getcapacitor.JSObject;
+          import com.getcapacitor.PermissionState;
+          import com.getcapacitor.annotation.Permission;
+          import com.getcapacitor.annotation.PermissionCallback;
           import android.content.ContentResolver;
           import android.content.Context;
           import android.content.Intent;
@@ -224,7 +237,7 @@ jobs:
           import com.getcapacitor.annotation.CapacitorPlugin;
 
           /** Contrôles du téléphone, déclenchés uniquement par une commande de l'utilisateur. */
-          @CapacitorPlugin(name = "LisaPhone")
+          @CapacitorPlugin(name = "LisaPhone", permissions = {@Permission(strings = {Manifest.permission.READ_CONTACTS}, alias = "contacts")})
           public class LisaPhone extends Plugin {
               private Context ctx() { return getContext(); }
               private void launch(Intent i) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); ctx().startActivity(i); }
@@ -285,6 +298,36 @@ jobs:
                   }
                   launch(new Intent(a)); c.resolve();
               }
+
+              private boolean go(Intent i) { try { launch(i); return true; } catch (Exception e) { return false; } }
+
+              @PluginMethod public void alarm(PluginCall c) {
+                  Intent i = new Intent(AlarmClock.ACTION_SET_ALARM).putExtra(AlarmClock.EXTRA_HOUR, c.getInt("h", 7).intValue()).putExtra(AlarmClock.EXTRA_MINUTES, c.getInt("m", 0).intValue()).putExtra(AlarmClock.EXTRA_MESSAGE, c.getString("label", "Lisa")).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                  if (go(i)) c.resolve(); else c.reject("indisponible");
+              }
+
+              @PluginMethod public void timer(PluginCall c) {
+                  Intent i = new Intent(AlarmClock.ACTION_SET_TIMER).putExtra(AlarmClock.EXTRA_LENGTH, c.getInt("seconds", 60).intValue()).putExtra(AlarmClock.EXTRA_MESSAGE, c.getString("label", "Lisa")).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                  if (go(i)) c.resolve(); else c.reject("indisponible");
+              }
+
+              @PluginMethod public void call(PluginCall c) {
+                  if (getPermissionState("contacts") != PermissionState.GRANTED) { requestPermissionForAlias("contacts", c, "callPerm"); return; }
+                  doCall(c);
+              }
+              @PermissionCallback private void callPerm(PluginCall c) {
+                  if (getPermissionState("contacts") == PermissionState.GRANTED) doCall(c); else c.reject("permission");
+              }
+              private void doCall(PluginCall c) {
+                  Uri u = Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI, Uri.encode(c.getString("name", "")));
+                  try (Cursor q = ctx().getContentResolver().query(u, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME}, null, null, null)) {
+                      if (q != null && q.moveToFirst()) {
+                          JSObject o = new JSObject(); o.put("name", q.getString(1));
+                          if (go(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(q.getString(0)))))) { c.resolve(o); return; }
+                      }
+                  } catch (Exception e) { c.reject(e.getMessage()); return; }
+                  c.reject("introuvable");
+              }
           }
           EOF_PHONE
           mkdir -p $(dirname android/app/src/main/java/com/leonard/lisa/MainActivity.java)
@@ -306,7 +349,7 @@ jobs:
           cat > /tmp/patch_manifest.py <<'EOF_PATCH'
           p = "android/app/src/main/AndroidManifest.xml"
           s = open(p, encoding="utf-8").read()
-          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>\n    '
+          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>\n    '
           svc = '<service android:name=".LisaNotifService" android:exported="false" android:label="Lisa" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"><intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter></service>\n    '
           s = s.replace("<application", perms + "<application", 1)
           s = s.replace("</application>", svc + "</application>", 1)
