@@ -270,7 +270,22 @@
   [data-vt] .v-on { display: none; } [data-vt].on .v-on { display: block; } [data-vt].on .v-off { display: none; }
   #att-btn { position: relative; } #att-btn[data-n]:not([data-n=""])::after { content: attr(data-n); position: absolute; top: -2px; right: -2px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px; background: #22d3ee; color: #04101f; font-size: 10px; font-weight: 700; line-height: 15px; text-align: center; }
 </style>
-</head>
+<style>
+.composer{padding:12px 12px 8px 16px}.composer textarea{font-size:16px;min-height:28px}
+.composer.empty .send:not([data-s="stop"]){background:rgba(148,163,184,.22);box-shadow:none;color:#94a3b8}
+#hub-btn{border:1px solid rgba(96,165,250,.3);font-size:20px;line-height:1}
+</style><style>
+.av-img{transform-origin:50% 92%;animation:breathe 5.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.012) translateY(-.4%)}}
+.av-eye{margin-left:calc(var(--gx,0)*1%);margin-top:calc(var(--gy,0)*1%);transition:margin .35s ease-out}
+body:has(.mic-btn.listening) .av-eye{filter:brightness(1.7) hue-rotate(-25deg)}
+body:has(.mic-btn.listening) .av-img{animation-duration:2.4s}
+.perk{animation:perk .6s ease-out}@keyframes perk{0%{transform:scale(1)}35%{transform:scale(1.12)}100%{transform:scale(1)}}
+#live-line{transition:opacity .4s}#live-line.fade{opacity:0}
+@media (prefers-reduced-motion:reduce){.av-img{animation:none}}
+</style><style>
+.av-stage{transform-origin:50% 88%;transform:perspective(800px) rotateY(var(--hy,0deg)) rotateX(var(--hx,0deg)) rotateZ(var(--hz,0deg)) translateX(var(--tx,0%));will-change:transform}
+</style></head>
 <body>
 <div id="scene" aria-hidden="true"></div>
 
@@ -307,7 +322,7 @@
       <div class="max-w-xl mx-auto space-y-3">
         <div class="bubble">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>
-          <div><b id="home-hello">Bonjour !</b><p>Je suis <em>LISA</em>, votre assistant IA.<br>Comment puis-je vous aider aujourd'hui ?</p></div>
+          <div><b id="home-hello">Bonjour !</b><p>Je suis <em>LISA</em>, votre assistant IA.<br>Comment puis-je vous aider aujourd'hui ?</p><button id="live-line" type="button" class="chip mt-2 !whitespace-normal text-left"></button></div>
         </div>
 
         <div class="hero">
@@ -377,6 +392,7 @@
           <div id="avatar-chat" class="live w-11 h-11 rounded-full border border-blue-400/40 bg-black overflow-hidden transition-shadow shrink-0"></div>
           <div class="min-w-0 flex-1"><div class="chat-title">LISA</div><div id="mode-name" class="chat-sub"></div></div>
           <div class="flex items-center gap-1">
+            <button id="face-btn" type="button" class="tb" aria-label="Suivi du visage">👁</button>
             <button id="web-btn" class="tb" aria-label="Recherche web"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg></button>
             <button class="tb hands-btn" data-ic data-l="" aria-label="Mode conversation"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></button>
             <button id="lib-open" class="tb" aria-label="Mes fichiers"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
@@ -392,8 +408,9 @@
         <div id="att-bar" class="hidden flex gap-2 overflow-x-auto shrink-0"></div>
         <div id="slash" class="hidden shrink-0 max-h-40 overflow-y-auto rounded-2xl border border-blue-400/30 bg-black/85"></div>
         <form id="chat-form" class="composer shrink-0">
-          <textarea id="chat-input" rows="1" autocomplete="off" enterkeyhint="enter" placeholder="Écrivez à LISA…"></textarea>
+          <textarea id="chat-input" rows="1" autocomplete="off" enterkeyhint="enter" placeholder="Comment puis-je t'aider ?"></textarea>
           <div class="flex items-center gap-1">
+            <button type="button" id="hub-btn" class="cbtn" aria-label="Centre d'applications">＋</button>
             <button type="button" id="att-btn" class="cbtn" aria-label="Joindre une image ou un PDF"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M20 11.5l-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17.5a2 2 0 0 1-3-3L14.5 7"/></svg></button><input id="att-file" type="file" accept="image/*,application/pdf" multiple class="hidden">
             <button type="button" class="mic-btn cbtn" aria-label="Parler"><svg class="mic-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" fill-opacity=".28"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button>
             <button type="button" data-vt class="cbtn" aria-label="Voix"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="v-on"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="v-off"><path d="M11 5 6 9H3v6h3l5 4zM16 9l5 6M21 9l-5 6"/></svg></button>
@@ -411,14 +428,16 @@
         <div class="flex items-center justify-between"><div><div class="text-lg font-bold text-blue-50">Tâches</div><div id="t-net" class="text-xs text-zinc-400">Suivi local</div></div><div id="t-streak" class="chip on">🔥 0</div></div>
         <div id="t-stats" class="hud !p-3"></div>
         <div id="t-prop" class="hud !p-3"></div>
+        <div id="t-cal" class="hud !p-3"></div>
         <div class="flex gap-2" id="task-filters">
           <button class="chip on" data-tf="all">Toutes</button><button class="chip" data-tf="todo">En cours</button><button class="chip" data-tf="done">Terminées</button>
         </div>
         <form id="task-form" class="hud !p-2 space-y-2">
           <div class="flex gap-2"><input id="task-input" type="text" autocomplete="off" placeholder="Nouvelle tâche…" class="flex-1 min-w-0 bg-transparent text-sm px-2 py-2 outline-none placeholder-zinc-500"><button class="btn-neon px-4 py-2 text-sm" type="submit">＋</button></div>
-          <div class="flex gap-2 px-1"><input id="task-date" type="date" class="bg-transparent text-xs text-blue-200 outline-none"><input id="task-time" type="time" class="bg-transparent text-xs text-blue-200 outline-none"><select id="task-pr" class="bg-transparent text-xs text-blue-200 outline-none ml-auto"><option value="" class="bg-black">Normale</option><option value="h" class="bg-black">★ Haute</option></select></div>
+          <div class="flex gap-2 px-1"><input id="task-date" type="date" class="bg-transparent text-xs text-blue-200 outline-none"><input id="task-time" type="time" class="bg-transparent text-xs text-blue-200 outline-none"><select id="task-pr" class="bg-transparent text-xs text-blue-200 outline-none ml-auto"><option value="" class="bg-black">Normale</option><option value="b" class="bg-black">Basse</option><option value="m" class="bg-black">Moyenne</option><option value="h" class="bg-black">Haute</option></select></div>
         </form>
         <div id="task-list" class="space-y-2"></div>
+        <div id="t-hist" class="hud !p-3"></div>
       </div>
     </section>
 
@@ -426,6 +445,7 @@
     <section id="tab-apps" class="tab">
       <div class="max-w-xl mx-auto space-y-3">
         <div><div class="text-lg font-bold text-blue-50">Applications</div><div class="text-xs text-zinc-400">Modules et outils à portée de main</div></div>
+        <div id="hub-root"></div><div class="hidden">
         <div class="grid grid-cols-3 gap-2">
           <button data-mode="code" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">💻</div><div class="text-xs font-bold text-blue-50">Programmation</div><div class="text-[10px] text-zinc-400">Sites, apps</div></button>
           <button data-mode="anglais" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#22c55e,#15803d)">🌐</div><div class="text-xs font-bold text-blue-50">Anglais</div><div class="text-[10px] text-zinc-400">Réviser</div></button>
@@ -437,10 +457,12 @@
           <button data-go="improve" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#ec4899,#be185d)">🧠</div><div class="text-xs font-bold text-blue-50">Évolution</div><div id="imp-sub" class="text-[10px] text-zinc-400">Mémoire, règles</div></button>
           <button id="apps-settings" class="tile !text-center"><div class="ico" style="background:linear-gradient(135deg,#64748b,#334155)">⚙</div><div class="text-xs font-bold text-blue-50">Réglages</div><div class="text-[10px] text-zinc-400">Clé, voix</div></button>
         </div>
+        <div class="lbl pt-1">Actions rapides · hors ligne</div>
+        <div id="quick" class="flex flex-wrap gap-2"></div>
         <button id="apps-tools" class="btn-neon w-full py-2.5 text-sm">🧮 Boîte à outils financière</button>
         <div class="lbl pt-1">Outils d'analyse</div>
         <div id="apps-ext" class="grid grid-cols-3 gap-2"></div>
-      </div>
+      </div></div>
     </section>
 
     <!-- ÉVOLUTION -->
@@ -546,6 +568,7 @@
     <button id="adm-open" type="button" class="chip w-full !rounded-xl">🛡 Espace admin</button>
     <button id="set-keytest" type="button" class="chip w-full !rounded-xl">Tester l'accès</button>
     <label class="lbl block" style="font-size:9px">Modèle<select id="set-model" class="fld"></select></label>
+    <div id="loc-box" class="hidden space-y-2"><div class="lbl" style="font-size:9px">IA locale (sans Internet)</div><div id="loc-st" class="text-[11px] text-zinc-400 leading-relaxed"></div><button id="loc-pick" type="button" class="chip w-full !rounded-xl">Choisir le modèle Gemma (.task)</button></div>
     <label class="lbl block" style="font-size:9px">Voix de Lisa<select id="set-voice" class="fld"></select></label>
     <button id="set-test" type="button" class="chip w-full !rounded-xl">Écouter cette voix</button>
     <label class="lbl block" style="font-size:9px">Instructions personnelles (facultatif)<textarea id="set-notes" rows="3" placeholder="Ex. : mon niveau en anglais, mes objectifs, mes cours…" class="fld"></textarea></label>
@@ -658,6 +681,27 @@
   <iframe id="prev-frame" class="flex-1 w-full bg-white" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
 </div>
 
+<script>
+(function () {
+  const PHn = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LisaPhone;
+  if (!PHn || !PHn.speak) return;
+  function U(t) { this.text = t || ''; this.lang = 'fr-FR'; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null; }
+  window.SpeechSynthesisUtterance = U;
+  let q = [], busy = false, gen = 0;
+  async function next() {
+    if (busy || !q.length) return; busy = true; const g = gen, u = q.shift();
+    try { if (u.onstart) u.onstart({}); await PHn.speak({ text: u.text, lang: u.lang || 'fr-FR', rate: u.rate || 1 }); } catch (e) { if (g === gen && u.onerror) u.onerror({ error: 'synthesis-failed' }); }
+    if (g !== gen) return; busy = false; if (u.onend) u.onend({}); next();
+  }
+  const S = { paused: false, pending: false, onvoiceschanged: null,
+    speak(u) { if (u.volume === 0) { setTimeout(() => { if (u.onstart) u.onstart({}); if (u.onend) u.onend({}); }, 0); return; } q.push(u); next(); },
+    cancel() { q = []; busy = false; gen++; try { PHn.stopSpeak(); } catch (e) {} },
+    pause() {}, resume() {}, getVoices() { return [{ voiceURI: 'android-fr', name: 'Voix Android', lang: 'fr-FR', default: true, localService: true }]; },
+    addEventListener() {}, removeEventListener() {} };
+  Object.defineProperty(S, 'speaking', { get() { return busy || q.length > 0; } });
+  try { Object.defineProperty(window, 'speechSynthesis', { value: S, configurable: true }); } catch (e) { window.speechSynthesis = S; }
+})();
+</script>
 <script>
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
@@ -847,12 +891,82 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   }
   const genCfg = model => /gemini-3\.8-flash/.test(model) ? { thinkingConfig: { thinkingLevel: (mode === 'maths' || mode === 'devoirs' || mode === 'code') ? 'medium' : 'low' } } : /gemini-2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: (mode === 'maths' || mode === 'devoirs') ? 1024 : 0 } } : {};
 
+  /* ---------- IA locale (Android, plugin LisaLocalAI) ---------- */
+  const LOCAL = window.Capacitor?.Plugins?.LisaLocalAI;
+  let localOK = false, localMB = 0;
+  function paintLoc() {
+    const b = $('#loc-box'); if (!b) return; b.classList.toggle('hidden', !LOCAL);
+    $('#loc-st').textContent = localOK ? 'Modèle prêt (' + localMB + ' Mo). Lisa répond sans Internet ni clé, et prend le relais si le service en ligne échoue.' : 'Aucun modèle installé. Choisissez le fichier Gemma .task déjà téléchargé sur le téléphone.';
+    $('#loc-pick').textContent = localOK ? 'Remplacer le modèle' : 'Choisir le modèle Gemma (.task)';
+  }
+  async function refreshLocal() {
+    if (!LOCAL) return false;
+    try { const st = await LOCAL.status(); localOK = !!st.ready; localMB = st.mb || 0; } catch { localOK = false; }
+    paintLoc(); return localOK;
+  }
+  if ($('#loc-pick')) $('#loc-pick').onclick = async () => {
+    const btn = $('#loc-pick'); btn.disabled = true; $('#loc-st').textContent = "Copie du modèle en cours… patientez et restez dans l'application.";
+    try { const st = await LOCAL.pickModel(); localOK = !!st.ready; localMB = st.mb || 0; toast(localOK ? 'IA locale prête' : "Fichier trop petit : ce n'est pas un modèle valide"); }
+    catch (e) { if (!/annule/i.test(String(e?.message || e))) uiAlert('Copie impossible : ' + (e?.message || e)); await refreshLocal(); }
+    btn.disabled = false; paintLoc();
+  };
+  refreshLocal();
+  function localPrompt(history, sysText) {
+    const sys = sysText || ('Tu es Lisa, assistante personnelle de ' + (settings.name || 'Leonard') + ', experte en analyse financière, data science et anglais. Réponds en français, de façon claire et concise.');
+    const turns = history.slice(-6).map(h => ({ r: h.role === 'user' ? 'user' : 'model', t: (h.parts || []).map(p => p.text || '').join('\n').trim() })).filter(x => x.t);
+    let used = sys.length, keep = [];
+    for (let i = turns.length - 1; i >= 0; i--) { const t = turns[i].t.slice(0, 900); if (used + t.length > 2200 && keep.length) break; used += t.length; keep.unshift({ r: turns[i].r, t }); }
+    while (keep.length && keep[0].r !== 'user') keep.shift();
+    if (!keep.length) keep = [{ r: 'user', t: '...' }];
+    keep[0] = { r: 'user', t: sys + '\n\n' + keep[0].t };
+    return keep.map(x => '<start_of_turn>' + x.r + '\n' + x.t + '<end_of_turn>\n').join('') + '<start_of_turn>model\n';
+  }
+  async function askLocal(history, onDelta, sysText) {
+    const last = history[history.length - 1], hasFile = !!(last && (last.parts || []).some(p => p.inlineData));
+    try {
+      const r = await LOCAL.generate({ prompt: localPrompt(history, sysText) });
+      let t = String(r?.text || '').replace(/<end_of_turn>[\s\S]*$/, '').replace(/<start_of_turn>[\s\S]*$/, '').trim();
+      if (!t) return { error: true, text: "L'IA locale n'a rien répondu. Reformulez en plus court." };
+      if (hasFile && !sysText) t += "\n\n(IA locale : les pièces jointes ne sont pas lues hors ligne.)";
+      return { error: false, text: t, src: [] };
+    } catch (e) { return { error: true, text: 'IA locale indisponible : ' + (e?.message || e) }; }
+  }
   async function ask(history, onDelta, sysText) {
+    const noAccess = !settings.key && !store.get('louis.pass', '');
+    if (localOK && (settings.model === 'local' || !navigator.onLine || noAccess)) {
+      if (sysText) return { error: true, text: "Cette fonction a besoin d'Internet (l'IA locale sert uniquement à la conversation)." };
+      return askLocal(history, onDelta, sysText);
+    }
+    const r = await askCloud(history, onDelta, sysText);
+    if (r.error && localOK && !sysText && !(abortCtl && abortCtl.signal.aborted)) {
+      const l = await askLocal(history, onDelta, sysText);
+      if (!l.error) { l.text = "(Service en ligne indisponible ou limite atteinte : réponse de l'IA locale.)\n\n" + l.text; return l; }
+    }
+    return r;
+  }
+  /* ---------- Suggestions hors ligne ---------- */
+  function offlineIdeas() { try { return offlineIdeas0(); } catch { return ['/plan', '/taches', '/outils']; } }
+  function offlineIdeas0() {
+    const h = new Date().getHours(), pool = [], ks = Object.keys(typeof GLOSS !== 'undefined' ? GLOSS : {});
+    if (tasks.some(t => !t.done)) pool.push('/taches');
+    pool.push('/plan');
+    if (ks.length) pool.push('définition ' + ks[Math.floor(Math.random() * ks.length)], 'quiz finance');
+    if (PH) pool.push(h < 18 ? 'minuteur 25 min' : 'compte rendu');
+    pool.push('/outils');
+    return [...new Set(pool)].sort(() => Math.random() - .5).slice(0, 3);
+  }
+  function offBlock() {
+    if (navigator.onLine) return '';
+    return '<div class="text-[11px] text-cyan-300 mt-4 mb-2">Hors ligne · idées pour toi</div><div class="flex flex-wrap gap-2 justify-center">' + offlineIdeas().map(t => `<button type="button" class="chip" data-sug="${escH(t)}">${escH(t)}</button>`).join('') + '</div>';
+  }
+  function refreshEmpty() { if (messages.length === 1 && messages[0].greet && $('#empty-st')) renderChat(); }
+  addEventListener('offline', refreshEmpty); addEventListener('online', refreshEmpty);
+  async function askCloud(history, onDelta, sysText) {
     const pass = store.get('louis.pass', '');
     const viaProxy = !settings.key && !!pass;
     if (!settings.key && !pass) setTimeout(openSettings, 300);
     if (!settings.key && !pass) return { error: true, text: "Accès manquant. Ouvrez le lien d'invitation reçu, ou collez votre clé Gemini dans ⚙ Réglages." };
-      const models = [...new Set([settings.model, 'gemini-3.5-flash-lite'])];
+      const models = [...new Set([settings.model === 'local' ? 'gemini-3.8-flash' : settings.model, 'gemini-3.5-flash-lite'])];
     let last = '';
     abortCtl = new AbortController();
     for (const model of models) {
@@ -1008,7 +1122,7 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     else b.innerHTML = md(stripTags(m.text), m.id);
   }
   function syncChips() { $('#chips').classList.toggle('hidden', messages.some(m => m.sender === 'user' && !m.greet)); }
-  function renderChat() { syncChips(); const log = $('#chat-log'); log.innerHTML = ''; messages.forEach(m => log.appendChild(msgEl(m))); log.scrollTop = log.scrollHeight; if (messages.length === 1 && messages[0].greet) { const e = document.createElement('div'); e.id = 'empty-st'; e.className = 'py-6 text-center'; e.innerHTML = '<div class="hello">Comment puis-je t\'aider ?</div><div class="text-xs text-zinc-400 mt-1 mb-4">Choisis une idée ou écris ton message</div><div class="grid grid-cols-2 gap-2 text-left">' + MODES[mode].chips.map((c, k) => `<button data-card="${k}" class="tile !p-3 text-[12px] text-blue-100">${c[0]}</button>`).join('') + '</div>'; e.querySelectorAll('[data-card]').forEach(b => b.onclick = () => $('#chips').querySelector(`[data-chip="${b.dataset.card}"]`)?.click()); log.appendChild(e); }
+  function renderChat() { syncChips(); const log = $('#chat-log'); log.innerHTML = ''; messages.forEach(m => log.appendChild(msgEl(m))); log.scrollTop = log.scrollHeight; if (messages.length === 1 && messages[0].greet) { const e = document.createElement('div'); e.id = 'empty-st'; e.className = 'py-6 text-center'; e.innerHTML = '<div class="hello">Comment puis-je t\'aider ?</div><div class="text-xs text-zinc-400 mt-1 mb-4">Choisis une idée ou écris ton message</div><div class="grid grid-cols-2 gap-2 text-left">' + MODES[mode].chips.map((c, k) => `<button data-card="${k}" class="tile !p-3 text-[12px] text-blue-100">${c[0]}</button>`).join('') + '</div>' + offBlock(); e.querySelectorAll('[data-card]').forEach(b => b.onclick = () => $('#chips').querySelector(`[data-chip="${b.dataset.card}"]`)?.click()); log.appendChild(e); }
     const i = $('#chat-input'); if (i) { i.value = cur.draft || ''; fit(); } }
   let raf = 0, lastL = 0;
   function live(a) {
@@ -1036,9 +1150,9 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     sp.idx += seg.length; enqueueSpeech(seg);
   }
   async function send(text, viaVoice) {
-    text = (text || '').trim(); if (!text && atts.length) text = 'Analyse ce fichier.'; if (!text || busy) return; if (!text.startsWith('/') && !quotaOk()) return;
+    text = (text || '').trim(); if (!text && atts.length) text = 'Analyse ce fichier.'; if (!text || busy) return; if (!text.startsWith('/') && !(localOK && (settings.model === 'local' || !navigator.onLine)) && !quotaOk()) return;
     const lc = atts.length ? null : localCmd(text);
-    if (lc) { const u0 = { id: Date.now(), sender: 'user', raw: text, text, ts: now() }, a0 = { id: u0.id + 1, sender: 'jarvis', text: lc, ts: now() }; messages.push(u0, a0); if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42); renderChat(); persist(); if (viaVoice) enqueueSpeech(lc); resumeHands(); return; }
+    if (lc) { const u0 = { id: Date.now(), sender: 'user', raw: text, text, ts: now() }, a0 = { id: u0.id + 1, sender: 'jarvis', text: lc, ts: now(), next: !navigator.onLine ? offlineIdeas() : [], offIdeas: !navigator.onLine }; messages.push(u0, a0); if (cur.title === 'Nouvelle conversation' && !text.startsWith('/')) cur.title = text.slice(0, 42); renderChat(); persist(); if (viaVoice) enqueueSpeech(lc); resumeHands(); return; }
     const F = atts; atts = []; paintAtt();
     stopSpeech(); busy = true; document.body.classList.add('busy'); $('#chat-send').dataset.s = 'stop'; exch++; store.set('louis.exch', exch);
     const u = { id: Date.now(), sender: 'user', raw: text, text: text + (F.length ? '\n' + F.map(f => '📎 ' + f.name).join('\n') : ''), files: F, ts: now() };
@@ -1054,9 +1168,10 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     a.pending = false; a.err = res.error; a.src = res.src || [];
     const tags = [...res.text.matchAll(/\[\[mem:\s*([^\]]+?)\s*\]\]/g)].map(x => x[1]);
     a.text = stripTags(res.text); const nx = (res.text.match(/\[\[suite:\s*([^\]]+?)\s*\]\]/) || [])[1]; a.next = nx && !res.error ? nx.split('|').map(x => x.trim()).filter(Boolean).slice(0, 3) : [];
+    if (!res.error && !a.next.length && (!navigator.onLine || settings.model === 'local' || res.text.startsWith('(Service en ligne indisponible'))) { a.next = offlineIdeas(); a.offIdeas = true; }
     clearTimeout(raf); raf = 0;
     const w = $('#m-' + a.id); if (w) w.replaceWith(msgEl(a));
-    if (!res.error) { feedSpeech(a.text, true); tags.forEach(proposeMem); if (a.next.length && (autoVoice || viaVoice)) enqueueSpeech('Si vous voulez, je peux aussi : ' + a.next.join(' ; ou ') + '.'); }
+    if (!res.error) { feedSpeech(a.text, true); tags.forEach(proposeMem); if (a.next.length && !a.offIdeas && (autoVoice || viaVoice)) enqueueSpeech('Si vous voulez, je peux aussi : ' + a.next.join(' ; ou ') + '.'); }
     busy = false; document.body.classList.remove('busy'); $('#chat-send').dataset.s = ''; persist(); updateBadge(); resumeHands();
     if (!res.error && !cur.titleAI && messages.filter(m => m.sender === 'user').length === 1) autoTitle(cur, text, a.text);
   }
@@ -1445,9 +1560,9 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   }
   const show = (id, on) => $(id).classList.toggle('hidden', !on);
   function openSettings() {
-    const ms = MODELS.slice(); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
+    const ms = MODELS.slice(); if (LOCAL) ms.push(['local', '📱 IA locale · hors ligne (Gemma)']); if (!ms.some(m => m[0] === settings.model)) ms.push([settings.model, settings.model]);
     $('#set-model').innerHTML = ms.map(m => `<option value="${escH(m[0])}">${escH(m[1])}</option>`).join(''); $('#set-model').value = settings.model;
-    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); show('#modal-settings', true);
+    $('#set-name').value = settings.name || ''; $('#set-greet').checked = settings.greet !== false; $('#set-key').value = settings.key; $('#set-notes').value = settings.notes || ''; fillVoices(); paintLoc(); show('#modal-settings', true);
   }
   $('#btn-settings').onclick = openSettings; $('#apps-settings').onclick = openSettings;
   $('#set-cancel').onclick = () => show('#modal-settings', false);
@@ -1640,8 +1755,10 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     setTimeout(() => { toast('⏰ Minuteur terminé'); navigator.vibrate?.([300, 100, 300]); if (hasTTS) enqueueSpeech('Monsieur, votre minuteur de ' + label + ' est terminé.'); if (window.Notification && Notification.permission === 'granted') new Notification('Lisa · Minuteur', { body: label, icon: 'icon-192.png' }); }, sec * 1000);
   }
   function localCmd(t) {
+    const ex0 = extraCmd(t); if (ex0) return ex0;
     if (t.startsWith('/')) return slash(t);
     const rp = replyCmd(t); if (rp) return rp;
+    const oc = offlineCmd(t); if (oc) return oc;
     const pc = phoneCtl(t); if (pc) return pc;
     if (/mes (e-?)?mails|compte[- ]rendu|qui m'a (appel|écrit|contact)|appels? manqu|messages? manqu|mes notifications/i.test(t)) return phoneCmd();
     const q = t.toLowerCase().replace(/[.!?]+$/, '').trim(); let m;
@@ -1659,9 +1776,10 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     if ((m = q.match(/^(?:calcule|calcul|combien font|combien fait)\s+([\d\s+\-*/().,x×÷^]+)$/))) { try { const ex = m[1].replace(/[x×]/g, '*').replace(/÷/g, '/').replace(/\^/g, '**').replace(/,/g, '.'); const v = Function('"use strict";return (' + ex + ')')(); if (Number.isFinite(v)) return m[1].trim() + ' = ' + (+v.toFixed(10)); } catch {} return 'Je ne peux pas calculer cette expression.'; }
     if ((m = q.match(/^ouvre\s+([\w .]+)$/))) { const ap = APPS.find(x => x.n.toLowerCase() === m[1]); if (ap) { window.open(ap.u, '_blank', 'noopener'); return 'J\'ouvre ' + ap.n + '.'; } }
     if (/(état|etat|santé|performance).*(système|systeme|appareil|téléphone)|comment va (le|mon) (système|systeme|appareil)/.test(q)) return perfSummary();
+    if (!navigator.onLine) return cachedAnswer(q) || (localOK ? null : OFFLINE_MISS);
     return null;
   }
-  const CMDS = [['/phone', 'Compte rendu : appels, SMS, WhatsApp'], ['/tache ', 'Ajouter une tâche (ex. /tache Réviser 18:30)'], ['/taches', 'Lister les tâches en cours'], ['/fait ', 'Valider une tâche (/fait 2)'], ['/plan', 'Propositions du jour'], ['/note ', 'Enregistrer une note'], ['/calc ', 'Calculer (ex. /calc 1500*1.07^10)'], ['/minuteur ', 'Minuteur (ex. /minuteur 25 min)'], ['/copie', 'Copier la dernière réponse'], ['/outils', 'Boîte à outils financière'], ['/new', 'Nouvelle conversation'], ['/clear', 'Vider cette conversation'], ['/export', 'Exporter en Markdown'], ['/pin', 'Épingler / désépingler'], ['/web', 'Recherche web on/off'], ['/voix', 'Voix on/off'], ['/mode ', 'Changer de mode (general, code, anglais, maths, devoirs)'], ['/dossier ', 'Ranger dans un dossier (ex. /dossier Anglais)'], ['/model ', 'Modèle : flash, lite ou pro'], ['/fichiers', 'Bibliothèque de fichiers'], ['/stats', 'Historique et stockage'], ['/aide', 'Liste des commandes']];
+  const CMDS = [['/messages', 'Lire mes messages WhatsApp et Gmail'], ['/offline', 'Ce qui marche sans Internet'], ['/phone', 'Compte rendu : appels, SMS, WhatsApp'], ['/tache ', 'Ajouter une tâche (ex. /tache Réviser 18:30)'], ['/taches', 'Lister les tâches en cours'], ['/fait ', 'Valider une tâche (/fait 2)'], ['/plan', 'Propositions du jour'], ['/note ', 'Enregistrer une note'], ['/calc ', 'Calculer (ex. /calc 1500*1.07^10)'], ['/minuteur ', 'Minuteur (ex. /minuteur 25 min)'], ['/copie', 'Copier la dernière réponse'], ['/outils', 'Boîte à outils financière'], ['/new', 'Nouvelle conversation'], ['/clear', 'Vider cette conversation'], ['/export', 'Exporter en Markdown'], ['/pin', 'Épingler / désépingler'], ['/web', 'Recherche web on/off'], ['/voix', 'Voix on/off'], ['/mode ', 'Changer de mode (general, code, anglais, maths, devoirs)'], ['/dossier ', 'Ranger dans un dossier (ex. /dossier Anglais)'], ['/model ', 'Modèle : flash, lite ou pro'], ['/fichiers', 'Bibliothèque de fichiers'], ['/stats', 'Historique et stockage'], ['/aide', 'Liste des commandes']];
   const tin = $('#chat-input'), coarse = matchMedia('(pointer:coarse)').matches;
   function fit() { const mx = Math.round(innerHeight * (big ? .55 : .3)); tin.style.height = 'auto'; tin.style.height = (big ? mx : Math.min(tin.scrollHeight, mx)) + 'px'; }
   function showSlash() {
@@ -1711,6 +1829,8 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
       case '/minuteur': return localCmd('minuteur ' + r.join(' ')) || 'Usage : /minuteur 10 min';
       case '/copie': { const l = [...messages].reverse().find(m => m.sender !== 'user' && m.text); if (!l) return 'Rien à copier.'; navigator.clipboard?.writeText(l.text); return 'Dernière réponse copiée.'; }
       case '/phone': return phoneCmd();
+      case '/messages': return readMsgs();
+      case '/offline': return OFFLINE;
       case '/outils': openTools(); return 'Boîte à outils ouverte.';
       case '/aide': return 'Commandes :\n' + CMDS.map(x => '- ' + x[0].trim() + ' : ' + x[1]).join('\n');
     }
@@ -1747,7 +1867,7 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   $('#theme-row').addEventListener('click', e => { const b = e.target.closest('[data-th]'); if (!b) return; settings.theme = +b.dataset.th; store.set('jarvis.settings', settings); paintTheme(); });
   paintTheme();
   $('#set-keytest').onclick = async () => {
-    const k = $('#set-key').value.trim(), pass = store.get('louis.pass', ''), m = $('#set-model').value;
+    const k = $('#set-key').value.trim(), pass = store.get('louis.pass', ''), m = $('#set-model').value === 'local' ? 'gemini-3.8-flash' : $('#set-model').value;
     if (!k && !pass) return uiAlert("Colle d'abord ta clé, ou ouvre ton lien d'invitation.");
     try {
       const r = k ? await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': k }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ok' }] }], generationConfig: { maxOutputTokens: 5 } }) })
@@ -1813,6 +1933,41 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     if (m = q.match(/^ouvre\s+(?:les |le |la )?(paramètres|parametres|wifi|bluetooth|batterie|son|affichage)$/)) return run('open', { page: { wifi: 'wifi', bluetooth: 'bluetooth', batterie: 'battery', son: 'sound', affichage: 'display' }[m[1]] || 'main' }, 'Paramètres ouverts.');
     return null;
   }
+  const GLOSS = { van: "VAN (valeur actuelle nette) : somme des flux futurs actualisés moins l'investissement initial. Positive = projet créateur de valeur.", tri: "TRI (taux de rendement interne) : taux d'actualisation qui annule la VAN. À comparer au coût du capital.", cagr: "CAGR : taux de croissance annuel moyen = (valeur finale / valeur initiale)^(1/années) − 1.", wacc: "WACC : coût moyen pondéré du capital, mélange du coût des fonds propres et de la dette après impôt.", ebitda: "EBITDA : résultat avant intérêts, impôts, dépréciations et amortissements. Mesure la rentabilité opérationnelle.", bfr: "BFR : besoin en fonds de roulement = stocks + créances clients − dettes fournisseurs.", roe: "ROE : rentabilité des capitaux propres = résultat net / capitaux propres.", roi: "ROI : retour sur investissement = (gain − coût) / coût.", per: "PER : cours de l'action / bénéfice par action. Indique combien le marché paie 1 € de bénéfice.", beta: "Bêta : sensibilité d'un actif au marché. Bêta > 1 = plus volatil que le marché.", sharpe: "Ratio de Sharpe : (rendement − taux sans risque) / volatilité. Mesure le rendement par unité de risque.", liquidite: "Liquidité : facilité à convertir un actif en argent rapidement sans perdre de valeur.", levier: "Effet de levier : usage de la dette pour amplifier le rendement des fonds propres, mais aussi le risque.", dividende: "Dividende : part du bénéfice distribuée aux actionnaires.", bilan: "Bilan : photographie du patrimoine d'une entreprise (actif = passif + capitaux propres).", inflation: "Inflation : hausse générale et durable des prix, qui réduit le pouvoir d'achat.", obligation: "Obligation : titre de dette qui verse des intérêts (coupons) et rembourse le capital à l'échéance.", action: "Action : part de capital d'une entreprise, donnant droit aux dividendes et au vote.", etf: "ETF : fonds coté en bourse qui réplique un indice, à faibles frais.", volatilite: "Volatilité : ampleur des variations du prix d'un actif, mesurée par l'écart-type des rendements.", correlation: "Corrélation : mesure (de −1 à 1) du lien entre les variations de deux actifs.", marge: "Marge nette : résultat net / chiffre d'affaires.", endettement: "Ratio d'endettement : dette nette / capitaux propres (ou / EBITDA).", fcf: "Free cash flow : flux de trésorerie disponible après investissements, = flux d'exploitation − capex.", capex: "Capex : dépenses d'investissement en équipements et immobilisations.", capitalisation: "Capitalisation boursière : cours de l'action × nombre d'actions.", spread: "Spread : écart de taux ou de prix, par exemple entre une obligation risquée et un emprunt d'État.", dcf: "DCF : valorisation par actualisation des flux de trésorerie futurs, plus une valeur terminale." };
+  const OFFLINE = "Sans Internet, Lisa sait faire :\n- tâches, suivi et propositions (/tache, /taches, /fait, /plan)\n- notes, calculs, boîte à outils financière (/note, /calc, /outils)\n- minuteur et alarme (« minuteur 10 min », « réveille-moi à 7h30 »)\n- compte rendu appels, SMS, WhatsApp, Gmail (/phone, /messages)\n- lampe, volume, luminosité, ne pas déranger, paramètres\n- appeler un contact (« appelle Karim »)\n- définitions de finance (« définition VAN ») et quiz (« quiz »)\n- réponses déjà données, retrouvées quand une question ressemble à une ancienne\n- boutons « Actions rapides » dans l'onglet Apps\n- réponses suggérées WhatsApp et Gmail (/repondre, /mail), bilan du jour (/jour)\n- mémoire (« retiens que… », « ma mémoire »), conversions, pourcentages, heure dans le monde\n- pile ou face, dé, mot de passe sûr, blague, citation\nLes réponses de l'IA demandent Internet.";
+  let quizK = null;
+  const QUICK = [['💡 Lampe', 'allume la lampe'], ['🌑 Éteindre', 'éteins la lampe'], ['🔊 Volume 30', 'mets le volume à 30'], ['🔊 Volume 70', 'mets le volume à 70'], ['☀️ Luminosité 50', 'luminosité 50'], ['🔕 Ne pas déranger', 'active ne pas déranger'], ['🔔 Sonnerie', 'désactive ne pas déranger'], ['⏲ 10 min', 'minuteur 10 min'], ['⏰ Réveil 7h', 'réveille-moi à 7h'], ['📞 Compte rendu', 'compte rendu'], ['💬 Mes messages', 'lis mes messages'], ['📋 Mes tâches', '/taches'], ['✨ Plan du jour', '/plan'], ['🧮 Outils', '/outils'], ['📶 Wi-Fi', 'ouvre wifi'], ['🔵 Bluetooth', 'ouvre bluetooth'], ['🎯 Quiz finance', 'quiz'], ['❓ Hors ligne', '/offline']];
+  $('#quick').innerHTML = QUICK.map((x, i) => `<button type="button" data-q="${i}" class="chip">${x[0]}</button>`).join('');
+  $('#quick').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) { go('chat'); send(QUICK[+b.dataset.q][1]); } });
+  const OFFLINE_MISS = "Hors ligne : je n'ai pas de réponse mémorisée pour cela. Sans Internet, je réponds aux commandes, au glossaire, au quiz et aux outils (tape /offline).";
+  function cachedAnswer(q) {
+    const tk = s => new Set(norm(s).split(' ').filter(w => w.length > 2)), A = tk(q); if (A.size < 2) return null;
+    let best = 0, ans = null;
+    messages.forEach((m, i) => { const a = messages[i + 1]; if (m.sender !== 'user' || !a || a.sender === 'user' || !a.text || a.pending || /^Erreur/.test(a.text)) return; const B = tk(m.raw || m.text); let n = 0; A.forEach(w => B.has(w) && n++); const sc = n / (A.size + B.size - n || 1); if (sc > best) { best = sc; ans = a.text; } });
+    return best >= 0.5 ? '(Réponse mémorisée, hors ligne)\n' + ans : null;
+  }
+  function readMsgs() {
+    if (!PB) return "Cette fonction demande l'application Android de Lisa.";
+    PB.report({ since: Date.now() - 864e5 }).then(r => {
+      const L = [];
+      r.wa.slice(-8).forEach(x => L.push('WhatsApp · ' + x.from + (x.s ? ' : ' + x.s : '')));
+      (r.gm || []).slice(-8).forEach(x => L.push('Gmail · ' + x.from + (x.s ? ' : ' + x.s : '')));
+      const t = L.length ? L.join('\n') : 'Aucun message récent.';
+      lisaSay(t); if (hasTTS) enqueueSpeech(t);
+    }).catch(() => lisaSay("Activez l'accès aux notifications pour Lisa."));
+    return 'Je regarde vos messages…';
+  }
+  function offlineCmd(t) {
+    const q = t.toLowerCase().trim().replace(/[.!?]+$/, ''); let m;
+    if (/^quiz( finance)?$/.test(q)) { const ks = Object.keys(GLOSS); quizK = ks[Math.floor(Math.random() * ks.length)]; return 'Quiz : que signifie « ' + quizK.toUpperCase() + ' » ? Dites « réponse » pour voir la solution.'; }
+    if (quizK && /^(réponse|reponse|solution)$/.test(q)) { const r = GLOSS[quizK]; quizK = null; return r; }
+    if (/^(lis|lire|montre)\s+(moi\s+)?(mes|les)\s+(messages|mails|e-?mails)/.test(q)) return readMsgs();
+    if (m = q.match(/^(?:définition|definition|c'est quoi|qu'est-ce que|que veut dire)\s+(?:de |du |des |d')?(?:le |la |l'|les |un |une )?(.+)$/)) { const k = Object.keys(GLOSS).find(x => norm(m[1]).normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(' ').includes(x)); if (k) return GLOSS[k]; }
+    if (m = q.match(/^(?:réveille-moi|reveille-moi|mets? (?:un )?(?:réveil|reveil)|alarme)(?:\s+(?:à|a|pour))?\s*(\d{1,2})\s*(?:h|:)\s*(\d{2})?$/)) { if (!PH) return "Le réveil demande l'application Android de Lisa."; const h = Math.min(23, +m[1]), mi = Math.min(59, +(m[2] || 0)); PH.alarm({ h, m: mi }).then(() => lisaSay('Réveil réglé à ' + h + 'h' + String(mi).padStart(2, '0') + '.')).catch(() => lisaSay('Impossible de régler le réveil.')); return "D'accord…"; }
+    if (PH && (m = q.match(/^(?:minuteur|timer|compte à rebours)\s+(?:de\s+)?(\d+)\s*(h|heures?|min|minutes?|s|secondes?)/))) { const n = +m[1], u = m[2][0], sec = u === 'h' ? n * 3600 : u === 's' ? n : n * 60; PH.timer({ seconds: sec }).then(() => lisaSay('Minuteur lancé.')).catch(() => lisaSay('Impossible de lancer le minuteur.')); return "D'accord…"; }
+    if (m = q.match(/^(?:appelle|appeler|téléphone à|telephone a)\s+(.+)$/)) { if (!PH) return "L'appel demande l'application Android de Lisa."; PH.call({ name: m[1].trim() }).then(r => lisaSay('Je prépare l\'appel vers ' + r.name + '. Touchez le bouton d\'appel.')).catch(() => lisaSay("Contact introuvable ou autorisation refusée.")); return "D'accord…"; }
+    return null;
+  }
   const phoneCmd = () => { if (!PB) return "Cette fonction demande l'application Android de Lisa."; phoneReport(true).then(t => t && lisaSay(t)); return 'Je consulte votre téléphone…'; };
   /* ---------- Tâches v2 : suivi hors ligne + propositions ---------- */
   const ymd = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -1847,19 +2002,23 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
     const today = ymd(), days = [...Array(7)].map((_, i) => ymd(new Date(Date.now() - (6 - i) * 864e5))), n = days.map(d => tlog.filter(x => x.d === d).length), mx = Math.max(1, ...n);
     const late = tasks.filter(isLate).length, open = tasks.filter(t => !t.done).length;
     $('#t-stats').innerHTML = `<div class="flex items-end gap-3"><div class="flex items-end gap-1 h-10 w-28">${n.map(v => `<i style="flex:1;height:${Math.max(10, v / mx * 100)}%;background:#22d3ee;opacity:${v ? 1 : .2};border-radius:3px"></i>`).join('')}</div><div class="text-[11px] text-zinc-300 leading-4"><b class="text-blue-50">${n[6]}</b> faite${n[6] > 1 ? 's' : ''} aujourd'hui<br>${open} en cours${late ? ' · <span class="text-rose-400">' + late + ' en retard</span>' : ''}</div></div>`;
-    renderProps();
+    renderProps(); renderCal(); renderHist();
     const list = $('#task-list'); list.innerHTML = '';
-    const rank = t => (t.done ? 9 : isLate(t) ? 0 : t.pr ? 1 : 2);
-    const shown = tasks.filter(t => tfilter === 'all' || (tfilter === 'done' ? t.done : !t.done)).sort((a, b) => rank(a) - rank(b) || (a.date || '9').localeCompare(b.date || '9') || (a.time || '99').localeCompare(b.time || '99'));
+    const rank = t => (t.done ? 9 : isLate(t) ? 0 : ({ h: 1, m: 2, '': 3, b: 4 })[t.pr || ''] ?? 3);
+    const shown = tasks.filter(t => (!calSel || t.date === calSel) && (tfilter === 'all' || (tfilter === 'done' ? t.done : !t.done))).sort((a, b) => rank(a) - rank(b) || (a.date || '9').localeCompare(b.date || '9') || (a.time || '99').localeCompare(b.time || '99'));
     if (!shown.length) { list.innerHTML = '<div class="text-center py-10 text-zinc-500 text-xs">Aucune tâche.</div>'; return; }
     shown.forEach(t => {
       const r = document.createElement('div'); r.className = 'hud !p-3 flex items-center gap-3';
-      r.innerHTML = '<button class="chk"></button><div class="flex-1 min-w-0"><div class="text-sm text-blue-50 break-words"></div><div class="text-[10px] text-zinc-400"></div></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
-      const chk = r.children[0], tt = r.children[1].children[0], mt = r.children[1].children[1];
+      r.innerHTML = '<button class="chk"></button><div class="flex-1 min-w-0"><div class="text-sm text-blue-50 break-words"></div><div class="flex flex-wrap items-center gap-1 mt-1"></div></div><button class="text-zinc-500 hover:text-rose-400 text-sm">✕</button>';
+      const chk = r.children[0], tt = r.children[1].children[0], mt = r.children[1].children[1], p = PRI[t.pr];
       chk.classList.toggle('done', t.done); chk.textContent = t.done ? '✓' : '';
-      tt.textContent = (t.pr ? '★ ' : '') + t.text; if (t.done) tt.style.textDecoration = 'line-through';
-      mt.textContent = (t.done ? 'Terminée' : isLate(t) ? 'En retard' : 'En cours') + (t.date && t.date !== today ? ' · ' + t.date.slice(8) + '/' + t.date.slice(5, 7) : '') + (t.time ? ' · ' + t.time : '');
-      if (isLate(t)) mt.style.color = '#fb7185';
+      tt.textContent = t.text; if (t.done) tt.style.textDecoration = 'line-through';
+      const pc = document.createElement('button'); pc.type = 'button'; pc.className = 'chip !py-0.5 !px-2 !text-[10px]'; pc.textContent = p ? p[0] : 'Normale'; if (p) pc.style.color = p[1];
+      pc.onclick = () => { t.pr = ({ '': 'b', b: 'm', m: 'h', h: '' })[t.pr || '']; saveT(); renderTasks(); };
+      const dc = document.createElement('label'); dc.className = 'chip !py-0.5 !px-2 !text-[10px] relative'; if (isLate(t)) dc.style.color = '#fb7185';
+      dc.innerHTML = '📅 ' + (t.date ? t.date.slice(8) + '/' + t.date.slice(5, 7) : 'Échéance') + (t.time ? ' ' + t.time : '') + (!t.done && t.date ? ' · ' + dueTxt(t) : '') + '<input type="date" class="absolute inset-0 opacity-0 w-full">';
+      dc.lastChild.value = t.date || ''; dc.lastChild.onchange = e => { t.date = e.target.value; saveT(); renderTasks(); };
+      mt.append(pc, dc);
       chk.onclick = () => toggleTask(t);
       r.children[2].onclick = () => { tasks = tasks.filter(x => x.id !== t.id); saveT(); renderTasks(); };
       list.appendChild(r);
@@ -2009,6 +2168,251 @@ STYLE : ton chaleureux, naturel et vivant, comme une assistante brillante et att
   $('#adm-cprev').onclick = () => clip(JSON.stringify(store.get('louis.adm.revoked', [])));
   startAccess();
 })();
+
+  /* ---------- Tâches dynamiques : priorité, échéance, calendrier, historique ---------- */
+  const PRI = { h: ['Haute', '#fb7185'], m: ['Moyenne', '#fbbf24'], b: ['Basse', '#4ade80'] };
+  let calM = new Date(), calSel = '';
+  function dueTxt(t) { const d = Math.round((new Date(t.date + 'T00:00') - new Date(ymd() + 'T00:00')) / 864e5); return d === 0 ? "aujourd'hui" : d === 1 ? 'demain' : d > 1 ? 'dans ' + d + ' j' : 'retard ' + (-d) + ' j'; }
+  function renderCal() {
+    const y = calM.getFullYear(), mo = calM.getMonth(), first = new Date(y, mo, 1), off = (first.getDay() + 6) % 7, nd = new Date(y, mo + 1, 0).getDate(), today = ymd();
+    let h = `<div class="flex items-center justify-between mb-2"><button type="button" data-cm="-1" class="cbtn">‹</button><div class="text-sm font-bold text-blue-50 capitalize">${first.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</div><button type="button" data-cm="1" class="cbtn">›</button></div><div class="grid grid-cols-7 gap-1 text-center text-[10px] text-zinc-500 mb-1">${'LMMJVSD'.split('').map(x => `<span>${x}</span>`).join('')}</div><div class="grid grid-cols-7 gap-1">`;
+    for (let i = 0; i < off; i++) h += '<span></span>';
+    for (let d = 1; d <= nd; d++) {
+      const k = ymd(new Date(y, mo, d)), ts = tasks.filter(t => t.date === k), op = ts.filter(t => !t.done).length, dot = op ? (k < today ? '#fb7185' : '#22d3ee') : ts.length ? '#4ade80' : 'transparent';
+      h += `<button type="button" data-cd="${k}" class="rounded-lg py-1 text-[12px] ${k === calSel ? 'bg-cyan-500/30 text-white' : k === today ? 'border border-cyan-400/60 text-cyan-200' : 'text-blue-100'}">${d}<i class="block mx-auto mt-0.5 w-1.5 h-1.5 rounded-full" style="background:${dot}"></i></button>`;
+    }
+    $('#t-cal').innerHTML = h + '</div>' + (calSel ? `<button type="button" data-cd="" class="chip mt-2">Tout afficher (jour ${calSel.slice(8)}/${calSel.slice(5, 7)} sélectionné)</button>` : '');
+  }
+  function renderHist() {
+    const done = tasks.filter(t => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 30), g = {};
+    done.forEach(t => { const d = t.doneAt ? ymd(new Date(t.doneAt)) : (t.date || '—'); (g[d] = g[d] || []).push(t); });
+    $('#t-hist').innerHTML = '<div class="lbl mb-1" style="font-size:9px">Historique</div>' + (done.length ? Object.keys(g).map(d => `<div class="text-[10px] text-zinc-400 mt-2">${d === ymd() ? "Aujourd'hui" : d.slice(8) + '/' + d.slice(5, 7)}</div>` + g[d].map(t => `<div class="flex items-center gap-2 py-1 text-[12px] text-blue-100"><span class="text-emerald-400">✓</span><span class="flex-1 min-w-0 truncate">${escH(t.text)}</span><button type="button" data-hr="${t.id}" class="text-cyan-300 text-[11px]">↺ rouvrir</button></div>`).join('')).join('') : "<div class=\"text-xs text-zinc-500\">Rien de terminé pour l'instant.</div>");
+  }
+  $('#t-cal').addEventListener('click', e => {
+    const m = e.target.closest('[data-cm]'), d = e.target.closest('[data-cd]');
+    if (m) { calM = new Date(calM.getFullYear(), calM.getMonth() + +m.dataset.cm, 1); renderCal(); }
+    else if (d) { calSel = calSel === d.dataset.cd ? '' : d.dataset.cd; $('#task-date').value = calSel; renderTasks(); }
+  });
+  $('#t-hist').addEventListener('click', e => { const b = e.target.closest('[data-hr]'); const t = b && tasks.find(x => String(x.id) === b.dataset.hr); if (t) toggleTask(t); });
+  setInterval(() => { if (!document.hidden && $('#tab-tasks').classList.contains('active')) renderTasks(); }, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) renderTasks(); });
+  renderTasks();
+
+  /* ---------- Centre d'applications ---------- */
+  const GR = 'linear-gradient(135deg,#1d4ed8,#0891b2)';
+  const HUB = [
+    ...[['code', '💻', 'Programmation', 'Sites, apps', 'Étudier'], ['anglais', '🌐', 'Anglais', 'Réviser', 'Étudier'], ['devoirs', '📚', 'Devoirs', 'Exercices', 'Étudier'], ['maths', '📐', 'Maths, finance', 'Preuves, code', 'Finance']].map(([k, i, n, d, c]) => ({ id: 'm-' + k, i, n, d, c, run: () => { startFresh(k); go('chat', true); } })),
+    ...[['lab', '∑', 'Labo', 'Monte-Carlo', 'Finance'], ['notes', '★', 'Notes', 'Carnet', 'Productivité'], ['tasks', '✅', 'Tâches', 'Échéances, priorités', 'Productivité'], ['sys', '📊', 'Système', 'Appareil', 'Téléphone'], ['improve', '🧠', 'Évolution', 'Mémoire, règles', 'Lisa']].filter(a => a[0] !== 'lab' || can('lab')).map(([k, i, n, d, c]) => ({ id: 'g-' + k, i, n, d, c, run: () => go(k) })),
+    { id: 'tools', i: '🧮', n: 'Boîte à outils', d: 'Calculs financiers', c: 'Finance', run: () => openTools() },
+    { id: 'set', i: '⚙', n: 'Réglages', d: 'Clé, voix, IA locale', c: 'Lisa', run: () => openSettings() },
+    ...QUICK.map((q, k) => ({ id: 'q-' + k, i: q[0].split(' ')[0], n: q[0].split(' ').slice(1).join(' '), d: 'Action rapide', c: 'Téléphone', run: () => { go('chat'); send(q[1]); } })),
+    ...APPS.map((a, k) => ({ id: 'x-' + k, i: a.i, n: a.n, d: "Ouvre l'outil", c: 'Finance', run: () => window.open(a.u, '_blank', 'noopener') }))
+  ];
+  let hubCat = 'Tous';
+  const hubGet = k => store.get(k, []);
+  function mountHub(root, done) {
+    const cats = ['Tous', 'Favoris', 'Étudier', 'Finance', 'Productivité', 'Téléphone', 'Lisa'];
+    root.innerHTML = '<input type="search" data-hq placeholder="Rechercher une application…" class="fld mb-2"><div class="flex gap-1 overflow-x-auto pb-2" data-hc></div><div class="flex gap-1 overflow-x-auto pb-2" data-hrc></div><div class="grid grid-cols-3 gap-2" data-hg></div>';
+    const q = root.querySelector('[data-hq]'), cs = root.querySelector('[data-hc]'), rc = root.querySelector('[data-hrc]'), g = root.querySelector('[data-hg]');
+    const draw = () => {
+      const fav = hubGet('lisa.fav'), s = q.value.trim().toLowerCase();
+      cs.innerHTML = cats.map(c => `<button type="button" data-c="${c}" class="chip ${c === hubCat ? 'on' : ''}">${c}</button>`).join('');
+      const rec = hubGet('lisa.rec').map(id => HUB.find(a => a.id === id)).filter(Boolean);
+      rc.innerHTML = hubCat === 'Tous' && !s && rec.length ? '<span class="text-[10px] text-zinc-500 self-center">Récents</span>' + rec.map(a => `<button type="button" data-a="${a.id}" class="chip">${a.i} ${escH(a.n)}</button>`).join('') : '';
+      const l = HUB.filter(a => (hubCat === 'Tous' || (hubCat === 'Favoris' ? fav.includes(a.id) : a.c === hubCat)) && (!s || (a.n + ' ' + a.d).toLowerCase().includes(s)));
+      g.innerHTML = l.length ? l.map(a => `<div data-a="${a.id}" role="button" tabindex="0" class="tile !text-center relative cursor-pointer"><span data-f="${a.id}" class="absolute top-1 right-2 text-[13px]">${fav.includes(a.id) ? '⭐' : '☆'}</span><div class="ico" style="background:${GR}">${escH(a.i)}</div><div class="text-xs font-bold text-blue-50">${escH(a.n)}</div><div class="text-[10px] text-zinc-400">${escH(a.d)}</div></div>`).join('') : '<div class="col-span-3 text-center py-8 text-xs text-zinc-500">Aucune application.</div>';
+    };
+    root.onclick = e => {
+      const c = e.target.closest('[data-c]'), f = e.target.closest('[data-f]'), a = e.target.closest('[data-a]');
+      if (c) { hubCat = c.dataset.c; draw(); }
+      else if (f) { const v = hubGet('lisa.fav'); store.set('lisa.fav', v.includes(f.dataset.f) ? v.filter(x => x !== f.dataset.f) : [...v, f.dataset.f]); draw(); }
+      else if (a) { const x = HUB.find(h => h.id === a.dataset.a); if (!x) return; store.set('lisa.rec', [x.id, ...hubGet('lisa.rec').filter(y => y !== x.id)].slice(0, 5)); done && done(); x.run(); }
+    };
+    q.oninput = draw; draw();
+  }
+  mountHub($('#hub-root'));
+  const hubClose = () => { show('#hub-sheet', false); mountHub($('#hub-root')); };
+  $('#hub-btn').onclick = () => { mountHub($('#hub-sheet-body'), hubClose); show('#hub-sheet', true); };
+  $('#hub-close').onclick = hubClose; $('#hub-sheet').addEventListener('click', e => { if (e.target.id === 'hub-sheet') hubClose(); });
+  const syncSend = () => $('#chat-form').classList.toggle('empty', !$('#chat-input').value.trim() && !atts.length);
+  $('#chat-input').addEventListener('input', syncSend); syncSend();
+
+  /* ---------- Lisa vivante : regard, présence, réactions ---------- */
+  { const root = document.documentElement; let last = 0, raf = 0, px = 0, py = 0;
+    const gaze = (x, y) => { root.style.setProperty('--gx', x.toFixed(2)); root.style.setProperty('--gy', y.toFixed(2)); };
+    addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; last = Date.now(); if (!raf) raf = requestAnimationFrame(() => { raf = 0; gaze((px / innerWidth - .5) * 1.8, (py / innerHeight - .5) * 1.2); }); }, { passive: true });
+    setInterval(() => { if (document.hidden || Date.now() - last < 4000) return; gaze((Math.random() - .5) * 1.6, (Math.random() - .5) * .9); }, 3200);
+  }
+  const liveLines = () => {
+    const h = new Date().getHours(), o = tasks.filter(t => !t.done), late = o.filter(isLate).length, td = o.filter(t => t.date === ymd()).length, st = streak(), L = [];
+    if (late) L.push(`⏰ ${late} tâche${late > 1 ? 's' : ''} en retard. On s'en occupe ?`);
+    if (td) L.push(`📌 ${td} tâche${td > 1 ? 's' : ''} pour aujourd'hui.`); else if (o.length) L.push(`📋 ${o.length} tâche${o.length > 1 ? 's' : ''} en cours.`);
+    if (st > 1) L.push(`🔥 ${st} jours d'affilée, continue !`);
+    L.push(h < 12 ? '☀️ Bonne matinée ! Un peu de Python ?' : h < 18 ? "📈 Un modèle Excel cet après-midi ?" : '🌙 Un quiz finance avant de dormir ?');
+    if (!navigator.onLine) L.push(localOK ? '📴 Hors ligne : je réponds avec mon IA locale.' : '📴 Hors ligne : tâches, quiz et outils restent disponibles.');
+    return L;
+  };
+  let liveI = 0;
+  const liveTick = () => { const b = $('#live-line'); if (!b) return; const L = liveLines(); b.classList.add('fade'); setTimeout(() => { b.textContent = L[liveI++ % L.length]; b.classList.remove('fade'); }, 350); };
+  $('#live-line').onclick = () => { const t = $('#live-line').textContent; if (/tâche/.test(t)) go('tasks'); else if (/quiz/.test(t)) { go('chat'); send('quiz finance'); } else go('chat', true); };
+  liveTick(); setInterval(() => { if (!document.hidden) liveTick(); }, 12000);
+  $('#chat-form').addEventListener('submit', () => navigator.vibrate?.(8));
+  new MutationObserver(m => { if (m[0].oldValue?.includes('busy') && !document.body.classList.contains('busy')) { navigator.vibrate?.([10, 40, 10]); const a = $('#avatar-chat'); if (a) { a.classList.remove('perk'); void a.offsetWidth; a.classList.add('perk'); } } }).observe(document.body, { attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+
+  /* ---------- Suivi du visage : Lisa tourne la tête vers toi ---------- */
+  const F = { on: false, v: null, det: null, native: false, stream: null, tgt: { x: 0, y: 0 }, cur: { x: 0, y: 0 }, seen: 0, raf: 0, timer: 0, busy: false };
+  function faceLoop() {
+    F.cur.x += (F.tgt.x - F.cur.x) * .14; F.cur.y += (F.tgt.y - F.cur.y) * .14;
+    const x = F.cur.x, y = F.cur.y, r = document.documentElement.style;
+    r.setProperty('--hy', (x * 14).toFixed(2) + 'deg'); r.setProperty('--hx', (-y * 8).toFixed(2) + 'deg'); r.setProperty('--hz', (x * 3).toFixed(2) + 'deg'); r.setProperty('--tx', (x * 1.5).toFixed(2) + '%'); r.setProperty('--gx', (x * .9).toFixed(2)); r.setProperty('--gy', (y * .6).toFixed(2));
+    F.raf = F.on || Math.abs(x) + Math.abs(y) > .01 ? requestAnimationFrame(faceLoop) : 0;
+  }
+  async function faceStep() {
+    if (F.busy || !F.on || F.v.readyState < 2) return; F.busy = true;
+    try {
+      const bb = F.native ? (await F.det.detect(F.v))[0]?.boundingBox : F.det.detectForVideo(F.v, performance.now()).detections[0]?.boundingBox;
+      if (bb) { const w = F.v.videoWidth, h = F.v.videoHeight, cx = (bb.x ?? bb.originX) + bb.width / 2, cy = (bb.y ?? bb.originY) + bb.height / 2, cl = v => Math.max(-1, Math.min(1, v)); F.tgt.x = cl((.5 - cx / w) * 3); F.tgt.y = cl((cy / h - .5) * 3); F.seen = Date.now(); }
+      else if (Date.now() - F.seen > 1500) F.tgt.x = F.tgt.y = 0;
+    } catch { }
+    F.busy = false;
+  }
+  function stopFace() { F.on = false; clearInterval(F.timer); F.stream?.getTracks().forEach(t => t.stop()); F.stream = null; F.tgt.x = F.tgt.y = 0; if (!F.raf) F.raf = requestAnimationFrame(faceLoop); $('#face-btn')?.classList.remove('acc'); }
+  async function startFace() {
+    if (F.on) return;
+    if (!navigator.mediaDevices?.getUserMedia) return toast('Caméra indisponible ici');
+    try {
+      toast('Activation du suivi du visage…');
+      F.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 320, height: 240 }, audio: false });
+      F.v = document.createElement('video'); F.v.muted = true; F.v.playsInline = true; F.v.srcObject = F.stream; await F.v.play();
+      if (!F.det) {
+        if ('FaceDetector' in window) { F.det = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 }); F.native = true; }
+        else { const B = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14', M = await import(B + '/vision_bundle.mjs'), fs = await M.FilesetResolver.forVisionTasks(B + '/wasm'); F.det = await M.FaceDetector.createFromOptions(fs, { baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite' }, runningMode: 'VIDEO' }); F.native = false; }
+      }
+      F.on = true; F.seen = Date.now(); F.timer = setInterval(faceStep, 90); if (!F.raf) F.raf = requestAnimationFrame(faceLoop);
+      $('#face-btn').classList.add('acc'); toast('Lisa te regarde 👀');
+    } catch (e) { stopFace(); toast(e?.name === 'NotAllowedError' ? 'Autorise la caméra pour Lisa' : 'Suivi du visage indisponible (Internet requis la première fois)'); }
+  }
+  const toggleFace = () => F.on ? stopFace() : startFace();
+  $('#face-btn').onclick = toggleFace;
+  HUB.push({ id: 'face', i: '👁', n: 'Suivi du visage', d: 'Lisa te regarde', c: 'Lisa', run: toggleFace });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && F.on) stopFace(); });
+
+  /* ================= Lisa vivante + extras hors ligne + réponses suggérées ================= */
+  const _e = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const _pick = a => a[Math.floor(Math.random() * a.length)];
+  document.head.appendChild(Object.assign(document.createElement('style'), { textContent:
+    '@keyframes lisabreathe{0%,100%{transform:translateY(0) rotate(0) scale(1)}50%{transform:translateY(-1.1%) rotate(.5deg) scale(1.012)}}' +
+    '@keyframes lisapop{0%{transform:scale(1)}30%{transform:scale(1.045) rotate(-1.2deg)}60%{transform:scale(.99) rotate(1deg)}100%{transform:scale(1)}}' +
+    '.av-stage:not(.sm){animation:lisabreathe 6s ease-in-out infinite;transform-origin:50% 90%}' +
+    '.av-stage.pop{animation:lisapop .9s ease-out 1}' }));
+  const _pop = () => document.querySelectorAll('.av-stage').forEach(a => { a.classList.remove('pop'); void a.offsetWidth; a.classList.add('pop'); setTimeout(() => a.classList.remove('pop'), 1000); });
+
+  /* --- Présence : salutation, réactions et initiatives (au repos seulement) --- */
+  (function () {
+    const H = new Date().getHours(), hi = H < 5 ? 'Bonne nuit' : H < 12 ? 'Bonjour' : H < 18 ? 'Bon après-midi' : 'Bonsoir';
+    let last = Date.now(), lastSay = 0;
+    ['pointerdown', 'keydown', 'touchstart'].forEach(e => addEventListener(e, () => last = Date.now(), { passive: true }));
+    const say = t => { lastSay = Date.now(); try { toast(t); _pop(); navigator.vibrate?.(40); } catch {} };
+    setTimeout(() => say(hi + ' Monsieur 👋 Lisa est en ligne, même sans Internet. Dites « /jour » pour votre bilan.'), 1800);
+    const TIPS = ['💡 Essayez « /repondre » : je propose des réponses à vos WhatsApp.', '📧 « /mail » : je prépare des réponses à vos e-mails.', '🧠 Dites « retiens que… » : je mémorise pour vous, hors ligne.', '🎲 Un peu de pause ? « blague » ou « pile ou face ».', '🌍 « heure à Tokyo » : l\'heure dans le monde, sans réseau.', '🔐 « mot de passe 16 » : j\'en génère un solide, sur l\'appareil.'];
+    setInterval(async () => {
+      if (document.hidden || Date.now() - last < 60000 || Date.now() - lastSay < 180000) return;
+      try {
+        if (P.bat != null && !P.chg && P.bat < 20) return say('🔋 Batterie à ' + P.bat + ' % : pensez à brancher.');
+        if (PB) { const r = await PB.report({ since: store.get('lisa.seen', Date.now() - 36e5) }), n = r.wa.length + (r.gm || []).length + r.sms.length; if (n) return say('📬 ' + n + ' nouveau(x) message(s). Dites « /repondre » pour des réponses prêtes.'); }
+      } catch {}
+      say(_pick(TIPS));
+    }, 30000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - last > 600000) say('👀 Content de vous revoir, Monsieur.'); });
+  })();
+
+  /* --- Réponses suggérées (règles locales + IA locale Gemma si installée) --- */
+  function repl(s) {
+    const q = norm(s || '');
+    if (/merci/.test(q)) return ['Avec plaisir !', 'De rien, content d\'avoir pu aider.', 'Pas de souci 😊'];
+    if (/(dispo|libre|rdv|rendez|reunion|demain|ce soir|quand)/.test(q) && /\?/.test(s)) return ['Oui, je suis disponible. Quelle heure te convient ?', 'Je vérifie mon agenda et je te confirme vite.', 'Désolé, pas dispo. On peut reporter ?'];
+    if (/(ou es|ou etes|t ou|arrive)/.test(q)) return ['J\'arrive dans 10 minutes.', 'Je suis en route, à tout de suite !', 'Je suis un peu en retard, désolé.'];
+    if (/(urgent|appelle|rappelle|call)/.test(q)) return ['Je t\'appelle dans quelques minutes.', 'Je suis occupé, je te rappelle dès que possible.', 'Je t\'appelle tout de suite.'];
+    if (/^(salut|bonjour|bonsoir|coucou|hello|cc|hey)\b/.test(q)) return ['Salut ! Ça va ?', 'Bonjour ! Je te réponds dans un instant.', 'Coucou 👋 Comment vas-tu ?'];
+    if (/(ok|d accord|entendu|parfait|top)\b/.test(q)) return ['Parfait, à tout à l\'heure.', 'Super, merci !', '👍'];
+    if (/\?/.test(s || '')) return ['Bonne question, je reviens vers toi rapidement.', 'Oui.', 'Non, désolé.'];
+    return ['Bien reçu, merci !', 'Merci, je te réponds dans un moment.', '👍'];
+  }
+  function sugPanel(kind, items) {
+    document.getElementById('sugg')?.remove();
+    const p = document.createElement('div'); p.id = 'sugg'; p.className = 'hud';
+    p.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:72vh;overflow:auto;z-index:70';
+    p.innerHTML = '<div class="flex justify-between items-center"><div class="lbl">Réponses suggérées · ' + (kind === 'wa' ? 'WhatsApp' : 'Gmail') + '</div><button type="button" data-x class="chip">✕</button></div>' +
+      items.map((it, i) => '<div class="mt-3"><div class="text-[12px] text-cyan-300">' + _e(it.from) + '</div><div class="text-[12px] opacity-80 mb-1">' + _e(it.s || '(texte non disponible)') + '</div><div class="flex flex-wrap gap-2">' +
+        it.r.map((r, j) => '<button type="button" class="chip" style="white-space:normal;text-align:left" data-i="' + i + '" data-j="' + j + '">' + (it.ai === j ? '✨ ' : '') + _e(r) + '</button>').join('') + '</div></div>').join('');
+    p.addEventListener('click', e => {
+      if (e.target.closest('[data-x]')) return p.remove();
+      const b = e.target.closest('[data-j]'); if (!b) return;
+      const it = items[+b.dataset.i], r = it.r[+b.dataset.j]; p.remove();
+      if (kind === 'wa') { pendingReply = { to: it.from, text: r, t: Date.now() }; go('chat'); lisaSay('Message pour ' + it.from + ' sur WhatsApp : « ' + r + ' »\nConfirmez-vous l\'envoi ? (oui / non)'); }
+      else location.href = 'mailto:?subject=' + encodeURIComponent('Re: ' + (it.s || '')) + '&body=' + encodeURIComponent(r + '\n\nCordialement,');
+    });
+    document.body.appendChild(p);
+  }
+  function suggestCmd(kind) {
+    if (!PB) return "Cette fonction demande l'application Android de Lisa.";
+    PB.report({ since: Date.now() - 864e5 }).then(async r => {
+      const seen = {}, items = [];
+      (kind === 'wa' ? r.wa : (r.gm || [])).slice().reverse().forEach(x => { if (!seen[x.from] && items.length < 6) { seen[x.from] = 1; items.push({ from: x.from, s: x.s || '', r: repl(x.s) }); } });
+      if (!items.length) return lisaSay('Aucun message ' + (kind === 'wa' ? 'WhatsApp' : 'Gmail') + ' récent à qui répondre.');
+      sugPanel(kind, items); _pop();
+      try {
+        const st = LOCAL && await LOCAL.status(); if (!st || !st.ready) return;
+        for (const it of items.slice(0, 3)) {
+          if (!it.s || !document.getElementById('sugg')) continue;
+          const o = await LOCAL.generate({ prompt: 'Tu es Lisa, assistante. Écris une réponse courte, naturelle et polie en français à ce message de ' + it.from + ' : « ' + it.s + ' ». Réponds uniquement par le texte du message.' });
+          const a = String(o.text || '').replace(/^["«\s]+|["»\s]+$/g, '').slice(0, 220);
+          if (a.length > 1) { it.r.unshift(a); it.ai = 0; if (document.getElementById('sugg')) sugPanel(kind, items); }
+        }
+      } catch {}
+    }).catch(() => lisaSay("Activez l'accès aux notifications pour Lisa."));
+    return 'Je prépare des réponses…';
+  }
+
+  /* --- Boîte à outils hors ligne --- */
+  const _U = { km: 1000, m: 1, cm: .01, mi: 1609.344, ft: .3048, kg: 1, g: .001, lb: .45359237, l: 1, gal: 3.78541 };
+  const _A = { kilometres: 'km', kilometre: 'km', metres: 'm', metre: 'm', miles: 'mi', mile: 'mi', pieds: 'ft', pied: 'ft', kilos: 'kg', kilo: 'kg', grammes: 'g', gramme: 'g', livres: 'lb', livre: 'lb', litres: 'l', litre: 'l', gallons: 'gal', gallon: 'gal', celsius: 'c', fahrenheit: 'f', c: 'c', f: 'f' };
+  const _u = s => { s = norm(s).replace(/[°\s]/g, ''); return _A[s] || s; };
+  const _TZ = { tokyo: 'Asia/Tokyo', 'new york': 'America/New_York', paris: 'Europe/Paris', londres: 'Europe/London', dubai: 'Asia/Dubai', pekin: 'Asia/Shanghai', shanghai: 'Asia/Shanghai', 'los angeles': 'America/Los_Angeles', montreal: 'America/Toronto', dakar: 'Africa/Dakar', abidjan: 'Africa/Abidjan', casablanca: 'Africa/Casablanca', sydney: 'Australia/Sydney', moscou: 'Europe/Moscow' };
+  const JOKES = ['Pourquoi les plongeurs plongent-ils en arrière ? Parce que sinon ils tombent dans le bateau.', 'Que fait un crocodile qui surveille la pharmacie ? Il Lacoste.', 'Quel est le comble pour un électricien ? De ne pas être au courant.', 'Pourquoi les poissons détestent l\'ordinateur ? À cause du net.'];
+  const QUOTES = ['« Le succès, c\'est tomber sept fois, se relever huit. »', '« Ce n\'est pas la montagne qui nous épuise, c\'est le caillou dans la chaussure. »', '« Fais de ta vie un rêve, et d\'un rêve une réalité. »', '« La discipline est le pont entre les objectifs et les résultats. »'];
+  function extraCmd(t) {
+    const q = t.toLowerCase().trim().replace(/[.!?]+$/, ''); let m;
+    if (/^\/?(repondre|répondre|suggestions?)$|(suggère|propose|prépare).*réponses?|aide.moi à répondre/.test(q)) return suggestCmd('wa');
+    if (/^\/(mail|gmail)$|^(réponses?|répondre).*(mail|gmail)|^mes réponses mail/.test(q)) return suggestCmd('gm');
+    if (/^\/jour$|^(bilan|ma journée|résumé de ma journée|bonjour lisa)$/.test(q)) {
+      let tk = ''; try { tk = slash('/taches'); } catch {}
+      if (PB) PB.report({ since: Date.now() - 864e5 }).then(r => lisaSay('Messages 24 h : ' + r.wa.length + ' WhatsApp, ' + (r.gm || []).length + ' Gmail, ' + r.sms.length + ' SMS, ' + r.calls.filter(c => c.type !== 'in').length + ' appel(s) manqué(s).')).catch(() => {});
+      return 'Nous sommes le ' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) + (P.bat != null ? ', batterie ' + P.bat + ' %' : '') + '.\n' + (tk || '') + '\nDites « /repondre » pour répondre à vos messages.';
+    }
+    if (/^(pile ou face|lance une pièce)$/.test(q)) return Math.random() < .5 ? '🪙 Pile !' : '🪙 Face !';
+    if (m = q.match(/^(?:lance|jette)\s+(?:un )?dé(?:\s+à)?\s*(\d+)?/)) return '🎲 ' + (1 + Math.floor(Math.random() * Math.max(2, +m[1] || 6)));
+    if (m = q.match(/^(?:génère|genere|crée|cree)?\s*(?:un )?mot de passe\s*(\d+)?$/)) { const n = Math.min(64, Math.max(8, +m[1] || 16)), cs = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*?', a = crypto.getRandomValues(new Uint32Array(n)); return '🔐 ' + Array.from(a, x => cs[x % cs.length]).join('') + '\n(Généré sur l\'appareil, non enregistré.)'; }
+    if (m = q.match(/^([\d.,]+)\s*%\s*de\s*([\d.,\s]+)$/)) { const a = parseFloat(m[1].replace(',', '.')), b = parseFloat(m[2].replace(/\s/g, '').replace(',', '.')); return a + ' % de ' + b + ' = ' + +(a * b / 100).toFixed(4); }
+    if (m = q.match(/^(?:convertis?|combien font)\s+([\d.,]+)\s*°?\s*([a-zéèêû°]+)\s+(?:en|vers)\s+°?([a-zéèêû]+)$/)) {
+      const v = parseFloat(m[1].replace(',', '.')), a = _u(m[2]), b = _u(m[3]);
+      if (a === 'c' && b === 'f') return v + ' °C = ' + +(v * 9 / 5 + 32).toFixed(2) + ' °F';
+      if (a === 'f' && b === 'c') return v + ' °F = ' + +((v - 32) * 5 / 9).toFixed(2) + ' °C';
+      if (_U[a] && _U[b]) return v + ' ' + a + ' = ' + +(v * _U[a] / _U[b]).toFixed(4) + ' ' + b;
+      return 'Conversion non reconnue (km, mi, m, ft, kg, lb, l, gal, °C, °F).';
+    }
+    if (m = q.match(/^heure\s+(?:à|a|au|en|de)\s+(.+)$/)) { const z = _TZ[norm(m[1])]; if (z) return 'À ' + m[1] + ' il est ' + new Date().toLocaleTimeString('fr-FR', { timeZone: z, hour: '2-digit', minute: '2-digit' }).replace(':', ' h ') + '.'; }
+    if (/^(blague|une blague|raconte.moi une blague)$/.test(q)) return '😄 ' + _pick(JOKES);
+    if (/^(citation|motive.moi|motivation)$/.test(q)) return '✨ ' + _pick(QUOTES);
+    if (m = q.match(/^(?:retiens|souviens.toi|mémorise|memorise)(?: que| de)?\s+(.+)$/)) { const a = store.get('lisa.mem', []); a.push({ t: Date.now(), x: m[1] }); store.set('lisa.mem', a.slice(-100)); return '🧠 C\'est retenu : ' + m[1]; }
+    if (/^(qu'est.ce que tu retiens|ma mémoire|mes souvenirs|rappelle.moi tout|\/memoire)$/.test(q)) { const a = store.get('lisa.mem', []); return a.length ? '🧠 Je retiens :\n' + a.slice(-12).map((x, i) => (i + 1) + '. ' + x.x).join('\n') : 'Je ne retiens rien pour l\'instant. Dites « retiens que… ».'; }
+    if (m = q.match(/^(?:oublie|efface)\s+(?:le souvenir |la mémoire )?(\d+)$/)) { const a = store.get('lisa.mem', []).slice(-12), x = a[+m[1] - 1]; if (!x) return 'Numéro inconnu.'; store.set('lisa.mem', store.get('lisa.mem', []).filter(y => y.t !== x.t)); return 'Oublié.'; }
+    return null;
+  }
+  QUICK.push(['💬 Réponses WhatsApp', '/repondre'], ['📧 Réponses Gmail', '/mail'], ['🌅 Mon bilan', '/jour'], ['🧠 Ma mémoire', 'ma mémoire'], ['🎲 Pile ou face', 'pile ou face'], ['🔐 Mot de passe', 'mot de passe 16'], ['😄 Blague', 'blague'], ['✨ Motivation', 'citation']);
+  $('#quick').innerHTML = QUICK.map((x, i) => `<button type="button" data-q="${i}" class="chip">${x[0]}</button>`).join('');
+
 </script>
+<div id="hub-sheet" class="hidden fixed inset-0 z-50 flex items-end bg-black/70"><div class="w-full max-h-[85vh] overflow-y-auto rounded-t-3xl p-4" style="background:#050a16;border-top:1px solid rgba(96,165,250,.3)"><div class="flex items-center justify-between mb-2"><div class="text-base font-bold text-blue-50">Centre d'applications</div><button id="hub-close" type="button" class="cbtn">✕</button></div><div id="hub-sheet-body"></div></div></div>
 </body>
 </html>
