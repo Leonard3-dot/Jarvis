@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - name: Préparer le projet
         run: |
           mkdir -p www
@@ -280,7 +280,6 @@ jobs:
                   c.resolve();
               }
 
-
               @PluginMethod public void alarm(PluginCall c) {
                   Intent i = new Intent(AlarmClock.ACTION_SET_ALARM).putExtra(AlarmClock.EXTRA_HOUR, c.getInt("h", 7)).putExtra(AlarmClock.EXTRA_MINUTES, c.getInt("m", 0)).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
                   launch(i); c.resolve();
@@ -457,6 +456,14 @@ jobs:
           s = open(a, encoding="utf-8").read()
           s = s.replace("</application>", '<uses-native-library android:name="libOpenCL.so" android:required="false"/>\n    </application>', 1)
           open(a, "w", encoding="utf-8").write(s)
+          w = "android/gradle/wrapper/gradle-wrapper.properties"
+          s = open(w, encoding="utf-8").read()
+          s = re.sub(r"gradle-[\d.]+-(bin|all)\.zip", "gradle-8.7-all.zip", s)
+          open(w, "w", encoding="utf-8").write(s)
+          b = "android/build.gradle"
+          s = open(b, encoding="utf-8").read()
+          s = re.sub(r"(com\.android\.tools\.build:gradle:)[\d.]+", r"\g<1>8.5.2", s)
+          open(b, "w", encoding="utf-8").write(s)
           EOF_PY
       - name: Compiler l'APK
         run: |
