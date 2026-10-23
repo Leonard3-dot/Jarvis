@@ -24,13 +24,6 @@ jobs:
           if [ -f manifest.json ]; then cp manifest.json www/; else echo '{"name":"Lisa","short_name":"Lisa","start_url":".","display":"standalone","background_color":"#030610","theme_color":"#030610"}' > www/manifest.json; fi
           npm init -y
           npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/speech-recognition@6
-          npm i -D tailwindcss@3.4.17
-          echo '@tailwind base;' > tw-in.css
-          echo '@tailwind components;' >> tw-in.css
-          echo '@tailwind utilities;' >> tw-in.css
-          npx tailwindcss -i tw-in.css -o www/tw.css --content www/index.html --minify
-          sed -i 's#<script src="https://cdn.tailwindcss.com/3.4.17"></script>#<link rel="stylesheet" href="tw.css">#' www/index.html
-          grep -c 'href="tw.css"' www/index.html
           npx cap init Lisa com.leonard.lisa --web-dir www
           npx cap add android
       - name: Ajouter le plugin Lisa (appels, SMS, WhatsApp)
@@ -201,8 +194,10 @@ jobs:
                       o.put("app", app);
                       o.put("from", title.toString());
                       o.put("t", sbn.getPostTime());
-                      CharSequence tx = n.extras.getCharSequence(Notification.EXTRA_TEXT);
-                      if (tx != null) o.put("s", tx.toString().substring(0, Math.min(120, tx.length())));
+                      {
+                          CharSequence tx = n.extras.getCharSequence(Notification.EXTRA_TEXT);
+                          if (tx != null) o.put("s", tx.toString().substring(0, Math.min(160, tx.length())));
+                      }
                       for (int i = Math.max(0, a.length() - 199); i < a.length(); i++) b.put(a.get(i));
                       b.put(o);
                       sp.edit().putString("notifs", b.toString()).apply();
@@ -214,15 +209,7 @@ jobs:
           cat > android/app/src/main/java/com/leonard/lisa/LisaPhone.java <<'EOF_PHONE'
           package com.leonard.lisa;
 
-          import android.Manifest;
           import android.app.NotificationManager;
-          import android.database.Cursor;
-          import android.provider.AlarmClock;
-          import android.provider.ContactsContract;
-          import com.getcapacitor.JSObject;
-          import com.getcapacitor.PermissionState;
-          import com.getcapacitor.annotation.Permission;
-          import com.getcapacitor.annotation.PermissionCallback;
           import android.content.ContentResolver;
           import android.content.Context;
           import android.content.Intent;
@@ -231,13 +218,20 @@ jobs:
           import android.media.AudioManager;
           import android.net.Uri;
           import android.provider.Settings;
+          import android.database.Cursor;
+          import android.provider.AlarmClock;
+          import android.provider.ContactsContract;
+          import androidx.core.content.ContextCompat;
+          import com.getcapacitor.JSObject;
           import com.getcapacitor.Plugin;
           import com.getcapacitor.PluginCall;
           import com.getcapacitor.PluginMethod;
           import com.getcapacitor.annotation.CapacitorPlugin;
+          import com.getcapacitor.annotation.Permission;
+          import com.getcapacitor.annotation.PermissionCallback;
 
           /** Contrôles du téléphone, déclenchés uniquement par une commande de l'utilisateur. */
-          @CapacitorPlugin(name = "LisaPhone", permissions = {@Permission(strings = {Manifest.permission.READ_CONTACTS}, alias = "contacts")})
+          @CapacitorPlugin(name = "LisaPhone", permissions = {@Permission(strings = {android.Manifest.permission.READ_CONTACTS}, alias = "contacts")})
           public class LisaPhone extends Plugin {
               private Context ctx() { return getContext(); }
               private void launch(Intent i) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); ctx().startActivity(i); }
@@ -286,6 +280,41 @@ jobs:
                   c.resolve();
               }
 
+
+              @PluginMethod public void alarm(PluginCall c) {
+                  Intent i = new Intent(AlarmClock.ACTION_SET_ALARM).putExtra(AlarmClock.EXTRA_HOUR, c.getInt("h", 7)).putExtra(AlarmClock.EXTRA_MINUTES, c.getInt("m", 0)).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                  launch(i); c.resolve();
+              }
+
+              @PluginMethod public void timer(PluginCall c) {
+                  Intent i = new Intent(AlarmClock.ACTION_SET_TIMER).putExtra(AlarmClock.EXTRA_LENGTH, c.getInt("seconds", 60)).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                  launch(i); c.resolve();
+              }
+
+              @PluginMethod public void call(PluginCall c) {
+                  if (ContextCompat.checkSelfPermission(ctx(), android.Manifest.permission.READ_CONTACTS) != android.content.pm.PackageManager.PERMISSION_GRANTED) { requestPermissionForAlias("contacts", c, "callPerm"); return; }
+                  doCall(c);
+              }
+
+              @PermissionCallback private void callPerm(PluginCall c) {
+                  if (ContextCompat.checkSelfPermission(ctx(), android.Manifest.permission.READ_CONTACTS) == android.content.pm.PackageManager.PERMISSION_GRANTED) doCall(c); else c.reject("permission");
+              }
+
+              /** Cherche le contact et ouvre le composeur : l'utilisateur touche lui-même le bouton d'appel. */
+              private void doCall(PluginCall c) {
+                  String name = c.getString("name", "");
+                  try (Cursor q = ctx().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                          new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER},
+                          ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " LIKE ?", new String[]{"%" + name + "%"}, null)) {
+                      if (q != null && q.moveToFirst()) {
+                          JSObject o = new JSObject(); o.put("name", q.getString(0));
+                          launch(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(q.getString(1)))));
+                          c.resolve(o); return;
+                      }
+                  } catch (Exception e) { c.reject(String.valueOf(e.getMessage())); return; }
+                  c.reject("introuvable");
+              }
+
               @PluginMethod public void open(PluginCall c) {
                   String a;
                   switch (c.getString("page", "main")) {
@@ -298,61 +327,6 @@ jobs:
                   }
                   launch(new Intent(a)); c.resolve();
               }
-
-              private boolean go(Intent i) { try { launch(i); return true; } catch (Exception e) { return false; } }
-
-              @PluginMethod public void alarm(PluginCall c) {
-                  Intent i = new Intent(AlarmClock.ACTION_SET_ALARM).putExtra(AlarmClock.EXTRA_HOUR, c.getInt("h", 7).intValue()).putExtra(AlarmClock.EXTRA_MINUTES, c.getInt("m", 0).intValue()).putExtra(AlarmClock.EXTRA_MESSAGE, c.getString("label", "Lisa")).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-                  if (go(i)) c.resolve(); else c.reject("indisponible");
-              }
-
-              @PluginMethod public void timer(PluginCall c) {
-                  Intent i = new Intent(AlarmClock.ACTION_SET_TIMER).putExtra(AlarmClock.EXTRA_LENGTH, c.getInt("seconds", 60).intValue()).putExtra(AlarmClock.EXTRA_MESSAGE, c.getString("label", "Lisa")).putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-                  if (go(i)) c.resolve(); else c.reject("indisponible");
-              }
-
-              @PluginMethod public void call(PluginCall c) {
-                  if (getPermissionState("contacts") != PermissionState.GRANTED) { requestPermissionForAlias("contacts", c, "callPerm"); return; }
-                  doCall(c);
-              }
-              @PermissionCallback private void callPerm(PluginCall c) {
-                  if (getPermissionState("contacts") == PermissionState.GRANTED) doCall(c); else c.reject("permission");
-              }
-              private void doCall(PluginCall c) {
-                  Uri u = Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI, Uri.encode(c.getString("name", "")));
-                  try (Cursor q = ctx().getContentResolver().query(u, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME}, null, null, null)) {
-                      if (q != null && q.moveToFirst()) {
-                          JSObject o = new JSObject(); o.put("name", q.getString(1));
-                          if (go(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(q.getString(0)))))) { c.resolve(o); return; }
-                      }
-                  } catch (Exception e) { c.reject(e.getMessage()); return; }
-                  c.reject("introuvable");
-              }
-
-              private android.speech.tts.TextToSpeech tts;
-
-              @PluginMethod public void speak(final PluginCall c) {
-                  final String text = c.getString("text", ""), lang = c.getString("lang", "fr-FR");
-                  final float rate = c.getFloat("rate", 1.0f);
-                  final Runnable say = () -> {
-                      tts.setLanguage(java.util.Locale.forLanguageTag(lang));
-                      tts.setSpeechRate(rate);
-                      tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
-                          @Override public void onStart(String u) {}
-                          @Override public void onDone(String u) { c.resolve(); }
-                          @Override public void onError(String u) { c.reject("tts"); }
-                          @Override public void onStop(String u, boolean interrupted) { c.resolve(); }
-                      });
-                      tts.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, String.valueOf(System.nanoTime()));
-                  };
-                  if (tts == null) {
-                      tts = new android.speech.tts.TextToSpeech(ctx(), status -> {
-                          if (status == android.speech.tts.TextToSpeech.SUCCESS) say.run(); else { tts = null; c.reject("tts"); }
-                      });
-                  } else say.run();
-              }
-
-              @PluginMethod public void stopSpeak(PluginCall c) { if (tts != null) tts.stop(); c.resolve(); }
           }
           EOF_PHONE
           mkdir -p $(dirname android/app/src/main/java/com/leonard/lisa/MainActivity.java)
@@ -374,12 +348,116 @@ jobs:
           cat > /tmp/patch_manifest.py <<'EOF_PATCH'
           p = "android/app/src/main/AndroidManifest.xml"
           s = open(p, encoding="utf-8").read()
-          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>\n    '
+          perms = '<uses-permission android:name="android.permission.READ_CALL_LOG" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.WRITE_SETTINGS" />\n    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>\n    '
           svc = '<service android:name=".LisaNotifService" android:exported="false" android:label="Lisa" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"><intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter></service>\n    '
           s = s.replace("<application", perms + "<application", 1)
           s = s.replace("</application>", svc + "</application>", 1)
           open(p, "w", encoding="utf-8").write(s)
           EOF_PATCH
+      - name: Ajouter l'IA locale (bloc à retirer en entier si le build échoue)
+        run: |
+          cat > android/app/src/main/java/com/leonard/lisa/LisaLocalAI.java <<'EOF_LOCAL'
+          package com.leonard.lisa;
+
+          import android.app.Activity;
+          import android.content.Intent;
+          import android.net.Uri;
+          import androidx.activity.result.ActivityResult;
+          import com.getcapacitor.JSObject;
+          import com.getcapacitor.Plugin;
+          import com.getcapacitor.PluginCall;
+          import com.getcapacitor.PluginMethod;
+          import com.getcapacitor.annotation.ActivityCallback;
+          import com.getcapacitor.annotation.CapacitorPlugin;
+          import com.google.mediapipe.tasks.genai.llminference.LlmInference;
+          import java.io.File;
+          import java.io.FileOutputStream;
+          import java.io.InputStream;
+          import java.io.OutputStream;
+
+          /** IA locale : modèle Gemma .task copié dans le stockage privé de l'app, aucune donnée ne sort du téléphone. */
+          @CapacitorPlugin(name = "LisaLocalAI")
+          public class LisaLocalAI extends Plugin {
+              private LlmInference llm;
+
+              private File model() { return new File(getContext().getFilesDir(), "model.task"); }
+
+              private JSObject st() {
+                  File f = model();
+                  JSObject o = new JSObject();
+                  o.put("ready", f.exists() && f.length() > 100000000L);
+                  o.put("mb", f.exists() ? f.length() / 1048576L : 0);
+                  return o;
+              }
+
+              private synchronized void closeLlm() { if (llm != null) { llm.close(); llm = null; } }
+
+              @PluginMethod public void status(PluginCall c) { c.resolve(st()); }
+
+              @PluginMethod public void pickModel(PluginCall c) {
+                  Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                  i.addCategory(Intent.CATEGORY_OPENABLE);
+                  i.setType("*/*");
+                  startActivityForResult(c, i, "picked");
+              }
+
+              @ActivityCallback private void picked(PluginCall c, ActivityResult r) {
+                  if (c == null) return;
+                  if (r.getResultCode() != Activity.RESULT_OK || r.getData() == null || r.getData().getData() == null) { c.reject("annule"); return; }
+                  final Uri u = r.getData().getData();
+                  new Thread(() -> {
+                      try {
+                          closeLlm();
+                          try (InputStream in = getContext().getContentResolver().openInputStream(u); OutputStream out = new FileOutputStream(model())) {
+                              byte[] b = new byte[1 << 16]; int n;
+                              while ((n = in.read(b)) > 0) out.write(b, 0, n);
+                          }
+                          c.resolve(st());
+                      } catch (Exception e) { model().delete(); c.reject(String.valueOf(e.getMessage())); }
+                  }).start();
+              }
+
+              @PluginMethod public void generate(PluginCall c) {
+                  final String p = c.getString("prompt", "");
+                  if (p.isEmpty() || !model().exists()) { c.reject("modele absent"); return; }
+                  new Thread(() -> {
+                      try {
+                          synchronized (this) {
+                              if (llm == null) {
+                                  LlmInference.LlmInferenceOptions o = LlmInference.LlmInferenceOptions.builder()
+                                      .setModelPath(model().getAbsolutePath()).setMaxTokens(1536).build();
+                                  llm = LlmInference.createFromOptions(getContext(), o);
+                              }
+                              JSObject out = new JSObject();
+                              out.put("text", llm.generateResponse(p));
+                              c.resolve(out);
+                          }
+                      } catch (Throwable e) { c.reject(String.valueOf(e.getMessage())); }
+                  }).start();
+              }
+
+              @PluginMethod public void unload(PluginCall c) { closeLlm(); c.resolve(); }
+          }
+          EOF_LOCAL
+          python3 - <<'EOF_PY'
+          import re
+          g = "android/variables.gradle"
+          s = open(g, encoding="utf-8").read()
+          s = re.sub(r"minSdkVersion\s*=\s*\d+", "minSdkVersion = 24", s)
+          open(g, "w", encoding="utf-8").write(s)
+          g = "android/app/build.gradle"
+          s = open(g, encoding="utf-8").read()
+          s = s.replace("dependencies {", "dependencies {\n    implementation 'com.google.mediapipe:tasks-genai:0.10.27'", 1)
+          open(g, "w", encoding="utf-8").write(s)
+          m = "android/app/src/main/java/com/leonard/lisa/MainActivity.java"
+          s = open(m, encoding="utf-8").read()
+          s = s.replace("registerPlugin(LisaPhone.class);", "registerPlugin(LisaPhone.class);\n        registerPlugin(LisaLocalAI.class);", 1)
+          open(m, "w", encoding="utf-8").write(s)
+          a = "android/app/src/main/AndroidManifest.xml"
+          s = open(a, encoding="utf-8").read()
+          s = s.replace("</application>", '<uses-native-library android:name="libOpenCL.so" android:required="false"/>\n    </application>', 1)
+          open(a, "w", encoding="utf-8").write(s)
+          EOF_PY
       - name: Compiler l'APK
         run: |
           python3 /tmp/patch_manifest.py
